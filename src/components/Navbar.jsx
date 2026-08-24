@@ -26,30 +26,28 @@ export default function Navbar() {
       {/* Outer fixed wrapper — always full viewport width, centers the pill */}
       <div
         className="navbar-themed fixed top-0 left-0 right-0 z-50 flex justify-center"
-        style={{ paddingTop: isScrolled ? '14px' : '0px', transition: 'padding-top 0.25s cubic-bezier(0.4,0,0.2,1)' }}
+        style={{ paddingTop: '12px', transition: 'padding-top 0.25s cubic-bezier(0.4,0,0.2,1)' }}
       >
         <motion.div
           layout
-          transition={{ duration: 0.25, ease: [0.4, 0, 0.2, 1] }}
-          className="flex items-center overflow-hidden"
+          transition={{ duration: 0.3, ease: [0.4, 0, 0.2, 1] }}
+          className="liquid-glass-nav flex items-center overflow-hidden"
           style={{
-            borderRadius: isScrolled ? '9999px' : '0px',
-            background: isScrolled ? '#0a0a0a' : 'transparent',
-            backdropFilter: isScrolled ? 'blur(24px)' : 'none',
-            paddingLeft: isScrolled ? '40px' : 'clamp(20px, 5vw, 60px)',
-            paddingRight: isScrolled ? '32px' : 'clamp(20px, 5vw, 60px)',
-            paddingTop: isScrolled ? '16px' : '18px',
-            paddingBottom: isScrolled ? '16px' : '18px',
-            width: isScrolled ? 'min(800px, 90vw)' : '100%',
-            maxWidth: isScrolled ? 'none' : '1536px',
-            gap: isScrolled ? '36px' : undefined,
+            borderRadius: '9999px',
+            paddingLeft: isScrolled ? '20px' : '28px',
+            paddingRight: isScrolled ? '8px' : '10px',
+            paddingTop: '6px',
+            paddingBottom: '6px',
+            width: isScrolled ? 'min(560px, 86vw)' : 'min(680px, 90vw)',
+            maxWidth: '740px',
+            gap: isScrolled ? '20px' : '28px',
             justifyContent: 'space-between',
-            transition: 'border-radius 0.25s cubic-bezier(0.4,0,0.2,1), background 0.25s ease, box-shadow 0.25s ease, padding 0.25s ease, border 0.25s ease, width 0.25s ease',
+            transition: 'border-radius 0.3s cubic-bezier(0.4,0,0.2,1), padding 0.3s ease, width 0.3s cubic-bezier(0.4,0,0.2,1), gap 0.3s ease',
           }}
         >
           {/* Logo — fades between icon and full logo */}
           <Link href="/" className="flex-shrink-0 flex items-center">
-            <div className="relative" style={{ width: isScrolled ? '36px' : '110px', height: isScrolled ? '36px' : '32px', transition: 'width 0.25s cubic-bezier(0.4,0,0.2,1), height 0.25s cubic-bezier(0.4,0,0.2,1)' }}>
+            <div className="relative flex items-center justify-center" style={{ width: isScrolled ? '28px' : '88px', height: '28px', transition: 'width 0.3s cubic-bezier(0.4,0,0.2,1)' }}>
               {/* Favicon — shown when scrolled */}
               <img
                 alt="Antbox"
@@ -57,39 +55,32 @@ export default function Navbar() {
                 className="absolute inset-0 h-full w-auto object-contain transition-opacity duration-300"
                 style={{ opacity: isScrolled ? 1 : 0, mixBlendMode: 'screen' }}
               />
-              {/* Full dark logo — Corporate theme */}
-              <img
-                alt="Antbox"
-                src="/antboxlogo.png"
-                className="logo-corporate absolute inset-0 h-full w-auto object-contain transition-opacity duration-300"
-                style={{ opacity: isScrolled ? 0 : 1 }}
-              />
-              {/* Full white logo — Candidate theme */}
+              {/* Full white logo */}
               <img
                 alt="Antbox"
                 src="/new-white-ant.png"
-                className="logo-candidate absolute inset-0 h-full w-auto object-contain transition-opacity duration-300"
+                className="absolute inset-0 h-full w-auto object-contain transition-opacity duration-300"
                 style={{ opacity: isScrolled ? 0 : 1 }}
               />
             </div>
           </Link>
 
           {/* Nav group — Links and CTA Button */}
-          <div className="hidden md:flex items-center" style={{ gap: isScrolled ? '36px' : '28px', transition: 'gap 0.25s ease' }}>
-            <nav className="flex items-center" style={{ gap: isScrolled ? '32px' : '28px', transition: 'gap 0.25s ease' }}>
+          <div className="hidden md:flex items-center" style={{ gap: isScrolled ? '20px' : '24px', transition: 'gap 0.25s ease' }}>
+            <nav className="flex items-center" style={{ gap: '8px' }}>
               <Link
-                className="navbar-link font-label-sm text-label-sm transition-colors duration-200 whitespace-nowrap"
-                style={{ color: isScrolled ? 'rgba(255,255,255,0.85)' : undefined, fontSize: '1.05rem', fontWeight: 500 }}
+                className="liquid-glass-link navbar-link whitespace-nowrap"
+                style={{ fontSize: '0.92rem', fontWeight: 500, padding: '0.35rem 0.8rem' }}
                 href="/about"
               >About</Link>
               <Link
-                className="navbar-link font-label-sm text-label-sm transition-colors duration-200 whitespace-nowrap"
-                style={{ color: isScrolled ? 'rgba(255,255,255,0.85)' : undefined, fontSize: '1.05rem', fontWeight: 500 }}
+                className="liquid-glass-link navbar-link whitespace-nowrap"
+                style={{ fontSize: '0.92rem', fontWeight: 500, padding: '0.35rem 0.8rem' }}
                 href="/resources"
               >Resources</Link>
-
             </nav>
-            <button className="bg-[#8e43ac] text-white hover:bg-[#702f8a] font-semibold rounded-full transition-all active:scale-95 duration-150 ease-in-out whitespace-nowrap flex-shrink-0 hidden md:inline-flex shadow-lg shadow-purple-500/30 items-center gap-2" style={{ fontSize: '1.05rem', letterSpacing: '0.01em', padding: isScrolled ? '0.8rem 2rem' : '0.875rem 2rem' }}>
+
+            <button className="liquid-glass-btn text-white font-semibold rounded-full active:scale-95 whitespace-nowrap flex-shrink-0 hidden md:inline-flex items-center gap-1.5" style={{ fontSize: '0.9rem', letterSpacing: '0.01em', padding: '0.52rem 1.3rem' }}>
               Enter Factory →
             </button>
           </div>
@@ -98,7 +89,7 @@ export default function Navbar() {
           <button
             onClick={toggleDrawer}
             className="navbar-icon-btn transition-colors duration-200 active:scale-95 md:hidden"
-            style={{ color: isScrolled ? '#fff' : undefined }}
+            style={{ color: '#fff' }}
           >
             <span className="material-symbols-outlined" style={{ fontVariationSettings: "'FILL' 0" }}>menu</span>
           </button>
