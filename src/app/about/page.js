@@ -84,31 +84,31 @@ export default function About() {
       title: "COOK IN THE GLASS KITCHEN", 
       desc: "Nothing great is made behind closed doors. We share the work raw, take the heat in the open, and plate the credit where everyone can see it.",
       bg: "#5BE7C4",
-      image: "/value-glass-kitchen.jpg"
+      image: "https://ibb.co/ycmdkdrH"
     },
     { 
       title: "THINK NAPKIN FIRST", 
       desc: "If you can't explain it simply, you don't understand it well enough. Clarity comes before action, and thinking comes before doing.",
       bg: "#FF6BE6",
-      image: "/value-napkin-first.jpg"
+      image: "https://ibb.co/352WpJSw"
     },
     { 
       title: "RESPECT THE GAME CLOCK", 
       desc: "Time is a competitive advantage. Move with urgency, honor commitments, and deliver before opportunities expire.",
       bg: "#FFD644",
-      image: "/value-game-clock.jpg"
+      image: "https://ibb.co/NwPnSwW"
     },
     { 
       title: "PROOF OF WORK", 
       desc: "Talk is a claim. Work is the evidence. We don't describe what we did, we show what shipped, and it speaks for itself.",
       bg: "#C56BFF",
-      image: "/value-proof-work.jpg"
+      image: "https://ibb.co/wFqn4z2w"
     },
     { 
       title: "OWN THE WHOLE BOX", 
       desc: "The best seat in the house comes with the whole scoreboard. Touch any part of the work, and all of it becomes yours - every cell carried home.",
       bg: "#FF8359",
-      image: "/value-own-box.jpg"
+      image: "https://ibb.co/wNXSYJWV"
     }
   ];
 
@@ -185,7 +185,7 @@ export default function About() {
 
   return (
     <main className={styles.main}>
-      {/* ── Section 1: Operators Banner ── */}
+      {/* ── Section 1: Operators Banner (Reference Style) ── */}
       <div className={styles.operatorsHeroSection}>
         <div className={styles.operatorsHeaderBlock}>
           <h2 className={styles.operatorsTitle}>
@@ -198,9 +198,10 @@ export default function About() {
 
         <div className={styles.operatorsImageFrame}>
           <Image
-            src="/team-photo-real-v2.jpg"
+            src="https://ibb.co/4g2FDLRp"
             alt="AntBox Team Operators"
             fill
+            unoptimized
             priority
             className={styles.operatorsImage}
           />
@@ -229,7 +230,7 @@ export default function About() {
         </div>
       </div>
 
-      {/* ── Section 3: Core Values (Sequential Overlapping Cards) ── */}
+      {/* ── Section 3: Core Values (Sequential Scroll 3D Cards) ── */}
       <div ref={valuesSectionRef} className={styles.valuesSection}>
         <div className={styles.heroQuoteContainer}>
           <div className={styles.valuesMeta}>
@@ -268,7 +269,8 @@ export default function About() {
                   <Image 
                     src={value.image} 
                     alt={value.title} 
-                    fill 
+                    fill
+                    unoptimized
                     className={styles.inspoImage}
                   />
                 </div>
@@ -290,9 +292,10 @@ export default function About() {
             <h2 className={styles.manifestoTitle}>Founders Manifesto</h2>
             <div className={styles.founderPhotoWrapper}>
               <Image 
-                src="/founder-photo-portrait.jpg" 
+                src="https://ibb.co/Pzm29yxB"
                 alt="Founder Photo" 
                 fill
+                unoptimized
                 className={styles.founderPhoto}
               />
             </div>
@@ -317,18 +320,22 @@ export default function About() {
         </div>
       </div>
 
-      {/* ── Section 5: Culture Section ── */}
+      {/* ── Section 4: Culture Section (Full Overlapping Sheet) ── */}
       <div className={`${styles.cultureOverlapWrapper} ${styles.reveal}`}>
         <div className={styles.cultureSection}>
           <div className={styles.cultureHeroCard}>
+
+            {/* Background center image */}
             <Image
-              src="/culture-hero-group.jpg"
+              src="https://ibb.co/F4S18bVT"
               alt="Life at AntBox"
               fill
+              unoptimized
               className={styles.cultureHeroImage}
             />
             <div className={styles.cultureHeroOverlay}></div>
 
+            {/* Big stacked heading left */}
             <div className={styles.cultureTextBlock}>
               <h2 className={styles.cultureStackedHeading}>
                 <span>LIFE</span>
@@ -337,7 +344,9 @@ export default function About() {
               </h2>
             </div>
 
+            {/* Bottom row */}
             <div className={styles.cultureBottomRow}>
+              {/* Subtitle + CTA bottom-left */}
               <div className={styles.cultureSubGroup}>
                 <p className={styles.cultureSubtitle}>
                   But we don't burn out doing it.
@@ -350,9 +359,13 @@ export default function About() {
                 </a>
               </div>
             </div>
+
           </div>
         </div>
       </div>
+
+
+
     </main>
   );
 }
