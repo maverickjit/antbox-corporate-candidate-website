@@ -1,9 +1,8 @@
 "use client";
-import React, { useRef, useEffect, useState, useCallback } from 'react';
+import React, { useRef, useEffect, useState } from 'react';
 import Image from 'next/image';
 import { motion, useScroll, useTransform, useMotionTemplate, AnimatePresence } from 'framer-motion';
 import AnimatedNumber from '@/components/ui/animated-number';
-import { useRouter } from 'next/navigation';
 
 /* ---- Reusable View Toggle ---- */
 // This renders inside the navbar row via a portal-like fixed overlay
@@ -65,6 +64,98 @@ const cardData = [
   { title: 'ZERO GUESSWORK', desc: 'Data-backed hiring decisions replace gut-feel screening every time.' },
 ];
 
+// Each card in the visible grid — fades in together
+function BenefitCard({ card, index, totalCards, scrollYProgress }) {
+  // Each card staggered fade-in
+  const cardOpacity = useTransform(
+    scrollYProgress,
+    [0, 0.15 + index * 0.04, 0.35 + index * 0.04],
+    [0, 0, 1]
+  );
+  const cardY = useTransform(
+    scrollYProgress,
+    [0, 0.15 + index * 0.04, 0.35 + index * 0.04],
+    [40, 40, 0]
+  );
+
+  const isTop = index === totalCards - 1;
+
+  return (
+    <motion.div
+      style={{
+        opacity: cardOpacity,
+        y: cardY,
+        borderRadius: '1.25rem',
+        overflow: 'hidden',
+        boxShadow: isTop
+          ? '0 0 40px 10px rgba(142,67,172,0.35), 0 20px 60px rgba(0,0,0,0.5)'
+          : '0 8px 32px rgba(0,0,0,0.4)',
+        position: 'relative',
+        cursor: 'default',
+      }}
+    >
+      <div style={{
+        minHeight: '220px',
+        background: isTop
+          ? 'linear-gradient(145deg, #561b6e 0%, #2b0c37 100%)'
+          : 'linear-gradient(145deg, #2a2a2e 0%, #1a1a1e 100%)',
+        display: 'flex',
+        flexDirection: 'column',
+        justifyContent: 'space-between',
+        padding: '2rem 1.75rem',
+        position: 'relative',
+        overflow: 'hidden',
+        border: isTop
+          ? '1px solid rgba(234,182,255,0.45)'
+          : '1px solid rgba(247,245,238,0.12)',
+      }}>
+        {/* Dot grid */}
+        <div style={{
+          position: 'absolute', inset: 0,
+          backgroundImage: 'radial-gradient(circle, rgba(255,255,255,0.05) 1px, transparent 1px)',
+          backgroundSize: '20px 20px',
+          pointerEvents: 'none',
+        }} />
+
+        {/* Title content */}
+        <div style={{ position: 'relative', zIndex: 1 }}>
+          <h4 style={{
+            margin: '0 0 0.5rem',
+            color: isTop ? '#fff' : 'var(--cream)',
+            fontFamily: 'Poppins, sans-serif',
+            fontSize: '1rem',
+            fontWeight: 800,
+            letterSpacing: '0.07em',
+            lineHeight: 1.3,
+          }}>{card.title}</h4>
+          <p style={{
+            margin: 0,
+            color: isTop ? '#e9c8ff' : '#a3a3a3',
+            fontSize: '0.88rem',
+            lineHeight: 1.6,
+          }}>{card.desc}</p>
+        </div>
+
+        {/* Number badge — bottom right, transparent */}
+        <span style={{
+          position: 'absolute',
+          right: '1.25rem',
+          bottom: '1.25rem',
+          fontSize: '2.5rem',
+          fontWeight: 900,
+          fontFamily: 'Poppins, sans-serif',
+          color: 'rgba(255,255,255,0.07)',
+          letterSpacing: '-0.04em',
+          lineHeight: 1,
+          zIndex: 0,
+          pointerEvents: 'none',
+          userSelect: 'none',
+        }}>0{index + 1}</span>
+      </div>
+    </motion.div>
+  );
+}
+
 function SolutionsSection() {
   const sectionRef = useRef(null);
   const { scrollYProgress } = useScroll({
@@ -72,37 +163,21 @@ function SolutionsSection() {
     offset: ["start start", "end end"]
   });
 
-  const messageOpacity = useTransform(scrollYProgress, [0, 0.08, 0.18, 0.28], [0, 1, 1, 0]);
-  const messageScale = useTransform(scrollYProgress, [0, 0.08, 0.18, 0.28], [0.85, 1, 1, 1.05]);
-  const titleOpacity = useTransform(scrollYProgress, [0.28, 0.36], [0, 1]);
+  // Phase 1: "We Built Antbox" message slides up smoothly
+  const messageY = useTransform(scrollYProgress, [0, 0.12, 0.22], ["40vh", "0vh", "-40vh"]);
+  const messageOpacity = useTransform(scrollYProgress, [0, 0.08, 0.18, 0.22], [0, 1, 1, 0]);
 
-  const innerLeftX = useTransform(scrollYProgress, [0.32, 0.50], [0, -210]);
-  const innerLeftR = useTransform(scrollYProgress, [0.32, 0.50], [0, -8]);
-  const innerRightX = useTransform(scrollYProgress, [0.32, 0.50], [0, 210]);
-  const innerRightR = useTransform(scrollYProgress, [0.32, 0.50], [0, 8]);
-  const outerLeftX = useTransform(scrollYProgress, [0.34, 0.54], [0, -420]);
-  const outerLeftR = useTransform(scrollYProgress, [0.34, 0.54], [0, -18]);
-  const outerLeftY = useTransform(scrollYProgress, [0.34, 0.54], [0, 35]);
-  const outerRightX = useTransform(scrollYProgress, [0.34, 0.54], [0, 420]);
-  const outerRightR = useTransform(scrollYProgress, [0.34, 0.54], [0, 18]);
-  const outerRightY = useTransform(scrollYProgress, [0.34, 0.54], [0, 35]);
+  // Phase 2: Cards grid fade in
+  const deckOpacity = useTransform(scrollYProgress, [0.22, 0.3], [0, 1]);
+  const deckScale = useTransform(scrollYProgress, [0.22, 0.3], [0.92, 1]);
 
-  const centerBlur = useTransform(scrollYProgress, [0.32, 0.42], [0, 0]);
-  const centerOp = useTransform(scrollYProgress, [0.32, 0.42], [0.8, 1]);
-  const centerGlow = useTransform(scrollYProgress, [0.32, 0.50], [0, 1]);
-
-  const innerBlur = useTransform(scrollYProgress, [0.50, 0.62], [0, 0]);
-  const innerOp = useTransform(scrollYProgress, [0.50, 0.62], [0.7, 1]);
-  const innerGlow = useTransform(scrollYProgress, [0.50, 0.64], [0, 1]);
-
-  const outerBlur = useTransform(scrollYProgress, [0.62, 0.76], [0, 0]);
-  const outerOp = useTransform(scrollYProgress, [0.62, 0.76], [0.6, 1]);
-  const outerGlow = useTransform(scrollYProgress, [0.62, 0.78], [0, 1]);
+  const totalCards = cardData.length;
 
   return (
     <section className="solutions-section-pinned" ref={sectionRef}>
       <div className="solutions-sticky-inner">
-        <motion.div className="solutions-fullpage-msg" style={{ opacity: messageOpacity, scale: messageScale }}>
+        {/* Phase 1: big message */}
+        <motion.div className="solutions-fullpage-msg" style={{ opacity: messageOpacity, y: messageY }}>
           <h3>
             <span className="msg-line">WE BUILT ANTBOX</span>
             <span className="msg-line msg-line-straight">TO END THIS</span>
@@ -110,16 +185,40 @@ function SolutionsSection() {
           </h3>
         </motion.div>
 
-        <motion.div className="solutions-cards-layer" style={{ opacity: titleOpacity }}>
-          <h2 className="section-title heading-serif text-center" style={{ color: '#fff' }}>
+        {/* Phase 2: Cards grid */}
+        <motion.div
+          style={{ opacity: deckOpacity, scale: deckScale, width: '100%', display: 'flex', flexDirection: 'column', alignItems: 'center', padding: '0 1.5rem' }}
+        >
+          <h2 className="section-title heading-serif text-center" style={{ color: '#fff', marginBottom: '2rem' }}>
             WHAT WE <span style={{ color: 'var(--accent-purple)' }}>BRING</span>
           </h2>
-          <div className="cards-center-layout">
-            <GlowCard card={cardData[3]} motions={{ x: outerLeftX, y: outerLeftY, rotate: outerLeftR, blur: outerBlur, opacity: outerOp, glow: outerGlow }} isCenter={false} />
-            <GlowCard card={cardData[2]} motions={{ x: innerLeftX, y: 0, rotate: innerLeftR, blur: innerBlur, opacity: innerOp, glow: innerGlow }} isCenter={false} />
-            <GlowCard card={cardData[0]} motions={{ x: 0, y: 0, rotate: 0, blur: centerBlur, opacity: centerOp, glow: centerGlow }} isCenter={true} />
-            <GlowCard card={cardData[1]} motions={{ x: innerRightX, y: 0, rotate: innerRightR, blur: innerBlur, opacity: innerOp, glow: innerGlow }} isCenter={false} />
-            <GlowCard card={cardData[4]} motions={{ x: outerRightX, y: outerRightY, rotate: outerRightR, blur: outerBlur, opacity: outerOp, glow: outerGlow }} isCenter={false} />
+
+          {/* 5-card grid — all visible at once */}
+          {/* Row 1: 3 cards */}
+          <div style={{ display: 'flex', gap: '1rem', width: '100%', maxWidth: '900px', marginBottom: '1rem' }}>
+            {cardData.slice(0, 3).map((card, i) => (
+              <div key={i} style={{ flex: 1, minWidth: 0 }}>
+                <BenefitCard
+                  card={card}
+                  index={i}
+                  totalCards={totalCards}
+                  scrollYProgress={scrollYProgress}
+                />
+              </div>
+            ))}
+          </div>
+          {/* Row 2: 2 cards centered */}
+          <div style={{ display: 'flex', gap: '1rem', width: '100%', maxWidth: '900px', justifyContent: 'center' }}>
+            {cardData.slice(3).map((card, i) => (
+              <div key={i + 3} style={{ flex: '0 0 calc(33.33% - 0.5rem)', minWidth: 0 }}>
+                <BenefitCard
+                  card={card}
+                  index={i + 3}
+                  totalCards={totalCards}
+                  scrollYProgress={scrollYProgress}
+                />
+              </div>
+            ))}
           </div>
         </motion.div>
       </div>
@@ -127,38 +226,6 @@ function SolutionsSection() {
   );
 }
 
-function GlowCard({ card, motions, isCenter }) {
-  const filterValue = useTransform(motions.blur, (v) => `blur(${v}px)`);
-  const boxShadowValue = useTransform(
-    motions.glow,
-    (v) => `0 0 ${v * 50}px ${v * 22}px rgba(142,67,172,${v * 0.60}), 0 0 ${v * 20}px rgba(142,67,172,${v * 0.3})`
-  );
-
-  return (
-    <motion.div
-      className={`glow-card ${isCenter ? 'glow-card-center' : 'glow-card-side'}`}
-      style={{
-        x: motions.x,
-        y: motions.y,
-        rotate: motions.rotate,
-        opacity: motions.opacity,
-        filter: filterValue,
-        boxShadow: boxShadowValue,
-        zIndex: isCenter ? 10 : 5,
-      }}
-      whileHover={{
-        scale: 1.15,
-        zIndex: 50,
-        filter: 'blur(0px)',
-        opacity: 1,
-        transition: { duration: 0.2 }
-      }}
-    >
-      <h4 className="glow-card-title">{card.title}</h4>
-      <p className="glow-card-desc">{card.desc}</p>
-    </motion.div>
-  );
-}
 
 
 
@@ -307,133 +374,7 @@ function CandidateFriction() {
   );
 }
 
-const searchPhrases = [
-  'building frontend developers...',
-  'building data scientists...',
-  'building product managers...',
-  'building UX designers...',
-  'building backend engineers...',
-  'building ML engineers...',
-  'building growth marketers...',
-  'building finance analysts...',
-];
 
-function DynamicSearchBar({ opacity }) {
-  const router = useRouter();
-  const [displayText, setDisplayText] = useState('');
-  const [phraseIndex, setPhraseIndex] = useState(0);
-  const [charIndex, setCharIndex] = useState(0);
-  const [deleting, setDeleting] = useState(false);
-  const [isFocused, setIsFocused] = useState(false);
-  const [searchValue, setSearchValue] = useState('');
-
-  useEffect(() => {
-    const current = searchPhrases[phraseIndex];
-    let timeout;
-
-    if (!deleting && charIndex < current.length) {
-      timeout = setTimeout(() => setCharIndex(i => i + 1), 45);
-    } else if (!deleting && charIndex === current.length) {
-      timeout = setTimeout(() => setDeleting(true), 1400);
-    } else if (deleting && charIndex > 0) {
-      timeout = setTimeout(() => setCharIndex(i => i - 1), 28);
-    } else if (deleting && charIndex === 0) {
-      setDeleting(false);
-      setPhraseIndex(i => (i + 1) % searchPhrases.length);
-    }
-
-    setDisplayText(current.slice(0, charIndex));
-    return () => clearTimeout(timeout);
-  }, [charIndex, deleting, phraseIndex]);
-
-  const handleKeyDown = (e) => {
-    if (e.key === 'Enter' && searchValue.trim()) {
-      router.push(`/search?q=${encodeURIComponent(searchValue.trim())}`);
-    }
-  };
-
-  return (
-    <motion.div style={{ opacity }} className="w-full flex justify-center mt-6 md:mt-10">
-      <div style={{
-        display: 'flex',
-        alignItems: 'center',
-        gap: '12px',
-        background: 'rgba(0,0,0,0.07)',
-        border: '1.5px solid rgba(142,67,172,0.3)',
-        borderRadius: '9999px',
-        padding: '14px 24px',
-        width: 'min(540px, 90vw)',
-        backdropFilter: 'blur(8px)',
-        boxShadow: '0 4px 30px rgba(142,67,172,0.12)',
-        position: 'relative',
-      }}>
-        {/* Search icon */}
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#8e43ac" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" style={{ flexShrink: 0 }}>
-          <circle cx="11" cy="11" r="8" />
-          <line x1="21" y1="21" x2="16.65" y2="16.65" />
-        </svg>
-
-        <div style={{ flex: 1, position: 'relative', display: 'flex', alignItems: 'center', minHeight: '1.4em' }}>
-          <input
-            type="text"
-            value={searchValue}
-            onChange={(e) => setSearchValue(e.target.value)}
-            onFocus={() => setIsFocused(true)}
-            onBlur={() => setIsFocused(false)}
-            onKeyDown={handleKeyDown}
-            placeholder={isFocused ? "Search..." : ""}
-            style={{
-              width: '100%',
-              background: 'transparent',
-              border: 'none',
-              outline: 'none',
-              fontFamily: 'Poppins, sans-serif',
-              fontWeight: 500,
-              fontSize: 'clamp(13px, 2vw, 16px)',
-              color: '#3a1a50',
-              letterSpacing: '0.01em',
-              zIndex: 10,
-              position: 'relative'
-            }}
-          />
-          {(!isFocused && !searchValue) && (
-            <span style={{
-              fontFamily: 'Poppins, sans-serif',
-              fontWeight: 500,
-              fontSize: 'clamp(13px, 2vw, 16px)',
-              color: '#3a1a50',
-              letterSpacing: '0.01em',
-              textTransform: 'none',
-              position: 'absolute',
-              left: 0,
-              pointerEvents: 'none',
-              display: 'flex',
-              alignItems: 'center'
-            }}>
-              {displayText}
-              <span style={{
-                display: 'inline-block',
-                width: '2px',
-                height: '1em',
-                background: '#8e43ac',
-                marginLeft: '2px',
-                animation: 'blink 1s step-end infinite',
-              }} />
-            </span>
-          )}
-        </div>
-        {/* Spinning loader dot */}
-        <div style={{
-          width: '8px', height: '8px',
-          borderRadius: '50%',
-          background: '#8e43ac',
-          flexShrink: 0,
-          animation: 'pulse 1.2s ease-in-out infinite',
-        }} />
-      </div>
-    </motion.div>
-  );
-}
 
 function HeroScrollSection() {
   const containerRef = useRef(null);
@@ -442,20 +383,27 @@ function HeroScrollSection() {
     offset: ["start start", "end end"]
   });
 
-  const leftX = useTransform(scrollYProgress, [0, 0.4], ["0vw", "-100vw"]);
-  const topOpacity = useTransform(scrollYProgress, [0.2, 0.4], [1, 0]);
+  // Fade out earlier so hero is fully gone before dark section overlaps
+  const leftX = useTransform(scrollYProgress, [0, 0.6], ["0vw", "-100vw"]);
+  const topOpacity = useTransform(scrollYProgress, [0, 0.5], [1, 0]);
 
-  const rightX = useTransform(scrollYProgress, [0, 0.4], ["0vw", "100vw"]);
+  const rightX = useTransform(scrollYProgress, [0, 0.6], ["0vw", "100vw"]);
 
-  const isX = useTransform(scrollYProgress, [0, 0.4], ["0vw", "-50vw"]);
-  const isOpacity = useTransform(scrollYProgress, [0.2, 0.4], [1, 0]);
+  const isX = useTransform(scrollYProgress, [0, 0.6], ["0vw", "-50vw"]);
+  const isOpacity = useTransform(scrollYProgress, [0, 0.5], [1, 0]);
 
-  const builtScale = useTransform(scrollYProgress, [0, 0.3, 0.8, 1], [1, 3, 100, 100]);
-  const builtOpacity = useTransform(scrollYProgress, [0, 0.8, 0.95], [1, 1, 0]);
+  const builtScale = useTransform(scrollYProgress, [0, 0.3, 0.55, 1], [1, 3, 100, 100]);
+  const builtOpacity = useTransform(scrollYProgress, [0, 0.35, 0.55], [1, 1, 0]);
+
+  // Hero section itself fades out cleanly
+  const heroOpacity = useTransform(scrollYProgress, [0.25, 0.55], [1, 0]);
 
   return (
-    <section ref={containerRef} style={{ height: '300vh', position: 'relative', background: 'var(--cream)', zIndex: 1 }}>
-      <div className="sticky top-0 h-screen w-full flex flex-col items-center justify-center overflow-hidden" style={{ paddingBottom: '15vh' }}>
+    <section ref={containerRef} style={{ height: '120vh', position: 'relative', background: 'var(--cream)', zIndex: 1 }}>
+      <motion.div
+        className="sticky top-0 h-screen w-full flex flex-col items-center justify-center overflow-hidden"
+        style={{ opacity: heroOpacity }}
+      >
         <div className="flex flex-col items-center justify-center gap-2 md:gap-4 font-black tracking-[-0.03em] uppercase leading-[1.05] text-center w-full" style={{ fontFamily: 'Poppins, sans-serif' }}>
 
           <motion.div
@@ -467,7 +415,7 @@ function HeroScrollSection() {
 
           <div className="flex items-center justify-center gap-4 text-[clamp(36px,8vw,120px)] w-full">
             <motion.div style={{ x: isX, opacity: isOpacity }} className="text-on-surface lowercase">
-              is
+              IS
             </motion.div>
             <motion.div
               style={{ scale: builtScale, opacity: builtOpacity, transformOrigin: 'center center', zIndex: 50 }}
@@ -494,10 +442,60 @@ function HeroScrollSection() {
             </span>
           </motion.div>
 
-          <DynamicSearchBar opacity={topOpacity} />
+        </div>
+      </motion.div>
+    </section>
+  );
+}
 
+function CorporateCTA() {
+  const sectionRef = useRef(null);
+  const { scrollYProgress } = useScroll({
+    target: sectionRef,
+    offset: ["start 85%", "end 100%"]
+  });
+
+  const clipPercent = useTransform(scrollYProgress, [0, 1], [100, 0]);
+  const clipPathValue = useMotionTemplate`inset(${clipPercent}% 0 0 0)`;
+
+  return (
+    <section ref={sectionRef} style={{ position: 'relative', height: '100dvh', minHeight: '100dvh', margin: 0, padding: 0, overflow: 'hidden' }}>
+      {/* Base layer — light yellow/cream */}
+      <div style={{
+        position: 'absolute', inset: 0, background: 'var(--cream)',
+        display: 'flex', alignItems: 'center', justifyContent: 'center',
+      }}>
+        <div className="cta-type-inner">
+          <p className="cta-eyebrow" style={{ color: 'var(--dark-grey)' }}>The next era of hiring</p>
+          <h2 className="cta-type-headline">
+            <span className="cta-line cta-line-italic" style={{ color: 'var(--black)' }}>The future is</span>
+            <span className="cta-line cta-line-bold" style={{ color: 'var(--black)' }}>Pre-Built</span>
+            <span className="cta-line cta-line-italic" style={{ color: 'var(--black)' }}>Talent</span>
+          </h2>
+          <button className="cta-type-btn" style={{ background: 'var(--purple)', color: '#fff' }}>Enter Factory →</button>
         </div>
       </div>
+
+      {/* Top purple layer — clips in from top on scroll down, clips out on scroll up */}
+      <motion.div
+        style={{
+          position: 'absolute', inset: 0,
+          background: 'var(--purple)',
+          clipPath: clipPathValue,
+          display: 'flex', alignItems: 'center', justifyContent: 'center',
+          zIndex: 2,
+        }}
+      >
+        <div className="cta-type-inner">
+          <p className="cta-eyebrow" style={{ color: 'rgba(43,12,55,0.7)' }}>The next era of hiring</p>
+          <h2 className="cta-type-headline">
+            <span className="cta-line cta-line-italic" style={{ color: 'var(--cream)' }}>The future is</span>
+            <span className="cta-line cta-line-bold" style={{ color: 'var(--cream)' }}>Pre-Built</span>
+            <span className="cta-line cta-line-italic" style={{ color: 'var(--cream)' }}>Talent</span>
+          </h2>
+          <button className="cta-type-btn" style={{ background: 'var(--black)', color: '#fff' }}>Enter Factory →</button>
+        </div>
+      </motion.div>
     </section>
   );
 }
@@ -538,54 +536,49 @@ function CorporateView({ activeTab, setActiveTab, isScrolled }) {
 
       <HeroScrollSection />
 
-      <div className="scroll-overlay-container">
-        <motion.section className="problems-section dark-section" style={{ paddingTop: '10rem', opacity: sectionOpacity }}>
-          <div className="w-full max-w-[1400px] mx-auto px-6 md:px-12">
-            <h2 className="section-title heading-serif text-center" style={{ color: '#fff' }}>WHAT <span style={{ color: 'var(--accent-purple)' }}>CORPORATES</span> FACE</h2>
-            <div className="problems-intro text-center" style={{ marginBottom: '6rem' }}>
-              <p className="problems-lead">One rushed interview. One resume. One gut call.</p>
-            </div>
-            <div className="problems-grid" ref={statsRef}>
-              <motion.div className="problem-card dark-card" style={{ y: yLeft }}>
-                <h3 className="problem-stat">
-                  <AnimatedNumber value={70} suffix="%" animated={statsVisible} />
-                </h3>
-                <p className="problem-text" style={{ color: '#a3a3a3' }}>underperform or quit within a year.</p>
-                <a href="#" className="arrow-link"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="7" y1="17" x2="17" y2="7"></line><polyline points="7 7 17 7 17 17"></polyline></svg></a>
-              </motion.div>
-              <motion.div className="problem-card dark-card" style={{ y: yCenter }}>
-                <h3 className="problem-stat">
-                  <AnimatedNumber value={4700} prefix="$" suffix="+" animated={statsVisible} />
-                </h3>
-                <p className="problem-text" style={{ color: '#a3a3a3' }}>burned per wrong hire.</p>
-                <a href="#" className="arrow-link"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="7" y1="17" x2="17" y2="7"></line><polyline points="7 7 17 7 17 17"></polyline></svg></a>
-              </motion.div>
-              <motion.div className="problem-card dark-card" style={{ y: yRight }}>
-                <h3 className="problem-stat">
-                  <AnimatedNumber value={4} animated={statsVisible} />
-                  <span>–</span>
-                  <AnimatedNumber value={6} animated={statsVisible} />
-                </h3>
-                <p className="problem-text" style={{ color: '#a3a3a3' }}>months lost in training before productivity.</p>
-                <a href="#" className="arrow-link"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="7" y1="17" x2="17" y2="7"></line><polyline points="7 7 17 7 17 17"></polyline></svg></a>
-              </motion.div>
-            </div>
+      {/* "What Corporates Face" — full viewport, vertically centered */}
+      <motion.section
+        className="problems-section"
+        style={{
+          opacity: sectionOpacity,
+          minHeight: '100vh',
+          display: 'flex',
+          flexDirection: 'column',
+          justifyContent: 'center',
+          paddingTop: '3rem',
+          paddingBottom: '3rem',
+        }}
+      >
+        <div className="w-full max-w-[1400px] mx-auto px-6 md:px-12">
+          <h2 className="section-title heading-serif text-center" style={{ color: 'var(--black)', marginBottom: '1rem' }}>WHAT <span style={{ color: 'var(--accent-purple)' }}>CORPORATES</span> FACE</h2>
+          <div className="problems-intro text-center" style={{ marginBottom: '3rem' }}>
+            <p className="problems-lead">One rushed interview. One resume. One gut call.</p>
           </div>
-        </motion.section>
+          <div className="problems-grid" ref={statsRef}>
+            <motion.div className="problem-card" style={{ y: yLeft }}>
+              <h3 className="problem-stat">70%</h3>
+              <p className="problem-text">underperform or quit within a year.</p>
+              <a href="#" className="arrow-link"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="7" y1="17" x2="17" y2="7"></line><polyline points="7 7 17 7 17 17"></polyline></svg></a>
+            </motion.div>
+            <motion.div className="problem-card" style={{ y: yCenter }}>
+              <h3 className="problem-stat">$4,700+</h3>
+              <p className="problem-text">burned per wrong hire.</p>
+              <a href="#" className="arrow-link"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="7" y1="17" x2="17" y2="7"></line><polyline points="7 7 17 7 17 17"></polyline></svg></a>
+            </motion.div>
+            <motion.div className="problem-card" style={{ y: yRight }}>
+              <h3 className="problem-stat">4–6</h3>
+              <p className="problem-text">months lost in training before productivity.</p>
+              <a href="#" className="arrow-link"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="7" y1="17" x2="17" y2="7"></line><polyline points="7 7 17 7 17 17"></polyline></svg></a>
+            </motion.div>
+          </div>
+        </div>
+      </motion.section>
 
+      <div className="scroll-overlay-container">
         <SolutionsSection />
 
-        <section className="cta-section cta-typographic" style={{ minHeight: '100dvh', margin: 0, padding: 0, paddingBottom: 0 }}>
-          <div className="cta-type-inner">
-            <p className="cta-eyebrow">The next era of hiring</p>
-            <h2 className="cta-type-headline">
-              <span className="cta-line cta-line-italic">The future is</span>
-              <span className="cta-line cta-line-bold">Pre-Built</span>
-              <span className="cta-line cta-line-italic">Talent</span>
-            </h2>
-            <button className="cta-type-btn">Enter Factory →</button>
-          </div>
-        </section>
+        {/* CTA with scroll-driven purple clip-path animation */}
+        <CorporateCTA />
       </div>
     </div>
   );
@@ -714,8 +707,8 @@ function CandidateHowItWorks() {
       solution: 'Discover Your Career Pathway Early',
       body: 'Participate in AntBox campus roadshows and hands-on workshops. Identify your core strengths and learn market-relevant tools long before placement season opens.',
       color: '#2b0c37',
-      accent: '#BB62DE',
-      emoji: '🚫',
+      accent: '#BB62DE'
+
     },
     {
       label: '02',
@@ -723,8 +716,8 @@ function CandidateHowItWorks() {
       solution: 'Build Proof of Work, Not Just Resumes',
       body: 'Work on real-world micro-internships with actual corporate briefs. Show hiring managers proof of what you can build, rather than just listing skills on paper.',
       color: '#1a0826',
-      accent: '#e093ff',
-      emoji: '📖',
+      accent: '#e093ff'
+
     },
     {
       label: '03',
@@ -732,8 +725,8 @@ function CandidateHowItWorks() {
       solution: 'Skip the Resume Queue',
       body: 'Top companies evaluate your live performance on micro-projects instead of filtering you out with generic criteria.',
       color: '#0f0518',
-      accent: '#BB62DE',
-      emoji: '⏳',
+      accent: '#BB62DE'
+
     },
     {
       label: '04',
@@ -741,8 +734,8 @@ function CandidateHowItWorks() {
       solution: 'Fast-Track Offers & Zero Retraining',
       body: 'Land job offers faster with complete confidence. Step into your role on Day 1 ready to deliver, without the fear of revoked offers or post-hiring lag.',
       color: '#200840',
-      accent: '#d580ff',
-      emoji: '🎓',
+      accent: '#d580ff'
+
     },
   ];
 
@@ -883,7 +876,7 @@ function CandidateView({ activeTab, setActiveTab, isScrolled }) {
       <ViewToggle activeTab={activeTab} setActiveTab={setActiveTab} isScrolled={isScrolled} />
       <div className="sticky-container candidate-hero-bg">
 
-        <main className="hero-section candidate-hero-section" style={{ paddingTop: '3rem', minHeight: 'auto', alignItems: 'center' }}>
+        <main className="hero-section candidate-hero-section" style={{ paddingTop: '8rem', minHeight: 'auto', alignItems: 'center' }}>
           <div className="hero-content" style={{ padding: '1rem 0' }}>
             <h1 className="hero-title heading-serif" style={{ color: '#fff', fontSize: 'clamp(2.5rem, 5.5vw, 5.5rem)', textTransform: 'uppercase', lineHeight: 1 }}>
               <span style={{ display: 'block' }}>CAMPUS TO</span>

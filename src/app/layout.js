@@ -14,7 +14,7 @@ export default function RootLayout({ children }) {
         <link href="https://fonts.googleapis.com/css2?family=EB+Garamond:ital@0;1&family=Hanken+Grotesk:wght@400;600;800;900&family=Work+Sans:wght@400&display=swap" rel="stylesheet"/>
         <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@700;800;900&display=swap" rel="stylesheet"/>
       </head>
-      <body className="bg-cream text-dark-grey font-gothic overflow-x-hidden min-h-screen flex flex-col pt-32 pb-20">
+      <body className="bg-cream text-dark-grey font-gothic overflow-x-hidden min-h-screen flex flex-col">
         <Navbar />
         {children}
       </body>

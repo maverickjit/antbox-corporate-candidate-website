@@ -1,5 +1,21 @@
 @import "tailwindcss";
 
+/* Global reset: ensure no body/html bottom spacing causes whitespace */
+html, body {
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  overflow-x: hidden;
+}
+
+/* page-wrapper must never add extra space */
+.page-wrapper {
+  margin: 0;
+  padding: 0;
+}
+
 :root {
   --cream: #F7F5EE;
   --purple: #BB62DE;
@@ -40,12 +56,15 @@
 
   /* Corporate sections */
   .problems-section {
-    padding: clamp(4rem, 8vw, 6rem) 0;
+    /* Only bottom padding; top is set inline per usage */
+    padding: 0 0 clamp(3rem, 6vw, 5rem) 0;
     background: var(--cream);
   }
 
   .problems-section.dark-section {
     background: transparent;
+    /* Give breathing room below the cards before solutions */
+    padding-bottom: 2rem;
   }
 
   .problems-intro {
@@ -136,10 +155,10 @@
     transform: translate(4px, -4px);
   }
 
-  /* Pinned solutions */
+  /* Pinned solutions — increased height for the card-from-box animation */
   .solutions-section-pinned {
     position: relative;
-    height: 300vh;
+    height: 250vh;
   }
 
   .solutions-sticky-inner {
@@ -263,13 +282,15 @@
   .scroll-overlay-container {
     position: relative;
     z-index: 2;
-    border-radius: 1.5rem 1.5rem 0 0;
+    border-radius: 2rem 2rem 0 0;
     background-color: var(--black);
     background-image: radial-gradient(circle, var(--bg-grid) 1px, transparent 1px);
     background-position: 0 0;
     background-size: 32px 32px;
-    box-shadow: 0 -24px 60px rgba(34, 34, 38, 0.2);
-    padding-bottom: 0;
+    box-shadow: 0 -40px 100px rgba(34, 34, 38, 0.4);
+    /* Pull aggressively up under the hero to remove the cream strip */
+    margin-top: -3rem;
+    padding: 0;
     margin-bottom: 0;
   }
 
@@ -285,8 +306,13 @@
     align-items: center;
     justify-content: center;
     background: var(--purple);
-    margin-bottom: 0;
-    padding-bottom: 0;
+    /* Lock height exactly to viewport — no margin/padding bleed */
+    height: 100dvh;
+    min-height: 100dvh;
+    max-height: 100dvh;
+    margin: 0;
+    padding: 0;
+    overflow: hidden;
   }
 
   .cta-type-inner {
