@@ -763,3 +763,64 @@ body {
   background: rgba(255, 255, 255, 0.12) !important;
   box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.2) !important;
 }
+
+/* Standard Navbar styles when not scrolled */
+.navbar-link {
+  color: var(--black);
+  font-weight: 600;
+  transition: color 0.2s ease;
+}
+
+.navbar-link:hover {
+  color: var(--accent-purple);
+}
+
+.navbar-icon-btn {
+  color: var(--black);
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.navbar-icon-btn:hover {
+  color: var(--accent-purple);
+}
+
+.navbar-cta {
+  background: var(--accent-purple);
+  color: #fff;
+  font-weight: 700;
+  font-family: var(--font-poppins);
+  border: none;
+  cursor: pointer;
+  line-height: 1.2;
+  letter-spacing: 0.01em;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  border-radius: 9999px;
+  box-shadow: 0 4px 16px rgba(187, 98, 222, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.2);
+  transition: all 0.2s ease;
+}
+
+.navbar-cta:hover {
+  background: #a64ac9;
+  transform: translateY(-1px);
+  box-shadow: 0 6px 22px rgba(187, 98, 222, 0.55), inset 0 1px 0 rgba(255, 255, 255, 0.25);
+}
+
+/* Candidate theme un-scrolled navbar overrides */
+body.theme-candidate .navbar-link {
+  color: rgba(255, 255, 255, 0.85);
+}
+
+body.theme-candidate .navbar-link:hover {
+  color: #fff;
+}
+
+body.theme-candidate .navbar-icon-btn {
+  color: #fff;
+}

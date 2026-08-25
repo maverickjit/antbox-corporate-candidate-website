@@ -84,31 +84,31 @@ export default function About() {
       title: "COOK IN THE GLASS KITCHEN", 
       desc: "Nothing great is made behind closed doors. We share the work raw, take the heat in the open, and plate the credit where everyone can see it.",
       bg: "#5BE7C4",
-      src: '/value_glass_kitchen_1787311047086.jpg'
+      image: '/value_glass_kitchen_1787311047086.jpg'
     },
     { 
       title: "THINK NAPKIN FIRST", 
       desc: "If you can't explain it simply, you don't understand it well enough. Clarity comes before action, and thinking comes before doing.",
       bg: "#FF6BE6",
-      src: '/value_think_napkin_first_1787311047086.jpg'
+      image: '/value_napkin_first_1787311075113.jpg'
     },
     { 
       title: "RESPECT THE GAME CLOCK", 
       desc: "Time is a competitive advantage. Move with urgency, honor commitments, and deliver before opportunities expire.",
       bg: "#FFD644",
-      src: "/value_respect_game_clock_1787311047086.jpg"
+      image: "/value_game_clock_1787311103049.jpg"
     },
     { 
       title: "PROOF OF WORK", 
       desc: "Talk is a claim. Work is the evidence. We don't describe what we did, we show what shipped, and it speaks for itself.",
       bg: "#C56BFF",
-      src: "/value_proof_of_work_1787311047086.jpg"
+      image: "/value_proof_work_1787311131543.jpg"
     },
     { 
       title: "OWN THE WHOLE BOX", 
       desc: "The best seat in the house comes with the whole scoreboard. Touch any part of the work, and all of it becomes yours - every cell carried home.",
       bg: "#FF8359",
-      src: "/value_own_box_1787311047086.jpg"
+      image: "/value_own_box_1787311159506.jpg"
     }
   ];
 
@@ -266,13 +266,15 @@ export default function About() {
                 }}
               >
                 <div className={styles.inspoImageContainer}>
-                  <Image 
-                    src={value.image} 
-                    alt={value.title} 
-                    fill
-                    unoptimized
-                    className={styles.inspoImage}
-                  />
+                  {value.image ? (
+                    <Image 
+                      src={value.image} 
+                      alt={value.title} 
+                      fill
+                      unoptimized
+                      className={styles.inspoImage}
+                    />
+                  ) : null}
                 </div>
 
                 <div>
@@ -292,7 +294,7 @@ export default function About() {
             <h2 className={styles.manifestoTitle}>Founders Manifesto</h2>
             <div className={styles.founderPhotoWrapper}>
               <Image 
-                image = '/founder-photo-portrait.jpg'
+                src="/founder-photo-portrait.jpg"
                 alt="Founder Photo" 
                 fill
                 unoptimized

@@ -42,7 +42,7 @@ const blogPosts = {
       category: 'Culture',
       readTime: '6 min read',
       date: 'Aug 10, 2026',
-      image: '/culture-4.png',
+      image: '/culture-3.png',
     },
   ],
 };
@@ -54,12 +54,12 @@ const playbooks = {
     { title: "Offer negotiation guide", excerpt: "How to structure competitive, retention-focused offers for young talent.", category: "Guide", image: "/culture-3.png", readTime: "6 min read" },
     { title: "48-Hour Onboarding checklist", excerpt: "Accelerate time-to-value with a structured 48-hour onboarding workflow.", category: "Checklist", image: "/culture-hero-real.jpg", readTime: "4 min read" },
     { title: "Domain evaluation framework", excerpt: "Assess true candidate signal over resume keywords using domain metrics.", category: "Framework", image: "/culture-1.png", readTime: "7 min read" },
-    { title: "Tech stack compatibility matrix", excerpt: "Match domain tooling to your team's existing tech stack seamlessly.", category: "Matrix", image: "/culture-hero-group.jpg", readTime: "5 min read" },
+    { title: "Tech stack compatibility matrix", excerpt: "Match domain tooling to your team's existing tech stack seamlessly.", category: "Matrix", image: "/culture-hero-real.jpg", readTime: "5 min read" },
   ],
   candidate: [
     { title: "Zero-experience portfolio build guide", excerpt: "Turn real projects and proof-of-work into a portfolio that commands attention.", category: "Guide", image: "/culture-2.png", readTime: "6 min read" },
     { title: "Cold email & outreach teardowns", excerpt: "Proven email scripts and teardowns that get responses from tech founders.", category: "Outreach", image: "/culture-1.png", readTime: "5 min read" },
-    { title: "Live Kitchen prep & simulation kit", excerpt: "Practice scenario simulations to ace live technical and operational assessments.", category: "Prep Kit", image: "/culture-hero-group.jpg", readTime: "10 min read" },
+    { title: "Live Kitchen prep & simulation kit", excerpt: "Practice scenario simulations to ace live technical and operational assessments.", category: "Prep Kit", image: "/culture-hero-real.jpg", readTime: "10 min read" },
     { title: "Resume vs Proof-of-Work framework", excerpt: "How to showcase actual output over traditional resume bullet points.", category: "Framework", image: "/culture-3.png", readTime: "4 min read" },
     { title: "2026 Tech stack learning roadmap", excerpt: "A focused learning path for high-demand modern tools and frameworks.", category: "Roadmap", image: "/culture-hero-real.jpg", readTime: "8 min read" },
     { title: "Script the Play: Technical writing guide", excerpt: "Document your code and decisions clearly for engineering teams.", category: "Writing", image: "/culture-2.png", readTime: "5 min read" },
@@ -204,7 +204,9 @@ export default function Resources() {
             {currentBlogs.map((post) => (
               <Link key={post.slug} href={`/blogs/${post.slug}`} className={styles.blogCard}>
                 <div className={styles.blogCardImage}>
-                  <Image src={post.image} alt={post.title} fill style={{ objectFit: 'cover' }} />
+                  {post.image ? (
+                    <Image src={post.image} alt={post.title} fill unoptimized style={{ objectFit: 'cover' }} />
+                  ) : null}
                   <div className={styles.blogCardOverlay}></div>
                   <span className={styles.blogCardCategory}>{post.category}</span>
                 </div>
@@ -248,7 +250,9 @@ export default function Resources() {
                 return (
                   <Link href={`/resources/${slug}`} key={index} className={styles.blogCard}>
                     <div className={styles.blogCardImage}>
-                      <Image src={item.image} alt={item.title} fill style={{ objectFit: 'cover' }} />
+                      {item.image ? (
+                        <Image src={item.image} alt={item.title} fill unoptimized style={{ objectFit: 'cover' }} />
+                      ) : null}
                       <div className={styles.blogCardOverlay}></div>
                       <span className={styles.blogCardCategory}>{item.category}</span>
                     </div>

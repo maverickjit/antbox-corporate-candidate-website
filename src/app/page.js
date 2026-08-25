@@ -3,58 +3,7 @@ import React, { useRef, useEffect, useState } from 'react';
 import Image from 'next/image';
 import { motion, useScroll, useTransform, useMotionTemplate, AnimatePresence } from 'framer-motion';
 import AnimatedNumber from '@/components/ui/animated-number';
-
-/* ---- Reusable View Toggle ---- */
-// This renders inside the navbar row via a portal-like fixed overlay
-function ViewToggle({ activeTab, setActiveTab, isScrolled }) {
-  const pillRef = useRef(null);
-  const corpBtnRef = useRef(null);
-  const candBtnRef = useRef(null);
-
-  // Slide the indicator to match the active button
-  useEffect(() => {
-    const pill = pillRef.current;
-    const activeBtn = activeTab === 'corporates' ? corpBtnRef.current : candBtnRef.current;
-    if (!pill || !activeBtn) return;
-    pill.style.left = activeBtn.offsetLeft + 'px';
-    pill.style.width = activeBtn.offsetWidth + 'px';
-  }, [activeTab, isScrolled]);
-
-  return (
-    <div
-      style={{
-        position: 'fixed',
-        top: isScrolled ? '14px' : '10px',
-        left: '50%',
-        transform: 'translateX(-50%)',
-        zIndex: 60,
-        opacity: isScrolled ? 0 : 1,
-        pointerEvents: isScrolled ? 'none' : 'auto',
-        transition: 'opacity 0.25s ease, top 0.25s ease',
-      }}
-    >
-      <div className="view-toggle-pill shadow-lg" style={{ display: 'flex', background: 'rgba(255,255,255,0.7)', borderRadius: '999px', padding: '4px', position: 'relative', border: '1px solid rgba(0,0,0,0.05)', backdropFilter: 'blur(12px)' }}>
-        <div ref={pillRef} className="view-toggle-indicator" style={{ position: 'absolute', top: '4px', bottom: '4px', background: 'white', borderRadius: '999px', transition: 'left 0.3s ease, width 0.3s ease', boxShadow: '0 2px 8px rgba(0,0,0,0.1)' }} />
-        <button
-          ref={corpBtnRef}
-          className={`view-toggle-btn${activeTab === 'corporates' ? ' active' : ''}`}
-          style={{ position: 'relative', zIndex: 1, padding: '8px 20px', borderRadius: '999px', fontWeight: 600, fontSize: '0.95rem', color: activeTab === 'corporates' ? 'var(--purple)' : 'var(--text-secondary)', transition: 'color 0.3s' }}
-          onClick={() => setActiveTab('corporates')}
-        >
-          Corporates
-        </button>
-        <button
-          ref={candBtnRef}
-          className={`view-toggle-btn${activeTab === 'candidates' ? ' active' : ''}`}
-          style={{ position: 'relative', zIndex: 1, padding: '8px 20px', borderRadius: '999px', fontWeight: 600, fontSize: '0.95rem', color: activeTab === 'candidates' ? 'var(--purple)' : 'var(--text-secondary)', transition: 'color 0.3s' }}
-          onClick={() => setActiveTab('candidates')}
-        >
-          Candidates
-        </button>
-      </div>
-    </div>
-  );
-}
+import { useTab } from '../context/TabContext';
 
 const cardData = [
   { title: 'CORPORATE-FIRST', desc: 'Every module, project, and simulation comes from actual roles inside real companies.' },
@@ -500,7 +449,7 @@ function CorporateCTA() {
   );
 }
 
-function CorporateView({ activeTab, setActiveTab, isScrolled }) {
+function CorporateView({ activeTab, setActiveTab }) {
   const statsRef = useRef(null);
   const [statsVisible, setStatsVisible] = useState(false);
 
@@ -532,8 +481,6 @@ function CorporateView({ activeTab, setActiveTab, isScrolled }) {
   const sectionOpacity = useTransform(scrollYProgress, [0.6, 0.9], [1, 0]);
   return (
     <div className="page-wrapper">
-      <ViewToggle activeTab={activeTab} setActiveTab={setActiveTab} isScrolled={isScrolled} />
-
       <HeroScrollSection />
 
       {/* "What Corporates Face" — full viewport, vertically centered */}
@@ -870,40 +817,58 @@ function CandidateHowItWorks() {
   );
 }
 
-function CandidateView({ activeTab, setActiveTab, isScrolled }) {
+function CandidateView() {
   return (
     <div className="page-wrapper candidate-view">
-      <ViewToggle activeTab={activeTab} setActiveTab={setActiveTab} isScrolled={isScrolled} />
-      <div className="sticky-container candidate-hero-bg">
+      <div className="sticky-container candidate-hero-bg" style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
 
-        <main className="hero-section candidate-hero-section" style={{ paddingTop: '8rem', minHeight: 'auto', alignItems: 'center' }}>
-          <div className="hero-content" style={{ padding: '1rem 0' }}>
-            <h1 className="hero-title heading-serif" style={{ color: '#fff', fontSize: 'clamp(2.5rem, 5.5vw, 5.5rem)', textTransform: 'uppercase', lineHeight: 1 }}>
+        <main
+          className="candidate-hero-section w-full max-w-[1240px] mx-auto px-6 sm:px-10 py-12 grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-14 items-center justify-center"
+          style={{ minHeight: '100vh', display: 'grid' }}
+        >
+          {/* Left: Centered Typography */}
+          <div className="flex flex-col justify-center text-left py-4">
+            <h1 className="hero-title heading-serif" style={{ color: '#fff', fontSize: 'clamp(2.75rem, 5.5vw, 5.5rem)', textTransform: 'uppercase', lineHeight: 1.02 }}>
               <span style={{ display: 'block' }}>CAMPUS TO</span>
               <span className="text-stroke-purple-italic" style={{ display: 'block' }}>CORPORATE</span>
               <span style={{ display: 'block' }}>WITHOUT THE</span>
               <span style={{ display: 'block', color: 'var(--accent-purple)' }}>GUESSWORK</span>
             </h1>
-            <p className="hero-subtitle" style={{ color: '#ccc', fontSize: '1.4rem', marginTop: '2rem', marginBottom: '1.5rem', fontWeight: 600 }}>
+            <p className="hero-subtitle" style={{ color: 'rgba(255, 255, 255, 0.75)', fontSize: 'clamp(1.1rem, 2vw, 1.35rem)', marginTop: '1.75rem', fontWeight: 500, lineHeight: 1.5, maxWidth: '520px' }}>
               Stop applying blindly. Start building real proof of work.
             </p>
           </div>
-          <div className="hero-image-container" style={{ background: '#0c0c0c', borderRadius: '20px', overflow: 'hidden', position: 'relative', height: '500px', display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
-            {/* Background image */}
-            <img
-              src="https://i.ibb.co/CqjssSp"
-              alt="Antbox Platform"
-              style={{ width: '100%', height: '100%', objectFit: 'cover', opacity: 0.7, position: 'absolute', inset: 0 }}
-              onError={(e) => { e.target.style.display = 'none'; }}
-            />
-            {/* Dark overlay for logo legibility */}
-            <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(135deg, rgba(0,0,0,0.6) 0%, rgba(0,0,0,0.3) 100%)' }} />
-            {/* Replaced with rohits.jpeg */}
-            <div style={{ position: 'relative', zIndex: 2, display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+
+          {/* Right: Full-bleed Hero Photo Card (No black letterboxing) */}
+          <div className="flex items-center justify-center w-full">
+            <div
+              className="relative w-full overflow-hidden"
+              style={{
+                height: 'clamp(380px, 52vh, 520px)',
+                borderRadius: '24px',
+                border: '1px solid rgba(255, 255, 255, 0.16)',
+                boxShadow: '0 24px 60px -12px rgba(0, 0, 0, 0.75), 0 0 32px rgba(187, 98, 222, 0.2)',
+                background: '#16161a',
+              }}
+            >
               <img
                 src="/rohits.jpeg"
-                alt="Rohit"
-                style={{ height: '300px', width: 'auto', borderRadius: '12px', boxShadow: '0 10px 30px rgba(0,0,0,0.3)' }}
+                alt="Antbox Candidate Experience"
+                style={{
+                  width: '100%',
+                  height: '100%',
+                  objectFit: 'cover',
+                  objectPosition: 'center',
+                  display: 'block',
+                }}
+              />
+              {/* Subtle edge overlay */}
+              <div
+                className="absolute inset-0 pointer-events-none"
+                style={{
+                  boxShadow: 'inset 0 0 20px rgba(0, 0, 0, 0.25)',
+                  borderRadius: '24px',
+                }}
               />
             </div>
           </div>
@@ -957,24 +922,7 @@ function CandidateView({ activeTab, setActiveTab, isScrolled }) {
 }
 
 export default function Home() {
-  const [activeTab, setActiveTab] = useState('corporates');
-  const [isScrolled, setIsScrolled] = useState(false);
-
-  useEffect(() => {
-    const handleScroll = () => setIsScrolled(window.scrollY > 60);
-    handleScroll();
-    window.addEventListener('scroll', handleScroll, { passive: true });
-    return () => window.removeEventListener('scroll', handleScroll);
-  }, []);
-
-  useEffect(() => {
-    if (activeTab === 'candidates') {
-      document.body.classList.add('theme-candidate');
-    } else {
-      document.body.classList.remove('theme-candidate');
-    }
-    window.scrollTo({ top: 0, behavior: 'instant' });
-  }, [activeTab]);
+  const { activeTab } = useTab();
 
   return (
     <AnimatePresence mode="wait">
@@ -986,7 +934,7 @@ export default function Home() {
           exit={{ opacity: 0, y: -12 }}
           transition={{ duration: 0.28, ease: 'easeInOut' }}
         >
-          <CorporateView activeTab={activeTab} setActiveTab={setActiveTab} isScrolled={isScrolled} />
+          <CorporateView />
         </motion.div>
       ) : (
         <motion.div
@@ -996,7 +944,7 @@ export default function Home() {
           exit={{ opacity: 0, y: -12 }}
           transition={{ duration: 0.28, ease: 'easeInOut' }}
         >
-          <CandidateView activeTab={activeTab} setActiveTab={setActiveTab} isScrolled={isScrolled} />
+          <CandidateView />
         </motion.div>
       )}
     </AnimatePresence>

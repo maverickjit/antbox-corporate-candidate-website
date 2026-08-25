@@ -1,5 +1,6 @@
 import "./globals.css";
 import Navbar from "../components/Navbar";
+import { TabProvider } from "../context/TabContext";
 
 export const metadata = {
   title: "Antbox",
@@ -15,8 +16,10 @@ export default function RootLayout({ children }) {
         <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@700;800;900&display=swap" rel="stylesheet"/>
       </head>
       <body className="bg-cream text-dark-grey font-gothic overflow-x-hidden min-h-screen flex flex-col">
-        <Navbar />
-        {children}
+        <TabProvider>
+          <Navbar />
+          {children}
+        </TabProvider>
       </body>
     </html>
   );
