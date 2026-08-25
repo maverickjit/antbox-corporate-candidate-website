@@ -4,17 +4,22 @@ import Link from 'next/link';
 import { motion } from 'framer-motion';
 import { useTab } from '../context/TabContext';
 
+const emptySubscribe = () => () => {};
+
 export default function Navbar() {
   const { activeTab, setActiveTab } = useTab();
   const [isScrolled, setIsScrolled] = useState(false);
-  const [mounted, setMounted] = useState(false);
+  const mounted = React.useSyncExternalStore(
+    emptySubscribe,
+    () => true,
+    () => false
+  );
 
   const pillRef = useRef(null);
   const corpBtnRef = useRef(null);
   const candBtnRef = useRef(null);
 
   useEffect(() => {
-    setMounted(true);
     const handleScroll = () => setIsScrolled(window.scrollY > 50);
     handleScroll();
     window.addEventListener('scroll', handleScroll, { passive: true });

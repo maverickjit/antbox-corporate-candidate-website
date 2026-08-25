@@ -99,7 +99,7 @@ function MaskedLineRevealStatement() {
     if (!isInView) return;
 
     let i1 = 0, i2 = 0, i3 = 0, i4 = 0;
-    const speed = 25;
+    const speed = 48;
 
     const t1 = setInterval(() => {
       if (i1 < full1.length) {
@@ -144,12 +144,12 @@ function MaskedLineRevealStatement() {
   }, [isInView]);
 
   return (
-    <div ref={containerRef} className={styles.valuesStatement} style={{ minHeight: '160px' }}>
-      <p style={{ margin: 0 }}>
+    <div ref={containerRef} className={styles.valuesStatement} style={{ minHeight: '160px', textAlign: 'left' }}>
+      <p style={{ margin: 0, textAlign: 'left' }}>
         {part1}
       </p>
 
-      <p style={{ margin: 0, marginTop: '0.2rem' }}>
+      <p style={{ margin: 0, marginTop: '0.2rem', textAlign: 'left' }}>
         {part2}
         {part3 && (
           <span style={{ color: '#BB62DE', fontStyle: 'italic', fontWeight: 700 }}>
@@ -165,7 +165,7 @@ function MaskedLineRevealStatement() {
         )}
       </p>
 
-      <p style={{ margin: 0, marginTop: '0.2rem' }}>
+      <p style={{ margin: 0, marginTop: '0.2rem', textAlign: 'left' }}>
         {part4 && (
           <ScribbleUnderline color="#BB62DE" active={showUnderline}>
             <span>
@@ -233,47 +233,22 @@ function RollingImageCardBox({ children }) {
   const containerRef = React.useRef(null);
   const { scrollYProgress } = useScroll({
     target: containerRef,
-    // Start triggering when card enters bottom of viewport, finish when it reaches 20% from top
-    offset: ["start 0.92", "start 0.18"]
+    offset: ["start end", "start start"]
   });
 
-  // Card rolls up from 300px below resting position → 0 (its natural place)
-  const y = useTransform(scrollYProgress, [0, 1], [300, 0]);
-  // Slight scale-up for the "popping up" feel
-  const scale = useTransform(scrollYProgress, [0, 1], [0.88, 1]);
-  // Fade in as it rises
-  const opacity = useTransform(scrollYProgress, [0, 0.25], [0, 1]);
-  // Shadow grows as card lifts — reinforces "rising card" illusion
-  const boxShadow = useTransform(
-    scrollYProgress,
-    [0, 1],
-    [
-      "0 4px 12px rgba(0,0,0,0.06)",
-      "0 40px 80px -16px rgba(0,0,0,0.22), 0 0 0 1px rgba(0,0,0,0.06)"
-    ]
-  );
+  const y = useTransform(scrollYProgress, [0, 1], [60, -20]);
+  const scale = useTransform(scrollYProgress, [0, 1], [0.96, 1]);
 
   return (
     <motion.div
       ref={containerRef}
-      style={{
-        y,
-        scale,
-        opacity,
-        boxShadow,
-        borderRadius: '24px',
-        overflow: 'hidden',
-        position: 'relative',
-        zIndex: 3,              // sits above text section as it overlaps
-        willChange: 'transform',
-      }}
+      style={{ y, scale }}
       className={styles.operatorsImageCardBox}
     >
       {children}
     </motion.div>
   );
 }
-
 
 export default function About() {
   const [activeFilter, setActiveFilter] = useState('View all');
@@ -333,7 +308,7 @@ export default function About() {
         return;
       }
 
-      const step = Math.floor(distanceScrolled / 160) + 1;
+      const step = Math.floor(distanceScrolled / 130) + 1;
       const count = Math.min(Math.max(step, 1), 5);
 
       setRevealedCount(count);
@@ -486,7 +461,7 @@ export default function About() {
         <MaskedLineRevealStatement />
       </div>
 
-      {/* ── Dark Overlapping Card Sheet (Transitions background to dark black on scroll) ── */}
+      {/* ── Dark Overlapping Card Sheet ── */}
       <div className={styles.darkOverlapSheet}>
         <div className={styles.darkOverlapContent}>
 
@@ -568,27 +543,28 @@ export default function About() {
               </div>
             </div>
           </div>
-        </div>
-      </div>
 
-      {/* ── Section 4: Founders Manifesto ── */}
-      <div className={`${styles.manifestoOverlapWrapper} ${styles.reveal}`}>
-        <div className={styles.manifestoSection}>
-          <div className={styles.manifestoImageContainer}>
-            <h2 className={styles.manifestoTitle}>Founders Manifesto</h2>
-            <div className={styles.founderPhotoWrapper}>
-              <Image
-                src="/founder-photo-portrait.jpg"
-                alt="Founder Photo"
-                fill
-                unoptimized
-                className={styles.founderPhoto}
-              />
+          {/* ── Section 4: Founders Manifesto ── */}
+          <div className={`${styles.manifestoOverlapWrapper} ${styles.reveal}`}>
+            <div className={styles.manifestoSection}>
+              <div className={styles.manifestoImageContainer}>
+                <h2 className={styles.manifestoTitle}>Founders Manifesto</h2>
+                <div className={styles.founderPhotoWrapper}>
+                  <Image
+                    src="/founder-photo-portrait.jpg"
+                    alt="Founder Photo"
+                    fill
+                    unoptimized
+                    className={styles.founderPhoto}
+                  />
+                </div>
+              </div>
+              <div className={styles.manifestoContent}>
+                <ContinuousScrollManifesto />
+              </div>
             </div>
           </div>
-          <div className={styles.manifestoContent}>
-            <ContinuousScrollManifesto />
-          </div>
+
         </div>
       </div>
 
@@ -621,7 +597,7 @@ export default function About() {
               {/* Subtitle + CTA bottom-left */}
               <div className={styles.cultureSubGroup}>
                 <p className={styles.cultureSubtitle}>
-                  But we do not burn out doing it.
+                  But we don't burn out doing it.
                 </p>
                 <a href="#jobs" className={styles.cultureCtaBtn}>
                   Join the team

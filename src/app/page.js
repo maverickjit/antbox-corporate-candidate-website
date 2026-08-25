@@ -13,93 +13,212 @@ const cardData = [
   { title: 'ZERO GUESSWORK', desc: 'Data-backed hiring decisions replace gut-feel screening every time.' },
 ];
 
-// Each card in the visible grid — fades in together
-function BenefitCard({ card, index, totalCards, scrollYProgress }) {
-  // Each card staggered fade-in — aligned with new deck entry range (0.26+)
-  const cardOpacity = useTransform(
-    scrollYProgress,
-    [0, 0.28 + index * 0.04, 0.44 + index * 0.04],
-    [0, 0, 1]
+// Odometer / Slot-machine spinning digit reel
+function DigitReel({ targetDigit, isAnimating, delay = 0 }) {
+  if (isNaN(parseInt(targetDigit, 10))) {
+    return <span style={{ display: 'inline-block' }}>{targetDigit}</span>;
+  }
+  const digit = parseInt(targetDigit, 10);
+  const cycles = 3;
+  const numbers = [];
+  for (let c = 0; c < cycles; c++) {
+    for (let d = 0; d <= 9; d++) {
+      numbers.push(d);
+    }
+  }
+  numbers.push(digit);
+  const targetIndex = numbers.length - 1;
+
+  return (
+    <span
+      style={{
+        display: 'inline-block',
+        height: '1em',
+        overflow: 'hidden',
+        verticalAlign: 'top',
+        lineHeight: 1,
+      }}
+    >
+      <motion.span
+        style={{ display: 'flex', flexDirection: 'column' }}
+        initial={{ y: '0%' }}
+        animate={{ y: isAnimating ? `-${(targetIndex / numbers.length) * 100}%` : '0%' }}
+        transition={{
+          duration: 1.6 + delay * 0.12,
+          ease: [0.16, 1, 0.3, 1],
+          delay: delay * 0.05,
+        }}
+      >
+        {numbers.map((num, idx) => (
+          <span
+            key={idx}
+            style={{
+              height: '1em',
+              lineHeight: 1,
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+            }}
+          >
+            {num}
+          </span>
+        ))}
+      </motion.span>
+    </span>
   );
+}
+
+function RollingNumber({ value, isAnimating }) {
+  const chars = String(value).split('');
+  return (
+    <span style={{ display: 'inline-flex', alignItems: 'baseline', lineHeight: 1 }}>
+      {chars.map((char, i) => (
+        <DigitReel key={i} targetDigit={char} isAnimating={isAnimating} delay={i} />
+      ))}
+    </span>
+  );
+}
+
+// Stacked Card in "WHAT WE BRING" — all purple type, opens downwards 01 -> 02 -> 03 -> 04 -> 05 on scroll
+function StackedBenefitCard({ card, index, totalCards, scrollYProgress }) {
+  // Opening timeline:
+  // Card 0 (01): stays at top y = 0
+  // Card 1 (02): opens downwards to 80px over [0.15, 0.26]
+  // Card 2 (03): opens downwards to 160px over [0.26, 0.37]
+  // Card 3 (04): opens downwards to 240px over [0.37, 0.48]
+  // Card 4 (05): opens downwards to 320px over [0.48, 0.60]
+  // All 5 cards stay fully open and visible from 0.60 to 1.0!
+  // On back-scroll: all cards smoothly slide back UP into the single stack at 01!
+
+  const startT = 0.15 + (index - 1) * 0.11;
+  const endT = startT + 0.11;
+  const targetY = index * 80;
+
   const cardY = useTransform(
     scrollYProgress,
-    [0, 0.28 + index * 0.04, 0.44 + index * 0.04],
-    [40, 40, 0]
+    index === 0
+      ? [0.08, 0.14]
+      : [startT, endT],
+    index === 0
+      ? [0, 0]
+      : [0, targetY]
   );
 
-  const isTop = index === totalCards - 1;
+  const cardScale = useTransform(
+    scrollYProgress,
+    index === 0
+      ? [0.08, 0.14]
+      : [startT, endT],
+    index === 0
+      ? [1, 1]
+      : [0.96, 1]
+  );
+
+  // zIndex: Card 0 is on top of initial stack (5), Card 4 is at bottom (1)
+  const zIndex = totalCards - index;
 
   return (
     <motion.div
       style={{
-        opacity: cardOpacity,
+        position: 'absolute',
+        top: 0,
+        left: 0,
+        right: 0,
         y: cardY,
+        scale: cardScale,
+        zIndex: zIndex,
         borderRadius: '1.25rem',
         overflow: 'hidden',
-        boxShadow: isTop
-          ? '0 0 40px 10px rgba(142,67,172,0.35), 0 20px 60px rgba(0,0,0,0.5)'
-          : '0 8px 32px rgba(0,0,0,0.4)',
-        position: 'relative',
-        cursor: 'default',
+        boxShadow: '0 0 40px 8px rgba(142,67,172,0.32), 0 16px 45px rgba(0,0,0,0.55)',
       }}
     >
-      <div style={{
-        minHeight: '220px',
-        background: isTop
-          ? 'linear-gradient(145deg, #561b6e 0%, #2b0c37 100%)'
-          : 'linear-gradient(145deg, #2a2a2e 0%, #1a1a1e 100%)',
-        display: 'flex',
-        flexDirection: 'column',
-        justifyContent: 'space-between',
-        padding: '2rem 1.75rem',
-        position: 'relative',
-        overflow: 'hidden',
-        border: isTop
-          ? '1px solid rgba(234,182,255,0.45)'
-          : '1px solid rgba(247,245,238,0.12)',
-      }}>
-        {/* Dot grid */}
-        <div style={{
-          position: 'absolute', inset: 0,
-          backgroundImage: 'radial-gradient(circle, rgba(255,255,255,0.05) 1px, transparent 1px)',
-          backgroundSize: '20px 20px',
-          pointerEvents: 'none',
-        }} />
+      <div
+        style={{
+          minHeight: '74px',
+          background: 'linear-gradient(145deg, #561b6e 0%, #2b0c37 100%)',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'space-between',
+          padding: '1.1rem 1.75rem',
+          position: 'relative',
+          overflow: 'hidden',
+          border: '1.5px solid rgba(234,182,255,0.45)',
+        }}
+      >
+        {/* Dot grid pattern */}
+        <div
+          style={{
+            position: 'absolute',
+            inset: 0,
+            backgroundImage: 'radial-gradient(circle, rgba(255,255,255,0.06) 1px, transparent 1px)',
+            backgroundSize: '20px 20px',
+            pointerEvents: 'none',
+          }}
+        />
 
-        {/* Title content */}
-        <div style={{ position: 'relative', zIndex: 1 }}>
-          <h4 style={{
-            margin: '0 0 0.5rem',
-            color: isTop ? '#fff' : 'var(--cream)',
-            fontFamily: 'Poppins, sans-serif',
-            fontSize: '1rem',
-            fontWeight: 800,
-            letterSpacing: '0.07em',
-            lineHeight: 1.3,
-          }}>{card.title}</h4>
-          <p style={{
-            margin: 0,
-            color: isTop ? '#e9c8ff' : '#a3a3a3',
-            fontSize: '0.88rem',
-            lineHeight: 1.6,
-          }}>{card.desc}</p>
+        {/* Content */}
+        <div style={{ position: 'relative', zIndex: 1, display: 'flex', alignItems: 'center', gap: '1.25rem', flex: 1 }}>
+          <span
+            style={{
+              fontSize: '1.85rem',
+              fontWeight: 900,
+              fontFamily: 'Poppins, sans-serif',
+              color: '#ea80fc',
+              letterSpacing: '-0.03em',
+              lineHeight: 1,
+              flexShrink: 0,
+              textShadow: '0 0 15px rgba(234,128,252,0.5)',
+            }}
+          >
+            0{index + 1}
+          </span>
+          <div style={{ flex: 1 }}>
+            <h4
+              style={{
+                margin: '0 0 0.2rem',
+                color: '#fff',
+                fontFamily: 'Poppins, sans-serif',
+                fontSize: '1.05rem',
+                fontWeight: 800,
+                letterSpacing: '0.05em',
+                lineHeight: 1.25,
+              }}
+            >
+              {card.title}
+            </h4>
+            <p
+              style={{
+                margin: 0,
+                color: '#e9c8ff',
+                fontSize: '0.86rem',
+                lineHeight: 1.45,
+              }}
+            >
+              {card.desc}
+            </p>
+          </div>
         </div>
 
-        {/* Number badge — bottom right, transparent */}
-        <span style={{
-          position: 'absolute',
-          right: '1.25rem',
-          bottom: '1.25rem',
-          fontSize: '2.5rem',
-          fontWeight: 900,
-          fontFamily: 'Poppins, sans-serif',
-          color: 'rgba(255,255,255,0.07)',
-          letterSpacing: '-0.04em',
-          lineHeight: 1,
-          zIndex: 0,
-          pointerEvents: 'none',
-          userSelect: 'none',
-        }}>0{index + 1}</span>
+        {/* Badge icon */}
+        <div style={{ position: 'relative', zIndex: 1, marginLeft: '1rem', flexShrink: 0 }}>
+          <div
+            style={{
+              width: '34px',
+              height: '34px',
+              borderRadius: '50%',
+              background: 'rgba(234,182,255,0.2)',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              border: '1px solid rgba(234,182,255,0.45)',
+            }}
+          >
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+              <line x1="7" y1="17" x2="17" y2="7"></line>
+              <polyline points="7 7 17 7 17 17"></polyline>
+            </svg>
+          </div>
+        </div>
       </div>
     </motion.div>
   );
@@ -112,21 +231,32 @@ function SolutionsSection() {
     offset: ["start start", "end end"]
   });
 
-  // Phase 1: message centered immediately, exits upward completely off-screen
-  const messageY = useTransform(scrollYProgress, [0, 0.24], ["0vh", "-120vh"]);
-  const messageOpacity = useTransform(scrollYProgress, [0, 0.12, 0.20], [1, 1, 0]);
+  // Phase 1: message centered, exits quickly between 0.06 and 0.12 so What We Bring appears fast
+  const messageY = useTransform(scrollYProgress, [0, 0.12], ["0vh", "-100vh"]);
+  const messageOpacity = useTransform(scrollYProgress, [0, 0.08, 0.12], [1, 1, 0]);
+  const messageDisplay = useTransform(scrollYProgress, (v) => (v > 0.12 ? 'none' : 'flex'));
 
-  // Phase 2: Cards grid fade in — starts only after message is fully gone
-  const deckOpacity = useTransform(scrollYProgress, [0.26, 0.38], [0, 1]);
-  const deckScale = useTransform(scrollYProgress, [0.26, 0.38], [0.92, 1]);
-
+  // Phase 2: Stacked Cards Deck appears smoothly at [0.10, 0.15] and STAYS visible until CTA
+  const deckOpacity = useTransform(scrollYProgress, [0.10, 0.15], [0, 1]);
   const totalCards = cardData.length;
 
+  // Active step counter for bottom pill indicator
+  const [activeStep, setActiveStep] = useState(0);
+  useEffect(() => {
+    return scrollYProgress.on('change', (latest) => {
+      if (latest < 0.22) setActiveStep(0);
+      else if (latest < 0.33) setActiveStep(1);
+      else if (latest < 0.44) setActiveStep(2);
+      else if (latest < 0.55) setActiveStep(3);
+      else setActiveStep(4);
+    });
+  }, [scrollYProgress]);
+
   return (
-    <section className="solutions-section-pinned" ref={sectionRef}>
+    <section className="solutions-section-pinned" ref={sectionRef} style={{ height: '320vh' }}>
       <div className="solutions-sticky-inner">
-        {/* Phase 1: big message — immediately visible, then scrolls away */}
-        <motion.div className="solutions-fullpage-msg" style={{ opacity: messageOpacity, y: messageY }}>
+        {/* Phase 1: big message — immediately visible, scrolls away fast */}
+        <motion.div className="solutions-fullpage-msg" style={{ opacity: messageOpacity, y: messageY, display: messageDisplay }}>
           <h3>
             <span className="msg-line">
               <span style={{ color: '#f7f5ee' }}>WE BUILT </span>
@@ -141,39 +271,48 @@ function SolutionsSection() {
           </h3>
         </motion.div>
 
-        {/* Phase 2: Cards grid */}
+        {/* Phase 2: Stacked Cards Deck revealed downwards (01 -> 02 -> 03 -> 04 -> 05) */}
         <motion.div
-          style={{ opacity: deckOpacity, scale: deckScale, width: '100%', display: 'flex', flexDirection: 'column', alignItems: 'center', padding: '0 1.5rem' }}
+          style={{
+            opacity: deckOpacity,
+            width: '100%',
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'center',
+            padding: '0 1.5rem',
+            maxWidth: '920px',
+          }}
         >
-          <h2 className="section-title heading-serif text-center" style={{ color: '#fff', marginBottom: '2rem' }}>
+          <h2 className="section-title heading-serif text-center" style={{ color: '#fff', marginBottom: '1.75rem' }}>
             WHAT WE <span style={{ color: 'var(--accent-purple)' }}>BRING</span>
           </h2>
 
-          {/* 5-card grid — all visible at once */}
-          {/* Row 1: 3 cards */}
-          <div style={{ display: 'flex', gap: '1rem', width: '100%', maxWidth: '900px', marginBottom: '1rem' }}>
-            {cardData.slice(0, 3).map((card, i) => (
-              <div key={i} style={{ flex: 1, minWidth: 0 }}>
-                <BenefitCard
-                  card={card}
-                  index={i}
-                  totalCards={totalCards}
-                  scrollYProgress={scrollYProgress}
-                />
-              </div>
+          {/* Stacked Deck Container */}
+          <div style={{ position: 'relative', width: '100%', maxWidth: '820px', height: '400px' }}>
+            {cardData.map((card, i) => (
+              <StackedBenefitCard
+                key={i}
+                card={card}
+                index={i}
+                totalCards={totalCards}
+                scrollYProgress={scrollYProgress}
+              />
             ))}
           </div>
-          {/* Row 2: 2 cards centered */}
-          <div style={{ display: 'flex', gap: '1rem', width: '100%', maxWidth: '900px', justifyContent: 'center' }}>
-            {cardData.slice(3).map((card, i) => (
-              <div key={i + 3} style={{ flex: '0 0 calc(33.33% - 0.5rem)', minWidth: 0 }}>
-                <BenefitCard
-                  card={card}
-                  index={i + 3}
-                  totalCards={totalCards}
-                  scrollYProgress={scrollYProgress}
-                />
-              </div>
+
+          {/* Progress dots indicator */}
+          <div style={{ display: 'flex', gap: '0.6rem', marginTop: '1.5rem', alignItems: 'center' }}>
+            {cardData.map((_, i) => (
+              <div
+                key={i}
+                style={{
+                  width: i === activeStep ? '2rem' : '0.5rem',
+                  height: '0.45rem',
+                  borderRadius: '999px',
+                  background: i === activeStep ? 'var(--accent-purple)' : 'rgba(255,255,255,0.2)',
+                  transition: 'all 0.35s cubic-bezier(0.4, 0, 0.2, 1)',
+                }}
+              />
             ))}
           </div>
         </motion.div>
@@ -305,23 +444,89 @@ function CandidateFriction() {
           >FRICTION</span>
         </h2>
 
-        <div className="process-layout" style={{ width: '100%' }}>
-          <div className="process-timeline">
-            <motion.div className="process-timeline-active-line" style={{ position: 'absolute', top: 0, left: 0, height: '1px', background: 'var(--accent-purple)', zIndex: 2, transformOrigin: 'left', scaleX: lineScaleX, width: '100%' }}></motion.div>
-            <motion.div className={`process-step ${activeStep >= 0 ? 'active' : ''}`} animate={{ opacity: activeStep >= 0 ? 1 : 0, y: activeStep >= 0 ? 0 : 20 }} transition={{ duration: 0.4, ease: "easeOut" }}>
-              <div className="process-number">01</div>
-              <h3 className="tc-heading">Outdated Campus Tech Stack</h3>
-              <p className="tc-body">AI and tech evolve every 12 months, but university courses take years to update. What you learn in class often falls short of what top companies demand on Day 1.</p>
+        <div className="process-layout" style={{ width: '100%', marginTop: '3.5rem' }}>
+          <div className="process-timeline" style={{ display: 'flex', gap: '2.5rem', width: '100%', position: 'relative' }}>
+            <motion.div className="process-timeline-active-line" style={{ position: 'absolute', top: 0, left: 0, height: '2px', background: 'var(--accent-purple)', zIndex: 2, transformOrigin: 'left', scaleX: lineScaleX, width: '100%' }}></motion.div>
+            
+            {/* Step 01 */}
+            <motion.div
+              className={`process-step ${activeStep >= 0 ? 'active' : ''}`}
+              animate={{ opacity: activeStep >= 0 ? 1 : 0.35, y: activeStep >= 0 ? 0 : 15 }}
+              transition={{ duration: 0.4, ease: "easeOut" }}
+              style={{ flex: 1, position: 'relative', paddingTop: '1.5rem' }}
+            >
+              <div
+                className="process-number"
+                style={{
+                  fontFamily: 'Poppins, sans-serif',
+                  fontSize: 'clamp(3rem, 6vw, 4.5rem)',
+                  fontWeight: 900,
+                  lineHeight: 1,
+                  letterSpacing: '-0.05em',
+                  color: activeStep >= 0 ? 'var(--accent-purple)' : 'rgba(255,255,255,0.2)',
+                  marginBottom: '1rem',
+                  textShadow: activeStep >= 0 ? '0 0 30px rgba(187,98,222,0.45)' : 'none',
+                  transition: 'all 0.4s ease',
+                }}
+              >
+                01
+              </div>
+              <h3 className="tc-heading" style={{ fontSize: '1.4rem', fontWeight: 800, color: 'var(--cream)', marginBottom: '0.6rem' }}>Outdated Campus Tech Stack</h3>
+              <p className="tc-body" style={{ color: '#a6a6a6', fontSize: '1.02rem', lineHeight: 1.6 }}>AI and tech evolve every 12 months, but university courses take years to update. What you learn in class often falls short of what top companies demand on Day 1.</p>
             </motion.div>
-            <motion.div className={`process-step ${activeStep >= 1 ? 'active' : ''}`} animate={{ opacity: activeStep >= 1 ? 1 : 0, y: activeStep >= 1 ? 0 : 20 }} transition={{ duration: 0.4, ease: "easeOut" }}>
-              <div className="process-number">02</div>
-              <h3 className="tc-heading">Judged in Hours After 4 Years of Study</h3>
-              <p className="tc-body">Traditional hiring compresses your entire degree into a single resume screening or a 30-minute interview, leading to higher drop-offs and missed opportunities.</p>
+
+            {/* Step 02 */}
+            <motion.div
+              className={`process-step ${activeStep >= 1 ? 'active' : ''}`}
+              animate={{ opacity: activeStep >= 1 ? 1 : 0.35, y: activeStep >= 1 ? 0 : 15 }}
+              transition={{ duration: 0.4, ease: "easeOut" }}
+              style={{ flex: 1, position: 'relative', paddingTop: '1.5rem' }}
+            >
+              <div
+                className="process-number"
+                style={{
+                  fontFamily: 'Poppins, sans-serif',
+                  fontSize: 'clamp(3rem, 6vw, 4.5rem)',
+                  fontWeight: 900,
+                  lineHeight: 1,
+                  letterSpacing: '-0.05em',
+                  color: activeStep >= 1 ? 'var(--accent-purple)' : 'rgba(255,255,255,0.2)',
+                  marginBottom: '1rem',
+                  textShadow: activeStep >= 1 ? '0 0 30px rgba(187,98,222,0.45)' : 'none',
+                  transition: 'all 0.4s ease',
+                }}
+              >
+                02
+              </div>
+              <h3 className="tc-heading" style={{ fontSize: '1.4rem', fontWeight: 800, color: 'var(--cream)', marginBottom: '0.6rem' }}>Judged in Hours After 4 Years</h3>
+              <p className="tc-body" style={{ color: '#a6a6a6', fontSize: '1.02rem', lineHeight: 1.6 }}>Traditional hiring compresses your entire degree into a single resume screening or a 30-minute interview, leading to higher drop-offs and missed opportunities.</p>
             </motion.div>
-            <motion.div className={`process-step ${activeStep >= 2 ? 'active' : ''}`} animate={{ opacity: activeStep >= 2 ? 1 : 0, y: activeStep >= 2 ? 0 : 20 }} transition={{ duration: 0.4, ease: "easeOut" }}>
-              <div className="process-number">03</div>
-              <h3 className="tc-heading">The Experience Needed Paradox</h3>
-              <p className="tc-body">Companies expect prior experience for entry-level roles, but few give you the chance to gain it. Over 77% of grads end up learning everything from scratch on the job.</p>
+
+            {/* Step 03 */}
+            <motion.div
+              className={`process-step ${activeStep >= 2 ? 'active' : ''}`}
+              animate={{ opacity: activeStep >= 2 ? 1 : 0.35, y: activeStep >= 2 ? 0 : 15 }}
+              transition={{ duration: 0.4, ease: "easeOut" }}
+              style={{ flex: 1, position: 'relative', paddingTop: '1.5rem' }}
+            >
+              <div
+                className="process-number"
+                style={{
+                  fontFamily: 'Poppins, sans-serif',
+                  fontSize: 'clamp(3rem, 6vw, 4.5rem)',
+                  fontWeight: 900,
+                  lineHeight: 1,
+                  letterSpacing: '-0.05em',
+                  color: activeStep >= 2 ? 'var(--accent-purple)' : 'rgba(255,255,255,0.2)',
+                  marginBottom: '1rem',
+                  textShadow: activeStep >= 2 ? '0 0 30px rgba(187,98,222,0.45)' : 'none',
+                  transition: 'all 0.4s ease',
+                }}
+              >
+                03
+              </div>
+              <h3 className="tc-heading" style={{ fontSize: '1.4rem', fontWeight: 800, color: 'var(--cream)', marginBottom: '0.6rem' }}>The Experience Needed Paradox</h3>
+              <p className="tc-body" style={{ color: '#a6a6a6', fontSize: '1.02rem', lineHeight: 1.6 }}>Companies expect prior experience for entry-level roles, but few give you the chance to gain it. Over 77% of grads end up learning everything from scratch on the job.</p>
             </motion.div>
           </div>
         </div>
@@ -332,77 +537,156 @@ function CandidateFriction() {
 
 
 
-function HeroScrollSection() {
-  const containerRef = useRef(null);
-  const { scrollYProgress } = useScroll({
-    target: containerRef,
-    offset: ["start start", "end end"]
-  });
+// Combined Scene: Hero ("Where talent IS Built not found") + "What Corporates Face"
+// 1. "Built" zooms in smoothly, and "What Corporates Face" appears directly from behind as soon as Built disappears.
+// 2. Numbers roll into place with slot machine digit animation.
+// 3. "What Corporates Face" stays pinned and still while the dark "We built antbox..." sheet covers it smoothly.
+function CorporateHeroAndProblems({ scrollProgress }) {
+  // Hero text fly-out (0.0 to 0.35)
+  const leftX = useTransform(scrollProgress, [0, 0.35], ["0vw", "-100vw"]);
+  const rightX = useTransform(scrollProgress, [0, 0.35], ["0vw", "100vw"]);
+  const isX = useTransform(scrollProgress, [0, 0.35], ["0vw", "-50vw"]);
+  const topOpacity = useTransform(scrollProgress, [0, 0.28], [1, 0]);
+  const isOpacity = useTransform(scrollProgress, [0, 0.28], [1, 0]);
 
-  // All words slide out, then "Built" slowly zooms to fill screen
-  // Height is 250vh → scroll range is 150vh → animation is 7.5× slower than before
-  const leftX = useTransform(scrollYProgress, [0, 0.55], ["0vw", "-100vw"]);
-  const topOpacity = useTransform(scrollYProgress, [0, 0.45], [1, 0]);
+  // "Built" zoom: smooth scale up to 45x and fades out cleanly
+  const builtScale = useTransform(scrollProgress, [0, 0.22, 0.46], [1, 2.5, 45]);
+  const builtOpacity = useTransform(scrollProgress, [0, 0.34, 0.46], [1, 1, 0]);
+  const heroOpacity = useTransform(scrollProgress, [0.38, 0.46], [1, 0]);
+  // Hero layer vanishes at exactly 0.46 revealing WCF underneath
+  const heroDisplay = useTransform(scrollProgress, (v) => (v > 0.46 ? 'none' : 'flex'));
+  const heroPointerEvents = useTransform(scrollProgress, (v) => (v > 0.46 ? 'none' : 'auto'));
 
-  const rightX = useTransform(scrollYProgress, [0, 0.55], ["0vw", "100vw"]);
+  // Stats roll animation: trigger when hero starts fading
+  const [statsVisible, setStatsVisible] = useState(false);
 
-  const isX = useTransform(scrollYProgress, [0, 0.55], ["0vw", "-50vw"]);
-  const isOpacity = useTransform(scrollYProgress, [0, 0.45], [1, 0]);
-
-  // Built zooms slowly, reaches full coverage at 0.75, fades out at 0.8
-  const builtScale = useTransform(scrollYProgress, [0, 0.35, 0.75, 1], [1, 2.5, 100, 100]);
-  const builtOpacity = useTransform(scrollYProgress, [0, 0.6, 0.80], [1, 1, 0]);
-
-  // Hero section fades just before Built finishes
-  const heroOpacity = useTransform(scrollYProgress, [0.5, 0.80], [1, 0]);
+  useEffect(() => {
+    return scrollProgress.on('change', (latest) => {
+      if (latest >= 0.38) {
+        setStatsVisible(true);
+      } else {
+        setStatsVisible(false);
+      }
+    });
+  }, [scrollProgress]);
 
   return (
-    <section ref={containerRef} style={{ height: '250vh', position: 'relative', background: 'var(--cream)', zIndex: 1, overflow: 'hidden' }}>
-      <motion.div
-        className="sticky top-0 h-screen w-full flex flex-col items-center justify-center overflow-hidden"
-        style={{ opacity: heroOpacity }}
+    <div style={{ position: 'relative', width: '100%', height: '100%', overflow: 'hidden', background: 'var(--cream)' }}>
+      {/* Layer 1: "What Corporates Face" — always visible (opacity:1), revealed when hero fades away */}
+      <div
+        style={{
+          opacity: 1,
+          position: 'absolute',
+          inset: 0,
+          zIndex: 2,
+          display: 'flex',
+          flexDirection: 'column',
+          justifyContent: 'center',
+          alignItems: 'center',
+          padding: '3rem 1.5rem',
+          background: 'var(--cream)',
+        }}
       >
-        <div className="flex flex-col items-center justify-center gap-2 md:gap-4 font-black tracking-[-0.03em] uppercase leading-[1.05] text-center w-full" style={{ fontFamily: 'Poppins, sans-serif' }}>
+        <div className="w-full max-w-[1400px] mx-auto px-6 md:px-12">
+          <h2 className="section-title heading-serif text-center" style={{ color: 'var(--black)', marginBottom: '1rem' }}>
+            WHAT <span style={{ color: 'var(--accent-purple)' }}>CORPORATES</span> FACE
+          </h2>
+          <div className="problems-intro text-center" style={{ marginBottom: '3rem' }}>
+            <p className="problems-lead">One rushed interview. One resume. One gut call.</p>
+          </div>
+          <div className="problems-grid">
+            <div className="problem-card">
+              <h3 className="problem-stat">
+                <RollingNumber value="70%" isAnimating={statsVisible} />
+              </h3>
+              <p className="problem-text">underperform or quit within a year.</p>
+              <a href="#" className="arrow-link">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <line x1="7" y1="17" x2="17" y2="7"></line>
+                  <polyline points="7 7 17 7 17 17"></polyline>
+                </svg>
+              </a>
+            </div>
+            <div className="problem-card">
+              <h3 className="problem-stat">
+                <RollingNumber value="$4,700+" isAnimating={statsVisible} />
+              </h3>
+              <p className="problem-text">burned per wrong hire.</p>
+              <a href="#" className="arrow-link">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <line x1="7" y1="17" x2="17" y2="7"></line>
+                  <polyline points="7 7 17 7 17 17"></polyline>
+                </svg>
+              </a>
+            </div>
+            <div className="problem-card">
+              <h3 className="problem-stat">
+                <RollingNumber value="4–6" isAnimating={statsVisible} />
+              </h3>
+              <p className="problem-text">months lost in training before productivity.</p>
+              <a href="#" className="arrow-link">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <line x1="7" y1="17" x2="17" y2="7"></line>
+                  <polyline points="7 7 17 7 17 17"></polyline>
+                </svg>
+              </a>
+            </div>
+          </div>
+        </div>
+      </div>
 
-          <motion.div
-            style={{ x: leftX, opacity: topOpacity }}
-            className="text-on-surface text-[clamp(36px,8vw,120px)] whitespace-nowrap block"
-          >
-            Where talent
-          </motion.div>
-
-          <div className="flex items-center justify-center gap-4 text-[clamp(36px,8vw,120px)] w-full">
-            <motion.div style={{ x: isX, opacity: isOpacity }} className="text-on-surface lowercase">
-              IS
-            </motion.div>
+      {/* Layer 2: Hero Section ("Where talent IS Built not found") */}
+      <motion.div
+        className="flex flex-col items-center justify-center"
+        style={{
+          opacity: heroOpacity,
+          display: heroDisplay,
+          pointerEvents: heroPointerEvents,
+          position: 'absolute',
+          inset: 0,
+          zIndex: 5,
+          background: 'var(--cream)',
+        }}
+      >
+          <div className="flex flex-col items-center justify-center gap-2 md:gap-4 font-black tracking-[-0.03em] uppercase leading-[1.05] text-center w-full" style={{ fontFamily: 'Poppins, sans-serif' }}>
             <motion.div
-              style={{ scale: builtScale, opacity: builtOpacity, transformOrigin: 'center center', zIndex: 50 }}
-              className="text-[var(--accent-purple)] pointer-events-none"
+              style={{ x: leftX, opacity: topOpacity }}
+              className="text-on-surface text-[clamp(36px,8vw,120px)] whitespace-nowrap block"
             >
-              Built
+              Where talent
+            </motion.div>
+
+            <div className="flex items-center justify-center gap-4 text-[clamp(36px,8vw,120px)] w-full">
+              <motion.div style={{ x: isX, opacity: isOpacity }} className="text-on-surface lowercase">
+                IS
+              </motion.div>
+              <motion.div
+                style={{ scale: builtScale, opacity: builtOpacity, transformOrigin: 'center center', zIndex: 50 }}
+                className="text-[var(--accent-purple)] pointer-events-none"
+              >
+                Built
+              </motion.div>
+            </div>
+
+            <motion.div style={{ x: rightX, opacity: topOpacity }}>
+              <span
+                className="text-primary block"
+                style={{
+                  fontFamily: 'var(--font-times)',
+                  fontStyle: 'italic',
+                  fontSize: 'clamp(32px,7vw,100px)',
+                  lineHeight: 1,
+                  textTransform: 'none',
+                  letterSpacing: 'normal',
+                  fontWeight: 'normal',
+                }}
+              >
+                not found
+              </span>
             </motion.div>
           </div>
-
-          <motion.div style={{ x: rightX, opacity: topOpacity }}>
-            <span
-              className="text-primary block"
-              style={{
-                fontFamily: 'var(--font-times)',
-                fontStyle: 'italic',
-                fontSize: 'clamp(32px,7vw,100px)',
-                lineHeight: 1,
-                textTransform: 'none',
-                letterSpacing: 'normal',
-                fontWeight: 'normal',
-              }}
-            >
-              not found
-            </span>
-          </motion.div>
-
-        </div>
-      </motion.div>
-    </section>
+        </motion.div>
+    </div>
   );
 }
 
@@ -459,85 +743,41 @@ function CorporateCTA() {
 }
 
 function CorporateView({ activeTab, setActiveTab }) {
-  const statsRef = useRef(null);
-  const [statsVisible, setStatsVisible] = useState(false);
-
-  useEffect(() => {
-    const el = statsRef.current;
-    if (!el) return;
-    const observer = new IntersectionObserver(
-      ([entry]) => {
-        if (entry.isIntersecting) {
-          setStatsVisible(true);  // start animation
-        } else {
-          setStatsVisible(false); // reset so it replays next time
-        }
-      },
-      { threshold: 0.3 }
-    );
-    observer.observe(el);
-    return () => observer.disconnect();
-  }, []);
-
-  const { scrollYProgress } = useScroll({
-    target: statsRef,
-    offset: ["start end", "end start"]
+  // Track scroll ONLY over the spacer div — this way heroProgress 0→1 spans just 250vh.
+  // The sticky "What Corporates Face" layer is fully revealed at progress ~0.48 (≈120vh into spacer).
+  // The dark overlay doesn't enter the viewport until the spacer ends (at total ~350vh of scroll),
+  // so there is ~130vh of comfortable viewing of "What Corporates Face" before it gets covered.
+  const heroSpacerRef = useRef(null);
+  const { scrollYProgress: heroProgress } = useScroll({
+    target: heroSpacerRef,
+    offset: ["start start", "end start"]
   });
 
-  const yLeft = useTransform(scrollYProgress, [0, 1], [120, -120]);
-  const yCenter = useTransform(scrollYProgress, [0, 1], [60, -60]);
-  const yRight = useTransform(scrollYProgress, [0, 1], [180, -180]);
-
   return (
-    <div className="page-wrapper">
-      <HeroScrollSection />
-
-      {/* "What Corporates Face" — pulled up 140vh so it appears the moment Built fades out */}
-      <section
-        className="problems-section"
+    <div className="page-wrapper" style={{ position: 'relative' }}>
+      {/* Sticky viewport — stays pinned at top:0 for the ENTIRE scroll duration of page-wrapper */}
+      <div
         style={{
-          minHeight: '100vh',
-          display: 'flex',
-          flexDirection: 'column',
-          justifyContent: 'center',
-          paddingTop: '3rem',
-          paddingBottom: '3rem',
+          position: 'sticky',
+          top: 0,
+          height: '100vh',
+          width: '100vw',
+          marginLeft: 'calc(-50vw + 50%)',
+          zIndex: 1,
+          overflow: 'hidden',
           background: 'var(--cream)',
-          position: 'relative',
-          zIndex: 3,
-          marginTop: '-140vh',
-          marginBottom: 0,
         }}
       >
-        <div className="w-full max-w-[1400px] mx-auto px-6 md:px-12">
-          <h2 className="section-title heading-serif text-center" style={{ color: 'var(--black)', marginBottom: '1rem' }}>WHAT <span style={{ color: 'var(--accent-purple)' }}>CORPORATES</span> FACE</h2>
-          <div className="problems-intro text-center" style={{ marginBottom: '3rem' }}>
-            <p className="problems-lead">One rushed interview. One resume. One gut call.</p>
-          </div>
-          <div className="problems-grid" ref={statsRef}>
-            <motion.div className="problem-card" style={{ y: yLeft }}>
-              <h3 className="problem-stat">70%</h3>
-              <p className="problem-text">underperform or quit within a year.</p>
-              <a href="#" className="arrow-link"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="7" y1="17" x2="17" y2="7"></line><polyline points="7 7 17 7 17 17"></polyline></svg></a>
-            </motion.div>
-            <motion.div className="problem-card" style={{ y: yCenter }}>
-              <h3 className="problem-stat">$4,700+</h3>
-              <p className="problem-text">burned per wrong hire.</p>
-              <a href="#" className="arrow-link"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="7" y1="17" x2="17" y2="7"></line><polyline points="7 7 17 7 17 17"></polyline></svg></a>
-            </motion.div>
-            <motion.div className="problem-card" style={{ y: yRight }}>
-              <h3 className="problem-stat">4–6</h3>
-              <p className="problem-text">months lost in training before productivity.</p>
-              <a href="#" className="arrow-link"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="7" y1="17" x2="17" y2="7"></line><polyline points="7 7 17 7 17 17"></polyline></svg></a>
-            </motion.div>
-          </div>
-        </div>
-      </section>
+        <CorporateHeroAndProblems scrollProgress={heroProgress} />
+      </div>
 
-      <div className="scroll-overlay-container" style={{ marginTop: 0 }}>
+      {/* Spacer — heroProgress tracks THIS div only (0→1 over 250vh).
+          Hero animation completes by ~0.48 (120vh). Dark overlay enters at end of spacer (~350vh total). */}
+      <div ref={heroSpacerRef} style={{ height: '250vh' }} />
+
+      {/* Dark section — rolls up over the pinned "What Corporates Face" like a curtain */}
+      <div className="scroll-overlay-container" style={{ position: 'relative', zIndex: 10, background: 'var(--black)' }}>
         <SolutionsSection />
-
-        {/* CTA with scroll-driven purple clip-path animation */}
         <CorporateCTA />
       </div>
     </div>
@@ -705,11 +945,11 @@ function CandidateHowItWorks() {
   // Active step driven by scroll
   const [activeStep, setActiveStep] = useState(0);
   useEffect(() => {
-    return scrollYProgress.onChange((latest) => {
+    return scrollYProgress.on('change', (latest) => {
       const idx = Math.min(Math.floor(latest * totalCards), totalCards - 1);
       setActiveStep(idx);
     });
-  }, [scrollYProgress]);
+  }, [scrollYProgress, totalCards]);
 
   return (
     <section
@@ -830,6 +1070,218 @@ function CandidateHowItWorks() {
   );
 }
 
+const hiringCompanies = [
+  {
+    name: 'SKYDO',
+    symbol: '◆',
+    color: '#38BDF8',
+    category: 'Cross-border Payments',
+    desc: 'B2B cross-border payment platform with zero-markup FX for global exporters.',
+    roles: 'Full Stack, Growth Ops',
+    hired: '4 Hired',
+  },
+  {
+    name: 'QAPITA',
+    symbol: '●',
+    color: '#2DD4BF',
+    category: 'CapTable & Equity SaaS',
+    desc: 'Digital equity management and private market liquidity software platform.',
+    roles: 'Backend Dev, Product Analyst',
+    hired: '6 Hired',
+  },
+  {
+    name: 'KUTLERRI',
+    symbol: '▲',
+    color: '#FB923C',
+    category: 'Smart Kitchen Tech',
+    desc: 'Next-gen automated culinary hardware and connected kitchen systems.',
+    roles: 'Frontend Dev, Supply Ops',
+    hired: '3 Hired',
+  },
+  {
+    name: 'LEADRAT',
+    symbol: '■',
+    color: '#A78BFA',
+    category: 'Real Estate CRM',
+    desc: 'High-velocity lead management and sales acceleration platform for developers.',
+    roles: 'Full Stack, QA Eng',
+    hired: '5 Hired',
+  },
+  {
+    name: 'RAZORPAY',
+    symbol: '★',
+    color: '#F43F5E',
+    category: 'Payments & Neo-banking',
+    desc: 'Full-stack financial services and payments infrastructure unicorn.',
+    roles: 'Platform Eng, Backend Systems',
+    hired: '8 Hired',
+  },
+  {
+    name: 'CRED',
+    symbol: '●',
+    color: '#E2E8F0',
+    category: 'Fintech Ecosystem',
+    desc: 'Premium rewards and high-trust financial ecosystem platform.',
+    roles: 'Mobile Dev, UI/UX Designer',
+    hired: '4 Hired',
+  },
+  {
+    name: 'DEEL',
+    symbol: '◆',
+    color: '#60A5FA',
+    category: 'Global Payroll & HR',
+    desc: 'International contractor compliance and automated global payroll solutions.',
+    roles: 'Full Stack, Compliance Ops',
+    hired: '7 Hired',
+  },
+  {
+    name: 'ZETA',
+    symbol: '▲',
+    color: '#F472B6',
+    category: 'Next-Gen Core Banking',
+    desc: 'Cloud-native modern banking stack powering scalable credit & cards programs.',
+    roles: 'Java Systems, Cloud Eng',
+    hired: '5 Hired',
+  },
+];
+
+function CompanyLogoBadge({ company }) {
+  const [isHovered, setIsHovered] = useState(false);
+
+  return (
+    <div
+      className="company-box relative inline-flex items-center gap-2 cursor-pointer transition-all duration-300"
+      style={{
+        fontSize: '1.15rem',
+        fontWeight: '800',
+        background: isHovered ? 'rgba(255,255,255,0.08)' : 'rgba(255,255,255,0.04)',
+        color: '#fff',
+        border: isHovered ? `1px solid ${company.color}99` : '1px solid rgba(255,255,255,0.08)',
+        borderRadius: '12px',
+        padding: '0.9rem 2rem',
+        boxShadow: isHovered ? `0 8px 30px ${company.color}25` : 'none',
+        transform: isHovered ? 'translateY(-2px)' : 'none',
+      }}
+      onMouseEnter={() => setIsHovered(true)}
+      onMouseLeave={() => setIsHovered(false)}
+    >
+      <span style={{ color: company.color }}>{company.symbol}</span>
+      <span>{company.name}</span>
+
+      {/* Floating brief card on hover */}
+      <AnimatePresence>
+        {isHovered && (
+          <motion.div
+            initial={{ opacity: 0, y: 10, scale: 0.95 }}
+            animate={{ opacity: 1, y: 0, scale: 1 }}
+            exit={{ opacity: 0, y: 6, scale: 0.95 }}
+            transition={{ duration: 0.22, ease: [0.16, 1, 0.3, 1] }}
+            style={{
+              position: 'absolute',
+              bottom: 'calc(100% + 14px)',
+              left: '50%',
+              transform: 'translateX(-50%)',
+              width: '280px',
+              background: '#16161a',
+              border: `1px solid ${company.color}55`,
+              borderRadius: '16px',
+              padding: '1.15rem 1.25rem',
+              boxShadow: `0 20px 50px rgba(0,0,0,0.85), 0 0 25px ${company.color}22`,
+              zIndex: 100,
+              pointerEvents: 'none',
+              textAlign: 'left',
+              whiteSpace: 'normal',
+            }}
+          >
+            {/* Header */}
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '0.5rem' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', fontWeight: 800, fontSize: '1rem', color: '#fff' }}>
+                <span style={{ color: company.color }}>{company.symbol}</span>
+                {company.name}
+              </div>
+              <span
+                style={{
+                  fontSize: '0.72rem',
+                  padding: '0.2rem 0.55rem',
+                  borderRadius: '999px',
+                  background: 'rgba(255,255,255,0.08)',
+                  color: company.color,
+                  fontWeight: 600,
+                  border: `1px solid ${company.color}33`,
+                }}
+              >
+                {company.category}
+              </span>
+            </div>
+
+            {/* Description */}
+            <p style={{ margin: '0 0 0.75rem', fontSize: '0.82rem', color: '#a3a3a3', lineHeight: 1.45, fontWeight: 400 }}>
+              {company.desc}
+            </p>
+
+            {/* Footer */}
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', paddingTop: '0.5rem', borderTop: '1px solid rgba(255,255,255,0.08)', fontSize: '0.75rem' }}>
+              <span style={{ color: '#888' }}>Roles: <strong style={{ color: '#e5e5e5', fontWeight: 600 }}>{company.roles}</strong></span>
+              <span style={{ color: 'var(--accent-purple)', fontWeight: 700, background: 'rgba(187,98,222,0.12)', padding: '0.15rem 0.45rem', borderRadius: '4px' }}>
+                ✓ {company.hired}
+              </span>
+            </div>
+
+            {/* Downward triangle pointer */}
+            <div
+              style={{
+                position: 'absolute',
+                top: '100%',
+                left: '50%',
+                transform: 'translateX(-50%)',
+                width: 0,
+                height: 0,
+                borderLeft: '7px solid transparent',
+                borderRight: '7px solid transparent',
+                borderTop: '7px solid #16161a',
+              }}
+            />
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </div>
+  );
+}
+
+function CompanyMarqueeSection() {
+  return (
+    <section
+      className="social-proof-section"
+      style={{
+        width: '100vw',
+        marginLeft: 'calc(-50vw + 50%)',
+        padding: '11rem 0 6rem',
+        overflow: 'visible',
+        background: 'var(--black)',
+        position: 'relative',
+        zIndex: 5,
+      }}
+    >
+      <div className="w-full text-center" style={{ overflow: 'visible' }}>
+        <div className="company-logos relative w-full" style={{ opacity: 0.95, overflow: 'visible' }}>
+          <div className="flex gap-12 whitespace-nowrap animate-marquee" style={{ overflow: 'visible' }}>
+            {[...Array(3)].map((_, groupIndex) => (
+              <React.Fragment key={groupIndex}>
+                {hiringCompanies.map((company, cIndex) => (
+                  <CompanyLogoBadge key={`${groupIndex}-${cIndex}`} company={company} />
+                ))}
+              </React.Fragment>
+            ))}
+          </div>
+        </div>
+        <p className="caption" style={{ marginTop: '3.5rem', color: '#888', fontStyle: 'italic', fontSize: '1.1rem' }}>
+          Where AntBox candidates get hired
+        </p>
+      </div>
+    </section>
+  );
+}
+
 function CandidateView() {
   return (
     <div className="page-wrapper candidate-view">
@@ -890,43 +1342,10 @@ function CandidateView() {
 
       <div className="scroll-overlay-container candidate-overlay">
         <CandidateFriction />
-        <section className="social-proof-section" style={{ width: '100vw', marginLeft: 'calc(-50vw + 50%)', padding: '6rem 0', overflow: 'hidden', background: 'var(--black)' }}>
-          <div className="w-full text-center">
-            <div className="company-logos overflow-hidden relative w-full mt-4" style={{ opacity: 0.9 }}>
-              <div className="flex gap-16 whitespace-nowrap animate-marquee">
-                {[...Array(3)].map((_, groupIndex) => (
-                  <React.Fragment key={groupIndex}>
-                    <div className="company-box" style={{ fontSize: '1.2rem', fontWeight: '800', background: 'rgba(255,255,255,0.04)', color: '#fff', border: '1px solid rgba(255,255,255,0.08)', borderRadius: '12px', padding: '1rem 2.2rem', display: 'inline-flex', alignItems: 'center', gap: '0.5rem' }}>
-                      <span style={{ color: '#38BDF8' }}>◆</span> SKYDO
-                    </div>
-                    <div className="company-box" style={{ fontSize: '1.2rem', fontWeight: '800', background: 'rgba(255,255,255,0.04)', color: '#fff', border: '1px solid rgba(255,255,255,0.08)', borderRadius: '12px', padding: '1rem 2.2rem', display: 'inline-flex', alignItems: 'center', gap: '0.5rem' }}>
-                      <span style={{ color: '#2DD4BF' }}>●</span> QAPITA
-                    </div>
-                    <div className="company-box" style={{ fontSize: '1.2rem', fontWeight: '800', background: 'rgba(255,255,255,0.04)', color: '#fff', border: '1px solid rgba(255,255,255,0.08)', borderRadius: '12px', padding: '1rem 2.2rem', display: 'inline-flex', alignItems: 'center', gap: '0.5rem' }}>
-                      <span style={{ color: '#FB923C' }}>▲</span> KUTLERRI
-                    </div>
-                    <div className="company-box" style={{ fontSize: '1.2rem', fontWeight: '800', background: 'rgba(255,255,255,0.04)', color: '#fff', border: '1px solid rgba(255,255,255,0.08)', borderRadius: '12px', padding: '1rem 2.2rem', display: 'inline-flex', alignItems: 'center', gap: '0.5rem' }}>
-                      <span style={{ color: '#A78BFA' }}>■</span> LEADRAT
-                    </div>
-                    <div className="company-box" style={{ fontSize: '1.2rem', fontWeight: '800', background: 'rgba(255,255,255,0.04)', color: '#fff', border: '1px solid rgba(255,255,255,0.08)', borderRadius: '12px', padding: '1rem 2.2rem', display: 'inline-flex', alignItems: 'center', gap: '0.5rem' }}>
-                      <span style={{ color: '#F43F5E' }}>★</span> RAZORPAY
-                    </div>
-                    <div className="company-box" style={{ fontSize: '1.2rem', fontWeight: '800', background: 'rgba(255,255,255,0.04)', color: '#fff', border: '1px solid rgba(255,255,255,0.08)', borderRadius: '12px', padding: '1rem 2.2rem', display: 'inline-flex', alignItems: 'center', gap: '0.5rem' }}>
-                      <span style={{ color: '#E2E8F0' }}>●</span> CRED
-                    </div>
-                    <div className="company-box" style={{ fontSize: '1.2rem', fontWeight: '800', background: 'rgba(255,255,255,0.04)', color: '#fff', border: '1px solid rgba(255,255,255,0.08)', borderRadius: '12px', padding: '1rem 2.2rem', display: 'inline-flex', alignItems: 'center', gap: '0.5rem' }}>
-                      <span style={{ color: '#60A5FA' }}>◆</span> DEEL
-                    </div>
-                    <div className="company-box" style={{ fontSize: '1.2rem', fontWeight: '800', background: 'rgba(255,255,255,0.04)', color: '#fff', border: '1px solid rgba(255,255,255,0.08)', borderRadius: '12px', padding: '1rem 2.2rem', display: 'inline-flex', alignItems: 'center', gap: '0.5rem' }}>
-                      <span style={{ color: '#F472B6' }}>▲</span> ZETA
-                    </div>
-                  </React.Fragment>
-                ))}
-              </div>
-            </div>
-            <p className="caption" style={{ marginTop: '2.5rem', color: '#666', fontStyle: 'italic', fontSize: '1.1rem' }}>Where AntBox candidates get hired</p>
-          </div>
-        </section>
+        
+        {/* Social Proof Marquee with pause on hover & company brief popups */}
+        <CompanyMarqueeSection />
+
         <CandidateHowItWorks />
         <CandidateCTA />
       </div>
