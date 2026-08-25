@@ -447,7 +447,7 @@ function CandidateFriction() {
         <div className="process-layout" style={{ width: '100%', marginTop: '3.5rem' }}>
           <div className="process-timeline" style={{ display: 'flex', gap: '2.5rem', width: '100%', position: 'relative' }}>
             <motion.div className="process-timeline-active-line" style={{ position: 'absolute', top: 0, left: 0, height: '2px', background: 'var(--accent-purple)', zIndex: 2, transformOrigin: 'left', scaleX: lineScaleX, width: '100%' }}></motion.div>
-            
+
             {/* Step 01 */}
             <motion.div
               className={`process-step ${activeStep >= 0 ? 'active' : ''}`}
@@ -648,44 +648,44 @@ function CorporateHeroAndProblems({ scrollProgress }) {
           background: 'var(--cream)',
         }}
       >
-          <div className="flex flex-col items-center justify-center gap-2 md:gap-4 font-black tracking-[-0.03em] uppercase leading-[1.05] text-center w-full" style={{ fontFamily: 'Poppins, sans-serif' }}>
-            <motion.div
-              style={{ x: leftX, opacity: topOpacity }}
-              className="text-on-surface text-[clamp(36px,8vw,120px)] whitespace-nowrap block"
-            >
-              Where talent
+        <div className="flex flex-col items-center justify-center gap-2 md:gap-4 font-black tracking-[-0.03em] uppercase leading-[1.05] text-center w-full" style={{ fontFamily: 'Poppins, sans-serif' }}>
+          <motion.div
+            style={{ x: leftX, opacity: topOpacity }}
+            className="text-on-surface text-[clamp(36px,8vw,120px)] whitespace-nowrap block"
+          >
+            Where talent
+          </motion.div>
+
+          <div className="flex items-center justify-center gap-4 text-[clamp(36px,8vw,120px)] w-full">
+            <motion.div style={{ x: isX, opacity: isOpacity }} className="text-on-surface lowercase">
+              IS
             </motion.div>
-
-            <div className="flex items-center justify-center gap-4 text-[clamp(36px,8vw,120px)] w-full">
-              <motion.div style={{ x: isX, opacity: isOpacity }} className="text-on-surface lowercase">
-                IS
-              </motion.div>
-              <motion.div
-                style={{ scale: builtScale, opacity: builtOpacity, transformOrigin: 'center center', zIndex: 50 }}
-                className="text-[var(--accent-purple)] pointer-events-none"
-              >
-                Built
-              </motion.div>
-            </div>
-
-            <motion.div style={{ x: rightX, opacity: topOpacity }}>
-              <span
-                className="text-primary block"
-                style={{
-                  fontFamily: 'var(--font-times)',
-                  fontStyle: 'italic',
-                  fontSize: 'clamp(32px,7vw,100px)',
-                  lineHeight: 1,
-                  textTransform: 'none',
-                  letterSpacing: 'normal',
-                  fontWeight: 'normal',
-                }}
-              >
-                not found
-              </span>
+            <motion.div
+              style={{ scale: builtScale, opacity: builtOpacity, transformOrigin: 'center center', zIndex: 50 }}
+              className="text-[var(--accent-purple)] pointer-events-none"
+            >
+              Built
             </motion.div>
           </div>
-        </motion.div>
+
+          <motion.div style={{ x: rightX, opacity: topOpacity }}>
+            <span
+              className="text-primary block"
+              style={{
+                fontFamily: 'var(--font-times)',
+                fontStyle: 'italic',
+                fontSize: 'clamp(32px,7vw,100px)',
+                lineHeight: 1,
+                textTransform: 'none',
+                letterSpacing: 'normal',
+                fontWeight: 'normal',
+              }}
+            >
+              not found
+            </span>
+          </motion.div>
+        </div>
+      </motion.div>
     </div>
   );
 }
@@ -735,7 +735,7 @@ function CorporateCTA() {
             <span className="cta-line cta-line-bold" style={{ color: 'var(--cream)' }}>Pre-Built</span>
             <span className="cta-line cta-line-italic" style={{ color: 'var(--cream)' }}>Talent</span>
           </h2>
-          <button className="cta-type-btn" style={{ background: 'var(--black)', color: '#fff' }}>Enter Factory →</button>
+          <button className="cta-type-btn" style={{ background: 'var(--black)', color: '#fff' }}>Get Pipeline →</button>
         </div>
       </motion.div>
     </section>
@@ -1342,7 +1342,7 @@ function CandidateView() {
 
       <div className="scroll-overlay-container candidate-overlay">
         <CandidateFriction />
-        
+
         {/* Social Proof Marquee with pause on hover & company brief popups */}
         <CompanyMarqueeSection />
 
