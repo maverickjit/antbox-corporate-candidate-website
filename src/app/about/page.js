@@ -2,7 +2,278 @@
 import React, { useState, useEffect } from 'react';
 import Image from 'next/image';
 import Lenis from 'lenis';
+import { motion, useScroll, useTransform, useInView } from 'framer-motion';
 import styles from './about.module.css';
+
+const manifestoParagraphs = [
+  "The degree was never a skill test. It was a proxy - cheap, universally agreed on, good enough for fifty years. Then every company announced they'd stopped using it. Harvard and Burning Glass went and checked the actual hires: at some large firms, fewer than 1 in 700 changed.",
+  "Turns out you can't delete a filter. You can only replace it. Nobody built the replacement. So I started AntBox in 2024 and did the unglamorous thing - built a tech enabled services business to fund the real one.",
+  "The tech enables service half is live. We take final and pre-final year students, run them through specific domains and deploy them into SaaS companies where they're useful on Day 0.",
+  "Paying clients, real revenue, and two years of watching up close what actually separates someone who's ready from someone who has a good CGPA. It also happens to be the best data collection operation I could have designed on purpose.",
+  "The product half is why I'm actually here. Every hour a student works throws off signal: what they built, how fast they got unstuck, what they did when nobody was watching. We're turning that into a number a hiring manager can trust about someone they've never met."
+];
+
+function Word({ word, progress, range }) {
+  const opacity = useTransform(progress, range, [0.4, 1]);
+  const color = useTransform(progress, range, ["#a1a1aa", "#000000"]);
+  const fontWeight = useTransform(progress, range, [400, 700]);
+
+  return (
+    <motion.span
+      style={{
+        opacity,
+        color,
+        fontWeight,
+        display: 'inline-block',
+        marginRight: '0.28em'
+      }}
+    >
+      {word}
+    </motion.span>
+  );
+}
+
+function ScribbleUnderline({ children, color = "#BB62DE", active = false }) {
+  return (
+    <span style={{ position: 'relative', display: 'inline-block', whiteSpace: 'nowrap', padding: '0 0.12em' }}>
+      <span style={{ position: 'relative', zIndex: 1, fontWeight: 700 }}>{children}</span>
+      <svg
+        viewBox="0 0 300 24"
+        fill="none"
+        xmlns="http://www.w3.org/2000/svg"
+        style={{
+          position: 'absolute',
+          bottom: '-6px',
+          left: '-2%',
+          width: '104%',
+          height: '18px',
+          overflow: 'visible',
+          pointerEvents: 'none',
+          zIndex: 0
+        }}
+      >
+        <motion.path
+          d="M 5,14 C 20,4 45,18 70,8 C 95,18 120,4 145,14 C 170,4 195,18 220,7 C 245,17 270,5 295,12"
+          stroke={color}
+          strokeWidth="3.5"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          initial={{ pathLength: 0, opacity: 0 }}
+          animate={{ pathLength: active ? 1 : 0, opacity: active ? 1 : 0 }}
+          transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
+        />
+        <motion.path
+          d="M 12,17 C 35,7 65,19 95,10 C 125,20 155,7 185,16 C 215,6 245,18 288,11"
+          stroke={color}
+          strokeWidth="2.2"
+          strokeOpacity="0.75"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          initial={{ pathLength: 0, opacity: 0 }}
+          animate={{ pathLength: active ? 1 : 0, opacity: active ? 0.75 : 0 }}
+          transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1], delay: 0.15 }}
+        />
+      </svg>
+    </span>
+  );
+}
+
+function MaskedLineRevealStatement() {
+  const containerRef = React.useRef(null);
+  const isInView = useInView(containerRef, { once: true, amount: 0.3 });
+
+  const [part1, setPart1] = React.useState('');
+  const [part2, setPart2] = React.useState('');
+  const [part3, setPart3] = React.useState('');
+  const [part4, setPart4] = React.useState('');
+
+  const [showUnderline, setShowUnderline] = React.useState(false);
+  const [isFinished, setIsFinished] = React.useState(false);
+
+  const full1 = "AntBox is built on a simple idea: the degree was never a skill";
+  const full2 = "test — ";
+  const full3 = "it was a proxy.";
+  const full4 = "Nobody built the replacement. So we did.";
+
+  useEffect(() => {
+    if (!isInView) return;
+
+    let i1 = 0, i2 = 0, i3 = 0, i4 = 0;
+    const speed = 25;
+
+    const t1 = setInterval(() => {
+      if (i1 < full1.length) {
+        setPart1(full1.slice(0, i1 + 1));
+        i1++;
+      } else {
+        clearInterval(t1);
+        const t2 = setInterval(() => {
+          if (i2 < full2.length) {
+            setPart2(full2.slice(0, i2 + 1));
+            i2++;
+          } else {
+            clearInterval(t2);
+            const t3 = setInterval(() => {
+              if (i3 < full3.length) {
+                setPart3(full3.slice(0, i3 + 1));
+                i3++;
+              } else {
+                clearInterval(t3);
+                setTimeout(() => {
+                  const t4 = setInterval(() => {
+                    if (i4 < full4.length) {
+                      setPart4(full4.slice(0, i4 + 1));
+                      i4++;
+                    } else {
+                      clearInterval(t4);
+                      setShowUnderline(true);
+                      setTimeout(() => setIsFinished(true), 600);
+                    }
+                  }, speed);
+                }, 180);
+              }
+            }, speed);
+          }
+        }, speed);
+      }
+    }, speed);
+
+    return () => {
+      clearInterval(t1);
+    };
+  }, [isInView]);
+
+  return (
+    <div ref={containerRef} className={styles.valuesStatement} style={{ minHeight: '160px' }}>
+      <p style={{ margin: 0 }}>
+        {part1}
+      </p>
+
+      <p style={{ margin: 0, marginTop: '0.2rem' }}>
+        {part2}
+        {part3 && (
+          <span style={{ color: '#BB62DE', fontStyle: 'italic', fontWeight: 700 }}>
+            {part3}
+          </span>
+        )}
+        {!part4 && !isFinished && part1 && (
+          <motion.span
+            animate={{ opacity: [1, 0] }}
+            transition={{ duration: 0.45, repeat: Infinity, repeatType: 'reverse' }}
+            style={{ display: 'inline-block', width: '2.5px', height: '1.1em', backgroundColor: '#BB62DE', marginLeft: '3px', verticalAlign: '-0.15em', borderRadius: '1px' }}
+          />
+        )}
+      </p>
+
+      <p style={{ margin: 0, marginTop: '0.2rem' }}>
+        {part4 && (
+          <ScribbleUnderline color="#BB62DE" active={showUnderline}>
+            <span>
+              {part4}
+            </span>
+          </ScribbleUnderline>
+        )}
+        {!isFinished && part4 && (
+          <motion.span
+            animate={{ opacity: [1, 0] }}
+            transition={{ duration: 0.45, repeat: Infinity, repeatType: 'reverse' }}
+            style={{ display: 'inline-block', width: '2.5px', height: '1.1em', backgroundColor: '#BB62DE', marginLeft: '3px', verticalAlign: '-0.15em', borderRadius: '1px' }}
+          />
+        )}
+      </p>
+    </div>
+  );
+}
+
+function ContinuousScrollManifesto() {
+  const containerRef = React.useRef(null);
+  const { scrollYProgress } = useScroll({
+    target: containerRef,
+    offset: ["start 0.72", "end 0.38"]
+  });
+
+  const parsedParagraphs = React.useMemo(() => {
+    let globalIndexCounter = 0;
+    return manifestoParagraphs.map(paragraphText => {
+      const words = paragraphText.split(" ");
+      return words.map(word => ({
+        word,
+        globalIndex: globalIndexCounter++
+      }));
+    });
+  }, []);
+
+  const totalWords = React.useMemo(() => {
+    return parsedParagraphs.reduce((sum, p) => sum + p.length, 0);
+  }, [parsedParagraphs]);
+
+  return (
+    <div ref={containerRef} style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
+      {parsedParagraphs.map((paraWords, pIndex) => (
+        <p key={pIndex} style={{ lineHeight: 1.75, fontSize: '1.08rem', margin: 0 }}>
+          {paraWords.map(({ word, globalIndex }) => {
+            const start = globalIndex / totalWords;
+            const end = Math.min(1, start + (1 / totalWords) * 3.5);
+            return (
+              <Word
+                key={globalIndex}
+                word={word}
+                progress={scrollYProgress}
+                range={[Math.max(0, start - 0.02), end]}
+              />
+            );
+          })}
+        </p>
+      ))}
+    </div>
+  );
+}
+
+function RollingImageCardBox({ children }) {
+  const containerRef = React.useRef(null);
+  const { scrollYProgress } = useScroll({
+    target: containerRef,
+    // Start triggering when card enters bottom of viewport, finish when it reaches 20% from top
+    offset: ["start 0.92", "start 0.18"]
+  });
+
+  // Card rolls up from 300px below resting position → 0 (its natural place)
+  const y = useTransform(scrollYProgress, [0, 1], [300, 0]);
+  // Slight scale-up for the "popping up" feel
+  const scale = useTransform(scrollYProgress, [0, 1], [0.88, 1]);
+  // Fade in as it rises
+  const opacity = useTransform(scrollYProgress, [0, 0.25], [0, 1]);
+  // Shadow grows as card lifts — reinforces "rising card" illusion
+  const boxShadow = useTransform(
+    scrollYProgress,
+    [0, 1],
+    [
+      "0 4px 12px rgba(0,0,0,0.06)",
+      "0 40px 80px -16px rgba(0,0,0,0.22), 0 0 0 1px rgba(0,0,0,0.06)"
+    ]
+  );
+
+  return (
+    <motion.div
+      ref={containerRef}
+      style={{
+        y,
+        scale,
+        opacity,
+        boxShadow,
+        borderRadius: '24px',
+        overflow: 'hidden',
+        position: 'relative',
+        zIndex: 3,              // sits above text section as it overlaps
+        willChange: 'transform',
+      }}
+      className={styles.operatorsImageCardBox}
+    >
+      {children}
+    </motion.div>
+  );
+}
+
 
 export default function About() {
   const [activeFilter, setActiveFilter] = useState('View all');
@@ -53,18 +324,18 @@ export default function About() {
       if (!valuesSectionRef.current) return;
       const rect = valuesSectionRef.current.getBoundingClientRect();
       const windowHeight = window.innerHeight;
-      
+
       const startPoint = windowHeight * 0.65;
       const distanceScrolled = startPoint - rect.top;
-      
+
       if (distanceScrolled <= 0) {
         setRevealedCount(1);
         return;
       }
-      
+
       const step = Math.floor(distanceScrolled / 160) + 1;
       const count = Math.min(Math.max(step, 1), 5);
-      
+
       setRevealedCount(count);
     };
 
@@ -80,32 +351,32 @@ export default function About() {
   }, []);
 
   const values = [
-    { 
-      title: "COOK IN THE GLASS KITCHEN", 
+    {
+      title: "COOK IN THE GLASS KITCHEN",
       desc: "Nothing great is made behind closed doors. We share the work raw, take the heat in the open, and plate the credit where everyone can see it.",
       bg: "#5BE7C4",
       image: '/value_glass_kitchen_1787311047086.jpg'
     },
-    { 
-      title: "THINK NAPKIN FIRST", 
+    {
+      title: "THINK NAPKIN FIRST",
       desc: "If you can't explain it simply, you don't understand it well enough. Clarity comes before action, and thinking comes before doing.",
       bg: "#FF6BE6",
       image: '/value_napkin_first_1787311075113.jpg'
     },
-    { 
-      title: "RESPECT THE GAME CLOCK", 
+    {
+      title: "RESPECT THE GAME CLOCK",
       desc: "Time is a competitive advantage. Move with urgency, honor commitments, and deliver before opportunities expire.",
       bg: "#FFD644",
       image: "/value_game_clock_1787311103049.jpg"
     },
-    { 
-      title: "PROOF OF WORK", 
+    {
+      title: "PROOF OF WORK",
       desc: "Talk is a claim. Work is the evidence. We don't describe what we did, we show what shipped, and it speaks for itself.",
       bg: "#C56BFF",
       image: "/value_proof_work_1787311131543.jpg"
     },
-    { 
-      title: "OWN THE WHOLE BOX", 
+    {
+      title: "OWN THE WHOLE BOX",
       desc: "The best seat in the house comes with the whole scoreboard. Touch any part of the work, and all of it becomes yours - every cell carried home.",
       bg: "#FF8359",
       image: "/value_own_box_1787311159506.jpg"
@@ -121,36 +392,36 @@ export default function About() {
   ];
 
   const partnerLogos = [
-    { 
-      name: 'antbox', 
+    {
+      name: 'antbox',
       icon: (
         <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor">
           <rect x="3" y="3" width="18" height="18" rx="4" />
         </svg>
-      ), 
-      style: { fontWeight: 800, fontSize: '0.95rem', letterSpacing: '-0.3px', marginLeft: '4px' } 
+      ),
+      style: { fontWeight: 800, fontSize: '0.95rem', letterSpacing: '-0.3px', marginLeft: '4px' }
     },
-    { 
-      name: 'Qapita', 
+    {
+      name: 'Qapita',
       icon: (
         <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
           <circle cx="12" cy="12" r="8" />
           <path d="M16 16l4 4" />
         </svg>
-      ), 
-      style: { fontWeight: 700, fontSize: '0.95rem', marginLeft: '4px' } 
+      ),
+      style: { fontWeight: 700, fontSize: '0.95rem', marginLeft: '4px' }
     },
-    { 
-      name: 'Anunta', 
+    {
+      name: 'Anunta',
       icon: (
         <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor">
           <path d="M12 2L2 22h20L12 2zm0 6l5 10H7l5-10z" />
         </svg>
-      ), 
-      style: { fontWeight: 700, fontSize: '0.95rem', marginLeft: '4px' } 
+      ),
+      style: { fontWeight: 700, fontSize: '0.95rem', marginLeft: '4px' }
     },
-    { 
-      name: 'Light Inc.', 
+    {
+      name: 'Light Inc.',
       icon: (
         <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round">
           <line x1="12" y1="2" x2="12" y2="6" />
@@ -158,28 +429,28 @@ export default function About() {
           <line x1="4.93" y1="4.93" x2="7.76" y2="7.76" />
           <line x1="16.24" y1="16.24" x2="19.07" y2="19.07" />
         </svg>
-      ), 
-      style: { fontWeight: 700, fontSize: '0.95rem', marginLeft: '4px' } 
+      ),
+      style: { fontWeight: 700, fontSize: '0.95rem', marginLeft: '4px' }
     },
-    { 
-      name: 'Skydo', 
+    {
+      name: 'Skydo',
       icon: (
         <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
           <polyline points="13 17 18 12 13 7" />
           <polyline points="6 17 11 12 6 7" />
         </svg>
-      ), 
-      style: { fontWeight: 700, fontSize: '0.95rem', marginLeft: '4px' } 
+      ),
+      style: { fontWeight: 700, fontSize: '0.95rem', marginLeft: '4px' }
     },
-    { 
-      name: 'Tezo', 
+    {
+      name: 'Tezo',
       icon: (
         <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
           <circle cx="4" cy="6" r="2.5" /><circle cx="12" cy="6" r="2.5" /><circle cx="20" cy="6" r="2.5" />
           <circle cx="4" cy="18" r="2.5" /><circle cx="12" cy="18" r="2.5" /><circle cx="20" cy="18" r="2.5" />
         </svg>
-      ), 
-      style: { fontWeight: 800, fontSize: '0.95rem', marginLeft: '4px' } 
+      ),
+      style: { fontWeight: 800, fontSize: '0.95rem', marginLeft: '4px' }
     }
   ];
 
@@ -196,94 +467,107 @@ export default function About() {
           </p>
         </div>
 
-        <div className={styles.operatorsImageFrame}>
-          <Image
-            src="/team-photo-real-v2.jpg"
-            alt="AntBox Team Operators"
-            fill
-            unoptimized
-            priority
-            className={styles.operatorsImage}
-          />
-        </div>
+        <RollingImageCardBox>
+          <div className={styles.operatorsImageFrame}>
+            <Image
+              src="/hero-image.png"
+              alt="AntBox Team Operators"
+              fill
+              unoptimized
+              priority
+              className={styles.operatorsImage}
+            />
+          </div>
+        </RollingImageCardBox>
       </div>
 
-      {/* ── Section 2: Partner / Core Companies Cards (Moving Belt Ticker) ── */}
-      <div className={`${styles.partnerBannerSection} ${styles.reveal}`}>
-        <div className={styles.partnerBannerContent}>
-          <h2 className={styles.partnerBannerTitle}>
-            We are the extended talent arm for 50+ B2B companies
-          </h2>
-          <div className={styles.partnerBannerDivider}></div>
-
-          {/* Moving Belt Ticker Track */}
-          <div className={styles.partnerLogoTickerContainer}>
-            <div className={styles.partnerLogoTrack}>
-              {[...partnerLogos, ...partnerLogos, ...partnerLogos].map((logo, idx) => (
-                <div key={idx} className={styles.partnerLogoCard}>
-                  {logo.icon}
-                  {logo.customContent ? logo.customContent : <span style={logo.style}>{logo.name}</span>}
-                </div>
-              ))}
-            </div>
-          </div>
-        </div>
+      {/* ── Core Values Quote Statement (Placed right below first image container) ── */}
+      <div className={styles.heroQuoteContainer}>
+        <MaskedLineRevealStatement />
       </div>
 
-      {/* ── Section 3: Core Values (Sequential Scroll 3D Cards) ── */}
-      <div ref={valuesSectionRef} className={styles.valuesSection}>
-        <div className={styles.heroQuoteContainer}>
-          <div className={styles.valuesMeta}>
-            <span className={styles.labelBadge}>Company Values</span>
-          </div>
+      {/* ── Dark Overlapping Card Sheet (Transitions background to dark black on scroll) ── */}
+      <div className={styles.darkOverlapSheet}>
+        <div className={styles.darkOverlapContent}>
 
-          <div className={styles.quoteIconSymbol}>“</div>
+          {/* ── Section 2: Partner / Core Companies Cards (Moving Belt Ticker) ── */}
+          <div className={`${styles.partnerBannerSection} ${styles.reveal}`}>
+            <div className={styles.partnerBannerContent}>
+              <h2 className={styles.partnerBannerTitle}>
+                We are the extended talent arm for 50+ B2B companies
+              </h2>
+              <div className={styles.partnerBannerDivider}></div>
 
-          <div className={styles.valuesStatement}>
-            <p>
-              AntBox is built on a simple idea: the degree was never a skill test —{' '}
-              <span className={styles.quoteAccent}>
-                <span className={styles.highlightSweepAccent}>it was a proxy.</span>
-              </span>
-              <br />
-              <strong className={styles.highlightSweepStrong}>
-                Nobody built the replacement. So we did.
-              </strong>
-            </p>
-          </div>
-        </div>
-
-        <div className={styles.inspoCardsContainer}>
-          {values.map((value, index) => {
-            const isRevealed = index < revealedCount;
-            return (
-              <div 
-                key={index} 
-                className={`${styles.inspoCard} ${isRevealed ? styles.inspoCardRevealed : styles.inspoCardHidden}`}
-                style={{ 
-                  backgroundColor: value.bg,
-                  transitionDelay: `${(index % 5) * 0.06}s` 
-                }}
-              >
-                <div className={styles.inspoImageContainer}>
-                  {value.image ? (
-                    <Image 
-                      src={value.image} 
-                      alt={value.title} 
-                      fill
-                      unoptimized
-                      className={styles.inspoImage}
-                    />
-                  ) : null}
-                </div>
-
-                <div>
-                  <h3 className={styles.inspoCardTitle}>{value.title}</h3>
-                  <p className={styles.inspoCardDesc}>{value.desc}</p>
+              {/* Moving Belt Ticker Track */}
+              <div className={styles.partnerLogoTickerContainer}>
+                <div className={styles.partnerLogoTrack}>
+                  {[...partnerLogos, ...partnerLogos, ...partnerLogos].map((logo, idx) => (
+                    <div key={idx} className={styles.partnerLogoCard}>
+                      {logo.icon}
+                      {logo.customContent ? logo.customContent : <span style={logo.style}>{logo.name}</span>}
+                    </div>
+                  ))}
                 </div>
               </div>
-            );
-          })}
+            </div>
+          </div>
+
+          {/* ── Section 3: Core Values (Sequential Scroll 3D Cards) ── */}
+          <div ref={valuesSectionRef} className={styles.valuesSection}>
+            <div className={styles.valuesStickyContainer}>
+              {/* Company Values Badge above the 5 cards */}
+              <div className={styles.valuesMeta} style={{ marginBottom: '1rem' }}>
+                <span className={styles.labelBadge}>Company Values</span>
+              </div>
+
+              {/* Card Step Indicator */}
+              <div className={styles.cardStepIndicator}>
+                <div className={styles.stepDots}>
+                  {[1, 2, 3, 4, 5].map((step) => (
+                    <button
+                      key={step}
+                      className={`${styles.stepDot} ${step <= revealedCount ? styles.stepDotActive : ''}`}
+                      onClick={() => setRevealedCount(step)}
+                      aria-label={`Jump to value ${step}`}
+                    />
+                  ))}
+                </div>
+              </div>
+
+              <div className={styles.inspoCardsContainer}>
+                {values.map((value, index) => {
+                  const isRevealed = index < revealedCount;
+                  return (
+                    <div
+                      key={index}
+                      className={`${styles.inspoCard} ${isRevealed ? styles.inspoCardRevealed : styles.inspoCardHidden}`}
+                      style={{
+                        backgroundColor: value.bg,
+                        transitionDelay: `${(index % 5) * 0.06}s`
+                      }}
+                    >
+                      <div className={styles.inspoImageContainer}>
+                        {value.image ? (
+                          <Image
+                            src={value.image}
+                            alt={value.title}
+                            fill
+                            unoptimized
+                            className={styles.inspoImage}
+                          />
+                        ) : null}
+                      </div>
+
+                      <div>
+                        <h3 className={styles.inspoCardTitle}>{value.title}</h3>
+                        <p className={styles.inspoCardDesc}>{value.desc}</p>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+          </div>
         </div>
       </div>
 
@@ -293,9 +577,9 @@ export default function About() {
           <div className={styles.manifestoImageContainer}>
             <h2 className={styles.manifestoTitle}>Founders Manifesto</h2>
             <div className={styles.founderPhotoWrapper}>
-              <Image 
+              <Image
                 src="/founder-photo-portrait.jpg"
-                alt="Founder Photo" 
+                alt="Founder Photo"
                 fill
                 unoptimized
                 className={styles.founderPhoto}
@@ -303,33 +587,19 @@ export default function About() {
             </div>
           </div>
           <div className={styles.manifestoContent}>
-            <p>
-              The degree was never a skill test. It was a proxy - cheap, universally agreed on, good enough for fifty years. Then every company announced they'd stopped using it. Harvard and Burning Glass went and checked the actual hires: at some large firms, fewer than 1 in 700 changed.
-            </p>
-            <p>
-              Turns out you can't delete a filter. You can only replace it. Nobody built the replacement. So I started AntBox in 2024 and did the unglamorous thing - built a tech enabled services business to fund the real one.
-            </p>
-            <p>
-              The tech enables service half is live. We take final and pre-final year students, run them through specific domains and deploy them into SaaS companies where they're useful on Day 0.
-            </p>
-            <p>
-              Paying clients, real revenue, and two years of watching up close what actually separates someone who's ready from someone who has a good CGPA. It also happens to be the best data collection operation I could have designed on purpose.
-            </p>
-            <p>
-              The product half is why I'm actually here. Every hour a student works throws off signal: what they built, how fast they got unstuck, what they did when nobody was watching. We're turning that into a number a hiring manager can trust about someone they've never met.
-            </p>
+            <ContinuousScrollManifesto />
           </div>
         </div>
       </div>
 
-      {/* ── Section 4: Culture Section (Full Overlapping Sheet) ── */}
-      <div className={`${styles.cultureOverlapWrapper} ${styles.reveal}`}>
+      {/* ── Section 5: Culture Section (Full Overlapping Sheet) ── */}
+      <div className={styles.cultureOverlapWrapper}>
         <div className={styles.cultureSection}>
           <div className={styles.cultureHeroCard}>
 
             {/* Background center image */}
             <Image
-              src = '/culture-hero-real.jpg'
+              src="/culture-hero-real.jpg"
               alt="Life at AntBox"
               fill
               unoptimized
@@ -351,12 +621,12 @@ export default function About() {
               {/* Subtitle + CTA bottom-left */}
               <div className={styles.cultureSubGroup}>
                 <p className={styles.cultureSubtitle}>
-                  But we don't burn out doing it.
+                  But we do not burn out doing it.
                 </p>
                 <a href="#jobs" className={styles.cultureCtaBtn}>
                   Join the team
                   <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-                    <line x1="7" y1="17" x2="17" y2="7"/><polyline points="7 7 17 7 17 17"/>
+                    <line x1="7" y1="17" x2="17" y2="7" /><polyline points="7 7 17 7 17 17" />
                   </svg>
                 </a>
               </div>
@@ -365,9 +635,6 @@ export default function About() {
           </div>
         </div>
       </div>
-
-
-
     </main>
   );
 }

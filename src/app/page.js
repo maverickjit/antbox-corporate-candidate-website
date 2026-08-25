@@ -15,15 +15,15 @@ const cardData = [
 
 // Each card in the visible grid — fades in together
 function BenefitCard({ card, index, totalCards, scrollYProgress }) {
-  // Each card staggered fade-in
+  // Each card staggered fade-in — aligned with new deck entry range (0.26+)
   const cardOpacity = useTransform(
     scrollYProgress,
-    [0, 0.15 + index * 0.04, 0.35 + index * 0.04],
+    [0, 0.28 + index * 0.04, 0.44 + index * 0.04],
     [0, 0, 1]
   );
   const cardY = useTransform(
     scrollYProgress,
-    [0, 0.15 + index * 0.04, 0.35 + index * 0.04],
+    [0, 0.28 + index * 0.04, 0.44 + index * 0.04],
     [40, 40, 0]
   );
 
@@ -112,25 +112,32 @@ function SolutionsSection() {
     offset: ["start start", "end end"]
   });
 
-  // Phase 1: "We Built Antbox" message slides up smoothly
-  const messageY = useTransform(scrollYProgress, [0, 0.12, 0.22], ["40vh", "0vh", "-40vh"]);
-  const messageOpacity = useTransform(scrollYProgress, [0, 0.08, 0.18, 0.22], [0, 1, 1, 0]);
+  // Phase 1: message centered immediately, exits upward completely off-screen
+  const messageY = useTransform(scrollYProgress, [0, 0.24], ["0vh", "-120vh"]);
+  const messageOpacity = useTransform(scrollYProgress, [0, 0.12, 0.20], [1, 1, 0]);
 
-  // Phase 2: Cards grid fade in
-  const deckOpacity = useTransform(scrollYProgress, [0.22, 0.3], [0, 1]);
-  const deckScale = useTransform(scrollYProgress, [0.22, 0.3], [0.92, 1]);
+  // Phase 2: Cards grid fade in — starts only after message is fully gone
+  const deckOpacity = useTransform(scrollYProgress, [0.26, 0.38], [0, 1]);
+  const deckScale = useTransform(scrollYProgress, [0.26, 0.38], [0.92, 1]);
 
   const totalCards = cardData.length;
 
   return (
     <section className="solutions-section-pinned" ref={sectionRef}>
       <div className="solutions-sticky-inner">
-        {/* Phase 1: big message */}
+        {/* Phase 1: big message — immediately visible, then scrolls away */}
         <motion.div className="solutions-fullpage-msg" style={{ opacity: messageOpacity, y: messageY }}>
           <h3>
-            <span className="msg-line">WE BUILT ANTBOX</span>
-            <span className="msg-line msg-line-straight">TO END THIS</span>
-            <span className="msg-line">GAME OF CHANCE</span>
+            <span className="msg-line">
+              <span style={{ color: '#f7f5ee' }}>WE BUILT </span>
+              <span style={{ color: 'var(--accent-purple)' }}>ANTBOX</span>
+            </span>
+            <span className="msg-line msg-line-straight" style={{ color: '#f7f5ee' }}>TO END THIS</span>
+            <span className="msg-line">
+              <span style={{ color: 'var(--accent-purple)' }}>GAME </span>
+              <span style={{ color: '#f7f5ee' }}>OF </span>
+              <span style={{ color: 'var(--accent-purple)' }}>CHANCE</span>
+            </span>
           </h3>
         </motion.div>
 
@@ -313,7 +320,7 @@ function CandidateFriction() {
             </motion.div>
             <motion.div className={`process-step ${activeStep >= 2 ? 'active' : ''}`} animate={{ opacity: activeStep >= 2 ? 1 : 0, y: activeStep >= 2 ? 0 : 20 }} transition={{ duration: 0.4, ease: "easeOut" }}>
               <div className="process-number">03</div>
-              <h3 className="tc-heading">The "Experience Needed" Paradox</h3>
+              <h3 className="tc-heading">The Experience Needed Paradox</h3>
               <p className="tc-body">Companies expect prior experience for entry-level roles, but few give you the chance to gain it. Over 77% of grads end up learning everything from scratch on the job.</p>
             </motion.div>
           </div>
@@ -332,23 +339,25 @@ function HeroScrollSection() {
     offset: ["start start", "end end"]
   });
 
-  // Fade out earlier so hero is fully gone before dark section overlaps
-  const leftX = useTransform(scrollYProgress, [0, 0.6], ["0vw", "-100vw"]);
-  const topOpacity = useTransform(scrollYProgress, [0, 0.5], [1, 0]);
+  // All words slide out, then "Built" slowly zooms to fill screen
+  // Height is 250vh → scroll range is 150vh → animation is 7.5× slower than before
+  const leftX = useTransform(scrollYProgress, [0, 0.55], ["0vw", "-100vw"]);
+  const topOpacity = useTransform(scrollYProgress, [0, 0.45], [1, 0]);
 
-  const rightX = useTransform(scrollYProgress, [0, 0.6], ["0vw", "100vw"]);
+  const rightX = useTransform(scrollYProgress, [0, 0.55], ["0vw", "100vw"]);
 
-  const isX = useTransform(scrollYProgress, [0, 0.6], ["0vw", "-50vw"]);
-  const isOpacity = useTransform(scrollYProgress, [0, 0.5], [1, 0]);
+  const isX = useTransform(scrollYProgress, [0, 0.55], ["0vw", "-50vw"]);
+  const isOpacity = useTransform(scrollYProgress, [0, 0.45], [1, 0]);
 
-  const builtScale = useTransform(scrollYProgress, [0, 0.3, 0.55, 1], [1, 3, 100, 100]);
-  const builtOpacity = useTransform(scrollYProgress, [0, 0.35, 0.55], [1, 1, 0]);
+  // Built zooms slowly, reaches full coverage at 0.75, fades out at 0.8
+  const builtScale = useTransform(scrollYProgress, [0, 0.35, 0.75, 1], [1, 2.5, 100, 100]);
+  const builtOpacity = useTransform(scrollYProgress, [0, 0.6, 0.80], [1, 1, 0]);
 
-  // Hero section itself fades out cleanly
-  const heroOpacity = useTransform(scrollYProgress, [0.25, 0.55], [1, 0]);
+  // Hero section fades just before Built finishes
+  const heroOpacity = useTransform(scrollYProgress, [0.5, 0.80], [1, 0]);
 
   return (
-    <section ref={containerRef} style={{ height: '120vh', position: 'relative', background: 'var(--cream)', zIndex: 1 }}>
+    <section ref={containerRef} style={{ height: '250vh', position: 'relative', background: 'var(--cream)', zIndex: 1, overflow: 'hidden' }}>
       <motion.div
         className="sticky top-0 h-screen w-full flex flex-col items-center justify-center overflow-hidden"
         style={{ opacity: heroOpacity }}
@@ -478,22 +487,26 @@ function CorporateView({ activeTab, setActiveTab }) {
   const yLeft = useTransform(scrollYProgress, [0, 1], [120, -120]);
   const yCenter = useTransform(scrollYProgress, [0, 1], [60, -60]);
   const yRight = useTransform(scrollYProgress, [0, 1], [180, -180]);
-  const sectionOpacity = useTransform(scrollYProgress, [0.6, 0.9], [1, 0]);
+
   return (
     <div className="page-wrapper">
       <HeroScrollSection />
 
-      {/* "What Corporates Face" — full viewport, vertically centered */}
-      <motion.section
+      {/* "What Corporates Face" — pulled up 140vh so it appears the moment Built fades out */}
+      <section
         className="problems-section"
         style={{
-          opacity: sectionOpacity,
           minHeight: '100vh',
           display: 'flex',
           flexDirection: 'column',
           justifyContent: 'center',
           paddingTop: '3rem',
           paddingBottom: '3rem',
+          background: 'var(--cream)',
+          position: 'relative',
+          zIndex: 3,
+          marginTop: '-140vh',
+          marginBottom: 0,
         }}
       >
         <div className="w-full max-w-[1400px] mx-auto px-6 md:px-12">
@@ -519,9 +532,9 @@ function CorporateView({ activeTab, setActiveTab }) {
             </motion.div>
           </div>
         </div>
-      </motion.section>
+      </section>
 
-      <div className="scroll-overlay-container">
+      <div className="scroll-overlay-container" style={{ marginTop: 0 }}>
         <SolutionsSection />
 
         {/* CTA with scroll-driven purple clip-path animation */}
