@@ -84,7 +84,7 @@ function RollingNumber({ value, isAnimating }) {
 function StackedBenefitCard({ card, index, totalCards, scrollYProgress }) {
   const startT = 0.15 + (index - 1) * 0.12;
   const endT = Math.min(startT + 0.12, 0.85);
-  const targetY = index * 98;
+  const targetY = index * 84;
 
   const cardY = useTransform(
     scrollYProgress,
@@ -208,20 +208,31 @@ function SolutionsSection() {
     offset: ["start start", "end end"]
   });
 
-  // Phase 1: message centered, exits smoothly between 0.04 and 0.14
-  const messageY = useTransform(scrollYProgress, [0.04, 0.14], ["0vh", "-100vh"]);
-  const messageOpacity = useTransform(scrollYProgress, [0.06, 0.14], [1, 0]);
-  const messageDisplay = useTransform(scrollYProgress, (v) => (v > 0.14 ? 'none' : 'flex'));
+  // Phase 1: "WE BUILT ANTBOX..." parallax exit (moves up with scale and depth)
+  const messageY = useTransform(scrollYProgress, [0, 0.14], ["0%", "-28%"]);
+  const messageScale = useTransform(scrollYProgress, [0, 0.14], [1, 0.92]);
+  const messageOpacity = useTransform(scrollYProgress, [0.04, 0.14], [1, 0]);
+  const messageDisplay = useTransform(scrollYProgress, (v) => (v >= 0.14 ? 'none' : 'flex'));
 
-  // Phase 2: Stacked Cards Deck is solid and visible, does NOT fade away
-  const deckOpacity = useTransform(scrollYProgress, [0.10, 0.14], [0, 1]);
+  // Phase 2: "WHAT WE BRING" parallax entrance, then stays 100% solid
+  const deckY = useTransform(scrollYProgress, [0.05, 0.14], ["40px", "0px"]);
+  const deckScale = useTransform(scrollYProgress, [0.05, 0.14], [0.96, 1]);
+  const deckOpacity = useTransform(scrollYProgress, [0.06, 0.13], [0, 1]);
   const totalCards = cardData.length;
 
   return (
     <section className="solutions-section-pinned" ref={sectionRef} style={{ height: '190vh' }}>
       <div className="solutions-sticky-inner">
-        {/* Phase 1: big message */}
-        <motion.div className="solutions-fullpage-msg" style={{ opacity: messageOpacity, y: messageY, display: messageDisplay }}>
+        {/* Phase 1: big message with smooth Parallax Transition */}
+        <motion.div
+          className="solutions-fullpage-msg"
+          style={{
+            opacity: messageOpacity,
+            y: messageY,
+            scale: messageScale,
+            display: messageDisplay,
+          }}
+        >
           <h3>
             <span className="msg-line">
               <span style={{ color: '#f7f5ee' }}>WE BUILT </span>
@@ -236,15 +247,17 @@ function SolutionsSection() {
           </h3>
         </motion.div>
 
-        {/* Phase 2: Stacked Cards Deck revealed downwards */}
+        {/* Phase 2: Stacked Cards Deck — parallax entrance and stays 100% solid */}
         <motion.div
           style={{
             opacity: deckOpacity,
+            y: deckY,
+            scale: deckScale,
             width: '100%',
             display: 'flex',
             flexDirection: 'column',
             alignItems: 'center',
-            padding: '0 1.5rem',
+            padding: '6.5rem 1.5rem 2rem',
             maxWidth: '1020px',
           }}
         >
@@ -253,7 +266,7 @@ function SolutionsSection() {
           </h2>
 
           {/* Stacked Deck Container */}
-          <div style={{ position: 'relative', width: '100%', maxWidth: '1020px', height: '500px' }}>
+          <div style={{ position: 'relative', width: '100%', maxWidth: '1020px', height: '460px' }}>
             {cardData.map((card, i) => (
               <StackedBenefitCard
                 key={i}
@@ -491,23 +504,28 @@ function CandidateFriction() {
 // 3. "BUILT" zooms in and dissolves; "WHAT CORPORATES FACE" appears directly behind "BUILT".
 // 4. "WHAT CORPORATES FACE" remains completely still until covered by dark curtain.
 function CorporateHeroAndProblems({ scrollProgress }) {
-  // 1. Hero text fly-out (0 to 0.22)
-  const leftX = useTransform(scrollProgress, [0, 0.22], ["0vw", "-60vw"]);
-  const rightX = useTransform(scrollProgress, [0, 0.22], ["0vw", "60vw"]);
-  const isX = useTransform(scrollProgress, [0, 0.22], ["0vw", "-35vw"]);
-  const topOpacity = useTransform(scrollProgress, [0, 0.18], [1, 0]);
-  const isOpacity = useTransform(scrollProgress, [0, 0.18], [1, 0]);
+  // 1. "Where talent", "IS", and "not found" fly away and fade immediately (0 to 0.05)
+  const leftX = useTransform(scrollProgress, [0, 0.06], ["0vw", "-70vw"]);
+  const rightX = useTransform(scrollProgress, [0, 0.06], ["0vw", "70vw"]);
+  const isX = useTransform(scrollProgress, [0, 0.06], ["0vw", "-45vw"]);
+  const topOpacity = useTransform(scrollProgress, [0, 0.04], [1, 0]);
+  const isOpacity = useTransform(scrollProgress, [0, 0.04], [1, 0]);
 
-  // 2. "Built" zoom & clean dissolve (0.04 to 0.30)
-  const builtScale = useTransform(scrollProgress, [0.04, 0.30], [1, 25]);
-  const builtOpacity = useTransform(scrollProgress, [0.04, 0.22, 0.30], [1, 1, 0]);
+  // 2. "Built" starts zooming immediately from scroll=0, smoothly expanding up to 26x
+  const builtScale = useTransform(scrollProgress, [0, 0.28], [1, 26]);
+  const builtOpacity = useTransform(scrollProgress, [0, 0.20, 0.28], [1, 1, 0]);
 
-  // 3. "What Corporates Face" is 100% solid, stationary at its place
-  const wcfOpacity = useTransform(scrollProgress, (v) => (v > 0.01 ? 1 : 0));
+  // 3. "What Corporates Face" opacity is delayed (starts at 0.04 after Built starts expanding),
+  // reaches 100% solid by 0.24, and stays completely solid with zero blur when the curtain overlays it
+  const wcfOpacity = useTransform(
+    scrollProgress,
+    [0, 0.04, 0.14, 0.24],
+    [0, 0, 0.50, 1]
+  );
 
-  // Hide hero overlay completely at 0.30
-  const heroDisplay = useTransform(scrollProgress, (v) => (v > 0.30 ? 'none' : 'flex'));
-  const heroPointerEvents = useTransform(scrollProgress, (v) => (v > 0.30 ? 'none' : 'auto'));
+  // Hide hero overlay completely after Built passes
+  const heroDisplay = useTransform(scrollProgress, (v) => (v > 0.28 ? 'none' : 'flex'));
+  const heroPointerEvents = useTransform(scrollProgress, (v) => (v > 0.28 ? 'none' : 'auto'));
 
   // Trigger stats roll animation
   const [statsVisible, setStatsVisible] = useState(false);
@@ -524,7 +542,7 @@ function CorporateHeroAndProblems({ scrollProgress }) {
 
   return (
     <div style={{ position: 'relative', width: '100%', height: '100%', overflow: 'hidden', background: 'var(--cream)' }}>
-      {/* Layer 1: "What Corporates Face" — 100% solid opacity, stationary until covered by dark curtain */}
+      {/* Layer 1: "What Corporates Face" — solid, non-blurred, stationary until covered by curtain */}
       <motion.div
         style={{
           opacity: wcfOpacity,
@@ -731,7 +749,7 @@ function CorporateView({ activeTab, setActiveTab }) {
         </div>
       </div>
 
-      {/* Dark section — rolls up and hovers over the pinned "What Corporates Face" with shadow and rounded corners */}
+      {/* Dark section — rolls up and hovers over the pinned "What Corporates Face" with clean rounded corners and NO black shadow */}
       <div
         className="scroll-overlay-container"
         style={{
@@ -739,9 +757,10 @@ function CorporateView({ activeTab, setActiveTab }) {
           zIndex: 10,
           background: 'var(--black)',
           marginTop: '-100vh',
-          boxShadow: '0 -35px 80px rgba(0, 0, 0, 0.95)',
+          boxShadow: 'none',
           borderTopLeftRadius: '2.5rem',
           borderTopRightRadius: '2.5rem',
+          borderTop: '1px solid rgba(255, 255, 255, 0.08)',
         }}
       >
         <SolutionsSection />
@@ -751,54 +770,52 @@ function CorporateView({ activeTab, setActiveTab }) {
   );
 }
 
-// Sub-component: each card handles its own semi-circle arc animation attached to the left side
+// Sub-component: each card handles its position on the continuous rotating semi-circle carousel wheel
 function HowItWorksCard({ step, index, totalCards, scrollYProgress }) {
-  const segmentSize = 1 / totalCards;
-  const center = (index + 0.5) * segmentSize;
-  const range = segmentSize * 1.3;
+  // Relative position from active focal center (-3 to +3)
+  // When scroll reaches index / (totalCards - 1), relPos is 0 (focal center)
+  const relPos = useTransform(scrollYProgress, (progress) => {
+    const currentPos = progress * (totalCards - 1);
+    return index - currentPos;
+  });
 
-  const start = Math.max(0, center - range);
-  const end = Math.min(1, center + range);
+  // Y moves smoothly along vertical arc (bottom -> center -> top)
+  const cardY = useTransform(relPos, (rel) => {
+    return `${rel * 38}vh`;
+  });
 
-  // Y moves along the vertical semi-circle path from bottom to top
-  const cardY = useTransform(
-    scrollYProgress,
-    [start, center - segmentSize * 0.4, center, center + segmentSize * 0.4, end],
-    ['65vh', '22vh', '0vh', '-22vh', '-65vh']
-  );
+  // X creates semi-circle arc: curves inwards (-45px) at center, outward at edges
+  const cardX = useTransform(relPos, (rel) => {
+    const clampedRel = Math.max(-2.5, Math.min(2.5, rel));
+    const offset = -45 + Math.pow(clampedRel, 2) * 26;
+    return `${offset}px`;
+  });
 
-  // X creates the semi-circle bulge attached to the left edge
-  const cardX = useTransform(
-    scrollYProgress,
-    [start, center - segmentSize * 0.4, center, center + segmentSize * 0.4, end],
-    ['-90px', '20px', '60px', '20px', '-90px']
-  );
+  // Tangent rotation along the semi-circle wheel curve
+  const cardRotate = useTransform(relPos, (rel) => {
+    return rel * 16;
+  });
 
-  // Tangent rotation along the semi-circle curve
-  const cardRotate = useTransform(
-    scrollYProgress,
-    [start, center, end],
-    [-22, 0, 22]
-  );
+  // Scale: 1.02 at focal center, smooth taper outward
+  const cardScale = useTransform(relPos, (rel) => {
+    const dist = Math.abs(rel);
+    return Math.max(0.76, 1.02 - dist * 0.12);
+  });
 
-  const cardScale = useTransform(
-    scrollYProgress,
-    [start, center - segmentSize * 0.35, center, center + segmentSize * 0.35, end],
-    [0.82, 0.94, 1.02, 0.94, 0.82]
-  );
-
-  const cardOpacity = useTransform(
-    scrollYProgress,
-    [start, center - segmentSize * 0.5, center, center + segmentSize * 0.5, end],
-    [0, 0.9, 1, 0.9, 0]
-  );
+  // Opacity: 1 at focal center, smoothly fades at distance
+  const cardOpacity = useTransform(relPos, (rel) => {
+    const dist = Math.abs(rel);
+    if (dist <= 0.6) return 1;
+    if (dist >= 1.7) return 0;
+    return 1 - (dist - 0.6) / 1.1;
+  });
 
   return (
     <motion.div
       style={{
         position: 'absolute',
         width: 'min(500px, 92%)',
-        left: 'clamp(1rem, 4vw, 3.5rem)',
+        right: 'clamp(1rem, 4vw, 3.5rem)',
         borderRadius: '26px',
         overflow: 'hidden',
         x: cardX,
@@ -808,7 +825,7 @@ function HowItWorksCard({ step, index, totalCards, scrollYProgress }) {
         scale: cardScale,
         boxShadow: '0 30px 70px rgba(0,0,0,0.5)',
         border: '1px solid rgba(187, 98, 222, 0.35)',
-        transformOrigin: 'left center',
+        transformOrigin: 'right center',
         background: '#240a2f',
       }}
     >
@@ -916,7 +933,7 @@ function CandidateHowItWorks() {
   const [activeStep, setActiveStep] = useState(0);
   useEffect(() => {
     return scrollYProgress.on('change', (latest) => {
-      const idx = Math.min(Math.floor(latest * totalCards), totalCards - 1);
+      const idx = Math.min(Math.round(latest * (totalCards - 1)), totalCards - 1);
       setActiveStep(idx);
     });
   }, [scrollYProgress, totalCards]);
@@ -926,7 +943,7 @@ function CandidateHowItWorks() {
       ref={sectionRef}
       style={{
         position: 'relative',
-        height: '175vh',
+        height: '210vh',
         background: '#F7F5EE',
       }}
     >
@@ -938,13 +955,84 @@ function CandidateHowItWorks() {
         display: 'flex',
         overflow: 'hidden',
       }}>
-        {/* LEFT — scrolling cards with semi-circle animation attached to left edge */}
+        {/* LEFT — HOW IT WORKS title and active solution panel */}
+        <div style={{
+          flex: '0 0 50%',
+          display: 'flex',
+          flexDirection: 'column',
+          justifyContent: 'center',
+          padding: 'clamp(2rem, 5vw, 6rem)',
+          position: 'relative',
+          zIndex: 2,
+        }}>
+          {/* HOW IT WORKS title — large, bold, and prominent */}
+          <h2 style={{
+            fontFamily: 'Poppins, sans-serif',
+            fontSize: 'clamp(3.5rem, 6.8vw, 6.25rem)',
+            fontWeight: 900,
+            letterSpacing: '-0.05em',
+            lineHeight: 0.88,
+            color: 'var(--black)',
+            margin: '0 0 3.25rem',
+            textTransform: 'uppercase',
+          }}>
+            HOW<br />
+            <span style={{ color: 'var(--accent-purple)' }}>IT WORKS</span>
+          </h2>
+
+          {/* Animated solution text with vertical accent bar ONLY beside heading */}
+          <AnimatePresence mode="wait">
+            <motion.div
+              key={activeStep}
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -14 }}
+              transition={{ duration: 0.35, ease: [0.22, 1, 0.36, 1] }}
+              style={{
+                maxWidth: '520px',
+              }}
+            >
+              {/* Heading with side vertical accent bar */}
+              <div style={{ display: 'flex', alignItems: 'center', gap: '1.25rem', marginBottom: '1.15rem' }}>
+                <div
+                  style={{
+                    width: '4.5px',
+                    height: '2.5rem',
+                    borderRadius: '999px',
+                    background: steps[activeStep].accent || 'var(--accent-purple)',
+                    flexShrink: 0,
+                  }}
+                />
+                <h3 style={{
+                  fontFamily: 'Poppins, sans-serif',
+                  fontSize: 'clamp(1.5rem, 2.7vw, 2.35rem)',
+                  fontWeight: 800,
+                  color: 'var(--black)',
+                  lineHeight: 1.15,
+                  margin: 0,
+                }}>{steps[activeStep].solution}</h3>
+              </div>
+
+              {/* Description body underneath without side bar */}
+              <p style={{
+                fontFamily: 'Century Gothic, sans-serif',
+                fontSize: '1.08rem',
+                color: '#545454',
+                lineHeight: 1.65,
+                paddingLeft: '1.5rem',
+                margin: 0,
+              }}>{steps[activeStep].body}</p>
+            </motion.div>
+          </AnimatePresence>
+        </div>
+
+        {/* RIGHT — scrolling cards with semi-circle animation attached to right edge */}
         <div style={{
           flex: '0 0 50%',
           position: 'relative',
           display: 'flex',
           alignItems: 'center',
-          justifyContent: 'flex-start',
+          justifyContent: 'flex-end',
           overflow: 'hidden',
         }}>
           {steps.map((step, i) => (
@@ -956,76 +1044,6 @@ function CandidateHowItWorks() {
               scrollYProgress={scrollYProgress}
             />
           ))}
-        </div>
-
-        {/* RIGHT — HOW IT WORKS title and active solution panel */}
-        <div style={{
-          flex: '0 0 50%',
-          display: 'flex',
-          flexDirection: 'column',
-          justifyContent: 'center',
-          padding: 'clamp(2rem,5vw,5rem)',
-          position: 'relative',
-          zIndex: 2,
-        }}>
-          {/* HOW IT WORKS title */}
-          <h2 style={{
-            fontFamily: 'Poppins, sans-serif',
-            fontSize: 'clamp(2.75rem,6vw,5.5rem)',
-            fontWeight: 900,
-            letterSpacing: '-0.05em',
-            lineHeight: 0.92,
-            color: 'var(--black)',
-            margin: '0 0 2.5rem',
-            textTransform: 'uppercase',
-          }}>
-            HOW<br />
-            <span style={{ color: 'var(--accent-purple)' }}>IT WORKS</span>
-          </h2>
-
-          {/* Animated solution text with sideways vertical accent bar */}
-          <AnimatePresence mode="wait">
-            <motion.div
-              key={activeStep}
-              initial={{ opacity: 0, y: 24 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -16 }}
-              transition={{ duration: 0.4, ease: [0.22, 1, 0.36, 1] }}
-              style={{
-                display: 'flex',
-                alignItems: 'stretch',
-                gap: '1.5rem',
-                maxWidth: '520px',
-              }}
-            >
-              {/* Sideways vertical accent bar */}
-              <div
-                style={{
-                  width: '4px',
-                  borderRadius: '999px',
-                  background: steps[activeStep].accent || 'var(--accent-purple)',
-                  flexShrink: 0,
-                }}
-              />
-
-              <div>
-                <h3 style={{
-                  fontFamily: 'Poppins, sans-serif',
-                  fontSize: 'clamp(1.5rem,2.8vw,2.35rem)',
-                  fontWeight: 800,
-                  color: 'var(--black)',
-                  lineHeight: 1.2,
-                  marginBottom: '1rem',
-                }}>{steps[activeStep].solution}</h3>
-                <p style={{
-                  fontFamily: 'Century Gothic, sans-serif',
-                  fontSize: '1.05rem',
-                  color: '#545454',
-                  lineHeight: 1.65,
-                }}>{steps[activeStep].body}</p>
-              </div>
-            </motion.div>
-          </AnimatePresence>
         </div>
       </div>
     </section>

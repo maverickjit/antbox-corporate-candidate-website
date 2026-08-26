@@ -44,7 +44,7 @@ function BlackRollingSheetContainer({ children }) {
   const scale = useTransform(scrollYProgress, [0, 1], [0.97, 1]);
 
   return (
-    <div ref={containerRef} style={{ position: 'relative', zIndex: 10, width: '100%' }}>
+    <div ref={containerRef} style={{ position: 'relative', zIndex: 10, width: '100%', marginBottom: '2rem' }}>
       <motion.div
         style={{
           y,
@@ -57,10 +57,10 @@ function BlackRollingSheetContainer({ children }) {
           right: '50%',
           marginLeft: '-50vw',
           marginRight: '-50vw',
-          borderRadius: '44px 44px 0 0',
-          padding: '8rem 2rem 6rem',
-          boxShadow: '0 -25px 70px rgba(0, 0, 0, 0.45)',
-          minHeight: '85vh',
+          borderRadius: '44px',
+          padding: '7rem 2rem 6rem',
+          boxShadow: '0 25px 70px rgba(0, 0, 0, 0.45)',
+          minHeight: '75vh',
           display: 'flex',
           flexDirection: 'column',
           alignItems: 'center',
@@ -206,13 +206,13 @@ function MaskedLineRevealStatement() {
   );
 
   return (
-    <div ref={containerRef} className={styles.valuesStatement} style={{ minHeight: '160px', textAlign: 'left' }}>
-      <p style={{ margin: 0, textAlign: 'left' }}>
+    <div ref={containerRef} className={styles.valuesStatement} style={{ minHeight: '160px', textAlign: 'center' }}>
+      <p style={{ margin: 0, textAlign: 'center' }}>
         {part1}
         {activePart === 1 && <Cursor />}
       </p>
 
-      <p style={{ margin: 0, marginTop: '0.2rem', textAlign: 'left' }}>
+      <p style={{ margin: 0, marginTop: '0.2rem', textAlign: 'center' }}>
         {part2}
         {part3 && (
           <span style={{ color: '#D8B4FE', fontStyle: 'italic', fontWeight: 700 }}>
@@ -222,7 +222,7 @@ function MaskedLineRevealStatement() {
         {(activePart === 2 || activePart === 3) && <Cursor />}
       </p>
 
-      <p style={{ margin: 0, marginTop: '0.2rem', textAlign: 'left' }}>
+      <p style={{ margin: 0, marginTop: '0.2rem', textAlign: 'center' }}>
         {part4 && (
           <ScribbleUnderline color="#BB62DE" active={showUnderline}>
             <span>
@@ -305,31 +305,38 @@ function ParallaxCultureCard() {
   const containerRef = React.useRef(null);
   const { scrollYProgress } = useScroll({
     target: containerRef,
-    offset: ["start end", "end start"]
+    offset: ["start end", "end end"]
   });
 
-  // Parallax Zoom transforms for background image
-  const imageY = useTransform(scrollYProgress, [0, 1], ["-18%", "18%"]);
-  const imageScale = useTransform(scrollYProgress, [0, 0.5, 1], [1.38, 1.05, 1.0]);
+  // Smooth scroll transformations for Full-Screen Expansion
+  const cardWidth = useTransform(scrollYProgress, [0.1, 0.65], ["85vw", "100vw"]);
+  const cardHeight = useTransform(scrollYProgress, [0.1, 0.65], ["76vh", "100vh"]);
+  const cardRadius = useTransform(scrollYProgress, [0.1, 0.65], ["36px", "0px"]);
+  const cardScale = useTransform(scrollYProgress, [0.1, 0.65], [0.92, 1.0]);
 
-  // Parallax Zoom transforms for card container
-  const cardY = useTransform(scrollYProgress, [0, 0.5, 1], [80, 0, -40]);
-  const cardScale = useTransform(scrollYProgress, [0, 0.5, 1], [0.88, 1.0, 0.96]);
+  // Parallax Zoom transforms for background image / video
+  const imageScale = useTransform(scrollYProgress, [0, 0.65, 1], [1.35, 1.05, 1.0]);
+  const imageY = useTransform(scrollYProgress, [0, 1], ["-10%", "10%"]);
 
   // Parallax Zoom transforms for heading typography
-  const textY = useTransform(scrollYProgress, [0, 0.5, 1], [60, 0, -40]);
-  const textScale = useTransform(scrollYProgress, [0, 0.5, 1], [0.85, 1.0, 0.95]);
-  const textOpacity = useTransform(scrollYProgress, [0, 0.25, 0.75, 1], [0.5, 1, 1, 0.7]);
+  const textScale = useTransform(scrollYProgress, [0.1, 0.65], [0.88, 1.05]);
+  const textY = useTransform(scrollYProgress, [0.1, 0.65], [30, 0]);
+  const overlayOpacity = useTransform(scrollYProgress, [0.1, 0.65], [0.65, 0.4]);
 
   return (
-    <div ref={containerRef} className={styles.cultureOverlapWrapper}>
-      <div className={styles.cultureSection}>
+    <div ref={containerRef} className={styles.cultureStickyTrack}>
+      <div className={styles.cultureStickyInner}>
         <motion.div
-          style={{ y: cardY, scale: cardScale }}
+          style={{
+            width: cardWidth,
+            height: cardHeight,
+            borderRadius: cardRadius,
+            scale: cardScale,
+          }}
           className={styles.cultureHeroCard}
         >
-          {/* Parallax Zoom Background image wrapper */}
-          <div style={{ position: 'absolute', inset: '-20%', overflow: 'hidden', zIndex: 0 }}>
+          {/* Parallax Zoom Background image / video wrapper */}
+          <div style={{ position: 'absolute', inset: 0, overflow: 'hidden', zIndex: 0 }}>
             <motion.div style={{ y: imageY, scale: imageScale, width: '100%', height: '100%', position: 'relative' }}>
               <Image
                 src="/culture-hero-real.jpg"
@@ -341,10 +348,13 @@ function ParallaxCultureCard() {
             </motion.div>
           </div>
 
-          <div className={styles.cultureHeroOverlay}></div>
+          <motion.div style={{ opacity: overlayOpacity }} className={styles.cultureHeroOverlay}></motion.div>
+
+          {/* Top badge */}
+          <span className={styles.cultureLabelBadge}>CULTURE & LIFE</span>
 
           {/* Parallax Zoom Big stacked heading */}
-          <motion.div style={{ y: textY, scale: textScale, opacity: textOpacity }} className={styles.cultureTextBlock}>
+          <motion.div style={{ y: textY, scale: textScale }} className={styles.cultureTextBlock}>
             <h2 className={styles.cultureStackedHeading}>
               <span>LIFE</span>
               <span>AT</span>
@@ -572,69 +582,66 @@ export default function About() {
         </div>
       </BlackRollingSheetContainer>
 
-      {/* ── Dark Overlapping Card Sheet ── */}
-      <div className={styles.darkOverlapSheet}>
-        <div className={styles.darkOverlapContent}>
+      {/* ── Section 3: Core Values (White Section with 5 Cards) ── */}
+      <div ref={valuesSectionRef} className={styles.valuesSection}>
+        <div className={styles.valuesStickyContainer}>
+          {/* Company Values Badge above the 5 cards */}
+          <div className={styles.valuesMeta} style={{ marginBottom: '1rem' }}>
+            <span className={styles.labelBadge}>Company Values</span>
+          </div>
 
-
-
-          {/* ── Section 3: Core Values (Sequential Scroll 3D Cards) ── */}
-          <div ref={valuesSectionRef} className={styles.valuesSection}>
-            <div className={styles.valuesStickyContainer}>
-              {/* Company Values Badge above the 5 cards */}
-              <div className={styles.valuesMeta} style={{ marginBottom: '1rem' }}>
-                <span className={styles.labelBadge}>Company Values</span>
-              </div>
-
-              {/* Card Step Indicator */}
-              <div className={styles.cardStepIndicator}>
-                <div className={styles.stepDots}>
-                  {[1, 2, 3, 4, 5].map((step) => (
-                    <button
-                      key={step}
-                      className={`${styles.stepDot} ${step <= revealedCount ? styles.stepDotActive : ''}`}
-                      onClick={() => setRevealedCount(step)}
-                      aria-label={`Jump to value ${step}`}
-                    />
-                  ))}
-                </div>
-              </div>
-
-              <div className={styles.inspoCardsContainer}>
-                {values.map((value, index) => {
-                  const isRevealed = index < revealedCount;
-                  return (
-                    <div
-                      key={index}
-                      className={`${styles.inspoCard} ${isRevealed ? styles.inspoCardRevealed : styles.inspoCardHidden}`}
-                      style={{
-                        backgroundColor: value.bg,
-                        transitionDelay: `${(index % 5) * 0.06}s`
-                      }}
-                    >
-                      <div className={styles.inspoImageContainer}>
-                        {value.image ? (
-                          <Image
-                            src={value.image}
-                            alt={value.title}
-                            fill
-                            unoptimized
-                            className={styles.inspoImage}
-                          />
-                        ) : null}
-                      </div>
-
-                      <div>
-                        <h3 className={styles.inspoCardTitle}>{value.title}</h3>
-                        <p className={styles.inspoCardDesc}>{value.desc}</p>
-                      </div>
-                    </div>
-                  );
-                })}
-              </div>
+          {/* Card Step Indicator */}
+          <div className={styles.cardStepIndicator}>
+            <div className={styles.stepDots}>
+              {[1, 2, 3, 4, 5].map((step) => (
+                <button
+                  key={step}
+                  className={`${styles.stepDot} ${step <= revealedCount ? styles.stepDotActive : ''}`}
+                  onClick={() => setRevealedCount(step)}
+                  aria-label={`Jump to value ${step}`}
+                />
+              ))}
             </div>
           </div>
 
+          <div className={styles.inspoCardsContainer}>
+            {values.map((value, index) => {
+              const isRevealed = index < revealedCount;
+              return (
+                <div
+                  key={index}
+                  className={`${styles.inspoCard} ${isRevealed ? styles.inspoCardRevealed : styles.inspoCardHidden}`}
+                  style={{
+                    backgroundColor: value.bg,
+                    transitionDelay: `${(index % 5) * 0.06}s`
+                  }}
+                >
+                  <div className={styles.inspoImageContainer}>
+                    {value.image ? (
+                      <Image
+                        src={value.image}
+                        alt={value.title}
+                        fill
+                        unoptimized
+                        className={styles.inspoImage}
+                      />
+                    ) : null}
+                  </div>
+
+                  <div>
+                    <h3 className={styles.inspoCardTitle}>{value.title}</h3>
+                    <p className={styles.inspoCardDesc}>{value.desc}</p>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+      </div>
+
+      {/* ── Dark Overlapping Card Sheet ── */}
+      <div className={styles.darkOverlapSheet}>
+        <div className={styles.darkOverlapContent}>
           {/* ── Section 4: Founders Manifesto ── */}
           <div className={`${styles.manifestoOverlapWrapper} ${styles.reveal}`}>
             <div className={styles.manifestoSection}>
@@ -655,7 +662,6 @@ export default function About() {
               </div>
             </div>
           </div>
-
         </div>
       </div>
 

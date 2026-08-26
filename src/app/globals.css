@@ -287,7 +287,7 @@ body {
     background-image: radial-gradient(circle, var(--bg-grid) 1px, transparent 1px);
     background-position: 0 0;
     background-size: 32px 32px;
-    box-shadow: 0 -40px 100px rgba(34, 34, 38, 0.4);
+    box-shadow: none;
     /* Pull aggressively up under the hero to remove the cream strip */
     margin-top: -3rem;
     padding: 0;
