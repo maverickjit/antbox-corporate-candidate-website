@@ -14,9 +14,9 @@ const manifestoParagraphs = [
 ];
 
 function Word({ word, progress, range }) {
-  const opacity = useTransform(progress, range, [0.2, 1]);
-  const color = useTransform(progress, range, ["#4A4A52", "#FFFFFF"]);
-  const fontWeight = useTransform(progress, range, [400, 800]);
+  const opacity = useTransform(progress, range, [0.85, 1]);
+  const color = useTransform(progress, range, ["#D1D1D6", "#FFFFFF"]);
+  const fontWeight = useTransform(progress, range, [500, 700]);
 
   return (
     <motion.span
@@ -33,42 +33,175 @@ function Word({ word, progress, range }) {
   );
 }
 
-function BlackRollingSheetContainer({ children }) {
+function HorizontalSwipeValuesSection({ values }) {
   const containerRef = React.useRef(null);
+  const [revealedCount, setRevealedCount] = React.useState(1);
+
   const { scrollYProgress } = useScroll({
     target: containerRef,
+    offset: ["start start", "end end"]
+  });
+
+  // Phase 1 (0.0 -> 0.12): Roll up entrance animation for Panel 1 black sheet
+  const sheetY = useTransform(scrollYProgress, [0.0, 0.12], [100, 0]);
+  const sheetRadius = useTransform(scrollYProgress, [0.0, 0.12], ["44px 44px 0 0", "0px 0px 0px 0px"]);
+
+  // Phase 2 (0.15 -> 0.35): Horizontal Swipe from Panel 1 (Black) to Panel 2 (White)
+  const panelX = useTransform(scrollYProgress, [0.15, 0.35], ["0vw", "-100vw"]);
+
+  // Phase 3 (0.35 -> 0.95): Card reveal sequence inside Panel 2
+  useEffect(() => {
+    const unsubscribe = scrollYProgress.on("change", (latest) => {
+      if (latest < 0.35) {
+        setRevealedCount(1);
+      } else if (latest <= 0.95) {
+        const cardProgress = (latest - 0.35) / 0.60;
+        const step = Math.floor(cardProgress * 5) + 1;
+        const count = Math.min(Math.max(step, 1), 5);
+        setRevealedCount(count);
+      } else {
+        setRevealedCount(5);
+      }
+    });
+    return () => unsubscribe();
+  }, [scrollYProgress]);
+
+  return (
+    <div ref={containerRef} className={styles.horizontalSwipeTrack}>
+      <div className={styles.horizontalStickyViewport}>
+        <motion.div
+          style={{ x: panelX }}
+          className={styles.horizontalPanelContainer}
+        >
+          {/* ── PANEL 1: Whole Screen Black Statement Section ── */}
+          <motion.div
+            style={{ y: sheetY, borderRadius: sheetRadius }}
+            className={styles.panelBlackQuote}
+          >
+            <div className={styles.heroQuoteContainer}>
+              <MaskedLineRevealStatement />
+            </div>
+          </motion.div>
+
+          {/* ── PANEL 2: Full-Screen White Section with 5 Cards ── */}
+          <div className={styles.panelWhiteCards}>
+            <div className={styles.valuesStickyContainer}>
+              {/* Company Values Badge */}
+              <div className={styles.valuesMeta} style={{ marginBottom: '1rem' }}>
+                <span className={styles.labelBadge}>Company Values</span>
+              </div>
+
+              {/* Card Step Indicator */}
+              <div className={styles.cardStepIndicator}>
+                <div className={styles.stepDots}>
+                  {[1, 2, 3, 4, 5].map((step) => (
+                    <button
+                      key={step}
+                      className={`${styles.stepDot} ${step <= revealedCount ? styles.stepDotActive : ''}`}
+                      onClick={() => setRevealedCount(step)}
+                      aria-label={`Jump to value ${step}`}
+                    />
+                  ))}
+                </div>
+              </div>
+
+              <div className={styles.inspoCardsContainer}>
+                {values.map((value, index) => {
+                  const isRevealed = index < revealedCount;
+                  return (
+                    <div
+                      key={index}
+                      className={`${styles.inspoCard} ${isRevealed ? styles.inspoCardRevealed : styles.inspoCardHidden}`}
+                      style={{
+                        backgroundColor: value.bg,
+                        transitionDelay: `${(index % 5) * 0.05}s`
+                      }}
+                    >
+                      <div className={styles.inspoImageContainer}>
+                        {value.image ? (
+                          <Image
+                            src={value.image}
+                            alt={value.title}
+                            fill
+                            unoptimized
+                            className={styles.inspoImage}
+                          />
+                        ) : null}
+                      </div>
+                      <div>
+                        <h3 className={styles.inspoCardTitle}>{value.title}</h3>
+                        <p className={styles.inspoCardDesc}>{value.desc}</p>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+          </div>
+        </motion.div>
+      </div>
+    </div>
+  );
+}
+
+function FoundersManifestoSection() {
+  const sectionRef = React.useRef(null);
+
+  const { scrollYProgress } = useScroll({
+    target: sectionRef,
     offset: ["start end", "start 0.15"]
   });
 
-  const y = useTransform(scrollYProgress, [0, 1], [90, 0]);
-  const scale = useTransform(scrollYProgress, [0, 1], [0.97, 1]);
+  // 3D Perspective entrance: rises from bottom-left — camera moving toward lower-left
+  const y = useTransform(scrollYProgress, [0, 1], ["80vh", "0vh"]);
+  const rotateZ = useTransform(scrollYProgress, [0, 1], [-5, 0]);
+  const scale = useTransform(scrollYProgress, [0, 1], [0.88, 1]);
+  const opacity = useTransform(scrollYProgress, [0, 0.35], [0, 1]);
 
   return (
-    <div ref={containerRef} style={{ position: 'relative', zIndex: 10, width: '100%', marginBottom: '2rem' }}>
+    <div
+      ref={sectionRef}
+      style={{
+        position: 'relative',
+        zIndex: 10,
+        overflow: 'hidden',
+        background: '#0A0A0E',
+        /* Dark fill stops the white page from bleeding through edge gaps */
+        paddingTop: '1px'
+      }}
+    >
       <motion.div
         style={{
           y,
+          rotateZ,
           scale,
-          backgroundColor: '#0A0A0E',
-          color: '#FFFFFF',
-          width: '100vw',
-          position: 'relative',
-          left: '50%',
-          right: '50%',
-          marginLeft: '-50vw',
-          marginRight: '-50vw',
-          borderRadius: '44px',
-          padding: '7rem 2rem 6rem',
-          boxShadow: '0 25px 70px rgba(0, 0, 0, 0.45)',
-          minHeight: '75vh',
-          display: 'flex',
-          flexDirection: 'column',
-          alignItems: 'center',
-          justifyContent: 'center',
-          overflow: 'hidden'
+          opacity,
+          transformOrigin: "bottom left",
+          willChange: "transform, opacity"
         }}
+        className={styles.darkOverlapSheet}
       >
-        {children}
+        <div className={styles.darkOverlapContent}>
+          <div className={styles.manifestoOverlapWrapper}>
+            <div className={styles.manifestoSection}>
+              <div className={styles.manifestoImageContainer}>
+                <h2 className={styles.manifestoTitle}>Founders Manifesto</h2>
+                <div className={styles.founderPhotoWrapper}>
+                  <Image
+                    src="/founder-photo-portrait.jpg"
+                    alt="Founder Photo"
+                    fill
+                    unoptimized
+                    className={styles.founderPhoto}
+                  />
+                </div>
+              </div>
+              <div className={styles.manifestoContent}>
+                <ContinuousScrollManifesto />
+              </div>
+            </div>
+          </div>
+        </div>
       </motion.div>
     </div>
   );
@@ -132,7 +265,7 @@ function MaskedLineRevealStatement() {
   const [showUnderline, setShowUnderline] = React.useState(false);
 
   const full1 = "AntBox is built on a simple idea: the degree was never a skill";
-  const full2 = "test, ";
+  const full2 = "test — ";
   const full3 = "it was a proxy.";
   const full4 = "Nobody built the replacement. So we did.";
 
@@ -236,11 +369,36 @@ function MaskedLineRevealStatement() {
   );
 }
 
+function ManifestoWord({ word, progress, range }) {
+  const opacity = useTransform(progress, range, [0.55, 1]);
+  const color = useTransform(progress, range, ["#A1A1A6", "#FFFFFF"]);
+  const fontWeight = useTransform(progress, range, [500, 700]);
+  const textShadow = useTransform(progress, range, [
+    "0 0 0px rgba(255,255,255,0)",
+    "0 0 12px rgba(255,255,255,0.4)"
+  ]);
+
+  return (
+    <motion.span
+      style={{
+        opacity,
+        color,
+        fontWeight,
+        textShadow,
+        display: 'inline-block',
+        marginRight: '0.28em'
+      }}
+    >
+      {word}
+    </motion.span>
+  );
+}
+
 function ContinuousScrollManifesto() {
   const containerRef = React.useRef(null);
   const { scrollYProgress } = useScroll({
     target: containerRef,
-    offset: ["start 0.72", "end 0.38"]
+    offset: ["start 0.82", "end 0.35"]
   });
 
   const parsedParagraphs = React.useMemo(() => {
@@ -259,14 +417,14 @@ function ContinuousScrollManifesto() {
   }, [parsedParagraphs]);
 
   return (
-    <div ref={containerRef} style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
+    <div ref={containerRef} style={{ display: 'flex', flexDirection: 'column', gap: '1.6rem' }}>
       {parsedParagraphs.map((paraWords, pIndex) => (
-        <p key={pIndex} style={{ lineHeight: 1.75, fontSize: '1.08rem', margin: 0 }}>
+        <p key={pIndex} style={{ lineHeight: 1.75, fontSize: '1.12rem', margin: 0 }}>
           {paraWords.map(({ word, globalIndex }) => {
             const start = globalIndex / totalWords;
-            const end = Math.min(1, start + (1 / totalWords) * 3.5);
+            const end = Math.min(1, start + (1 / totalWords) * 3);
             return (
-              <Word
+              <ManifestoWord
                 key={globalIndex}
                 word={word}
                 progress={scrollYProgress}
@@ -381,6 +539,8 @@ function ParallaxCultureCard() {
     </div>
   );
 }
+
+
 
 export default function About() {
   const [activeFilter, setActiveFilter] = useState('View all');
@@ -575,97 +735,13 @@ export default function About() {
         </div>
       </div>
 
-      {/* ── Rolling Black Curtain Sheet (Smooth Scroll Overlay) ── */}
-      <BlackRollingSheetContainer>
-        <div className={styles.heroQuoteContainer}>
-          <MaskedLineRevealStatement />
-        </div>
-      </BlackRollingSheetContainer>
+      {/* ── Section 2: Pinned Horizontal Swipe Track (Black Quote → White 5 Cards) ── */}
+      <HorizontalSwipeValuesSection values={values} />
 
-      {/* ── Section 3: Core Values (White Section with 5 Cards) ── */}
-      <div ref={valuesSectionRef} className={styles.valuesSection}>
-        <div className={styles.valuesStickyContainer}>
-          {/* Company Values Badge above the 5 cards */}
-          <div className={styles.valuesMeta} style={{ marginBottom: '1rem' }}>
-            <span className={styles.labelBadge}>Company Values</span>
-          </div>
+      {/* ── Section 3: Founders Manifesto (3D Perspective Bottom-Left Entrance) ── */}
+      <FoundersManifestoSection />
 
-          {/* Card Step Indicator */}
-          <div className={styles.cardStepIndicator}>
-            <div className={styles.stepDots}>
-              {[1, 2, 3, 4, 5].map((step) => (
-                <button
-                  key={step}
-                  className={`${styles.stepDot} ${step <= revealedCount ? styles.stepDotActive : ''}`}
-                  onClick={() => setRevealedCount(step)}
-                  aria-label={`Jump to value ${step}`}
-                />
-              ))}
-            </div>
-          </div>
-
-          <div className={styles.inspoCardsContainer}>
-            {values.map((value, index) => {
-              const isRevealed = index < revealedCount;
-              return (
-                <div
-                  key={index}
-                  className={`${styles.inspoCard} ${isRevealed ? styles.inspoCardRevealed : styles.inspoCardHidden}`}
-                  style={{
-                    backgroundColor: value.bg,
-                    transitionDelay: `${(index % 5) * 0.06}s`
-                  }}
-                >
-                  <div className={styles.inspoImageContainer}>
-                    {value.image ? (
-                      <Image
-                        src={value.image}
-                        alt={value.title}
-                        fill
-                        unoptimized
-                        className={styles.inspoImage}
-                      />
-                    ) : null}
-                  </div>
-
-                  <div>
-                    <h3 className={styles.inspoCardTitle}>{value.title}</h3>
-                    <p className={styles.inspoCardDesc}>{value.desc}</p>
-                  </div>
-                </div>
-              );
-            })}
-          </div>
-        </div>
-      </div>
-
-      {/* ── Dark Overlapping Card Sheet ── */}
-      <div className={styles.darkOverlapSheet}>
-        <div className={styles.darkOverlapContent}>
-          {/* ── Section 4: Founders Manifesto ── */}
-          <div className={`${styles.manifestoOverlapWrapper} ${styles.reveal}`}>
-            <div className={styles.manifestoSection}>
-              <div className={styles.manifestoImageContainer}>
-                <h2 className={styles.manifestoTitle}>Founders Manifesto</h2>
-                <div className={styles.founderPhotoWrapper}>
-                  <Image
-                    src="/founder-photo-portrait.jpg"
-                    alt="Founder Photo"
-                    fill
-                    unoptimized
-                    className={styles.founderPhoto}
-                  />
-                </div>
-              </div>
-              <div className={styles.manifestoContent}>
-                <ContinuousScrollManifesto />
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      {/* ── Section 5: Culture Section (3D Parallax Scroll Transition) ── */}
+      {/* ── Section 4: Culture Section (3D Parallax Scroll Transition) ── */}
       <ParallaxCultureCard />
     </main>
   );

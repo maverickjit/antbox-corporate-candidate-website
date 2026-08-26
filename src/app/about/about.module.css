@@ -148,9 +148,9 @@
 }
 
 .manifestoContent p {
-  color: var(--text-secondary);
-  font-size: 0.95rem;
-  line-height: 1.6;
+  color: #FFFFFF !important;
+  font-size: 1.05rem;
+  line-height: 1.7;
   margin-bottom: 1rem;
 }
 
@@ -168,10 +168,11 @@
 .manifestoTitle {
   font-family: inherit;
   font-size: 2.25rem;
-  font-weight: 600;
+  font-weight: 800;
   letter-spacing: -0.02em;
-  color: var(--text-primary);
-  text-align: center;
+  color: #FFFFFF !important;
+  opacity: 1 !important;
+  text-align: left;
 }
 
 .founderPhotoWrapper {
@@ -189,22 +190,82 @@
   object-fit: cover;
 }
 
-.valuesSection {
+.horizontalSwipeTrack {
   position: relative;
-  width: 100%;
-  height: 145vh;
-  margin: 1.5rem 0 3rem;
-  opacity: 1 !important;
+  width: 100vw;
+  left: 50%;
+  right: 50%;
+  margin-left: -50vw;
+  margin-right: -50vw;
+  height: 380vh;
+  background: transparent;
 }
 
-.valuesStickyContainer {
+.horizontalStickyViewport {
   position: sticky;
-  top: 10vh;
-  height: 78vh;
+  top: 0;
+  width: 100vw;
+  height: 100vh;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+}
+
+.horizontalPanelContainer {
+  display: flex;
+  width: 200vw;
+  height: 100vh;
+  will-change: transform;
+}
+
+.panelBlackQuote {
+  width: 100vw;
+  height: 100vh;
+  background: #0A0A0E;
+  color: #FFFFFF;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
+  position: relative;
+  flex-shrink: 0;
+  box-shadow: 25px 0 70px rgba(0, 0, 0, 0.5);
+  z-index: 2;
+  will-change: transform, border-radius;
+}
+
+
+
+.panelWhiteCards {
+  width: 100vw;
+  height: 100vh;
+  background: #FDFBF7;
+  color: #111111;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+  padding-top: 4.8rem;
+  position: relative;
+  flex-shrink: 0;
+  z-index: 1;
+}
+
+.valuesSection {
+  position: relative;
+  width: 100%;
+  margin: 0;
+  opacity: 1 !important;
+}
+
+.valuesStickyContainer {
+  position: relative;
+  top: 0;
+  height: auto;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
   width: 100%;
   z-index: 5;
 }
@@ -359,8 +420,10 @@
   align-items: center;
   justify-content: center;
   width: 100%;
-  margin: 0 auto 1.5rem;
-  padding: 0 0.5rem;
+  margin: 0.5rem auto 1.25rem;
+  padding: 0.5rem;
+  position: relative;
+  z-index: 10;
 }
 
 .cardStepText {
@@ -408,28 +471,28 @@
   position: relative;
   width: 100%;
   max-width: 1280px;
-  margin: 2rem auto;
-  padding: 1.5rem 1rem 3rem;
+  margin: 0.25rem auto 0;
+  padding: 0.5rem 1rem 1rem;
   justify-content: center;
   align-items: stretch;
 }
 
 .inspoCard {
-  width: 290px;
-  min-width: 290px;
-  border-radius: 28px;
+  width: 275px;
+  min-width: 275px;
+  border-radius: 24px;
   border: 3.5px solid #000000;
-  padding: 1.5rem 1.35rem 1.75rem;
+  padding: 1.15rem 1.15rem 1.25rem;
   display: flex;
   flex-direction: column;
   justify-content: flex-start;
-  gap: 1.15rem;
-  box-shadow: 8px 10px 0px #000000;
+  gap: 0.85rem;
+  box-shadow: 7px 8px 0px #000000;
   transition: transform 0.45s cubic-bezier(0.34, 1.56, 0.64, 1), opacity 0.4s ease, box-shadow 0.3s ease, margin-left 0.4s ease;
   position: relative;
   overflow: hidden;
   color: #000000;
-  margin-left: -55px;
+  margin-left: -50px;
   /* Overlap effect: cards layer over each other! */
   z-index: 1;
 }
@@ -571,10 +634,21 @@
   padding-top: 3.2rem;
 }
 
+.whiteManifestoParagraph {
+  font-family: var(--font-primary);
+  font-size: 1.15rem;
+  font-weight: 600;
+  line-height: 1.75;
+  color: #FFFFFF !important;
+  opacity: 1 !important;
+}
+
 .manifestoContent p {
   font-family: var(--font-primary);
-  font-size: 1.02rem;
-  line-height: 1.7;
+  font-size: 1.05rem;
+  line-height: 1.75;
+  color: #FFFFFF !important;
+  opacity: 1 !important;
 }
 
 .manifestoImageContainer {
@@ -588,8 +662,9 @@
 .manifestoTitle {
   font-family: var(--font-primary);
   font-size: 2rem;
-  font-weight: 700;
-  color: var(--text-primary);
+  font-weight: 800;
+  color: #FFFFFF !important;
+  opacity: 1 !important;
   letter-spacing: -0.025em;
   text-align: left;
   margin: 0;
@@ -605,36 +680,6 @@
   border: 1px solid rgba(255, 255, 255, 0.12);
   box-shadow: 0 15px 35px rgba(0, 0, 0, 0.4);
   background: #0E0C13;
-  clip-path: inset(0 0 0 0);
-  transform: none;
-  opacity: 1;
-  transition: transform 0.5s ease, box-shadow 0.5s ease;
-}
-
-/* Purple curtain overlay that wipes up ahead of the image reveal */
-.founderPhotoWrapper::after {
-  content: '';
-  position: absolute;
-  inset: 0;
-  background: var(--antbox-purple, #BB62DE);
-  z-index: 3;
-  clip-path: inset(0 0 0 0);
-  transition: clip-path 0.9s cubic-bezier(0.77, 0, 0.175, 1) 0.15s;
-  pointer-events: none;
-}
-
-/* Clip Wipe Up Reveal when scrolled into view */
-.manifestoOverlapWrapper.revealVisible .founderPhotoWrapper,
-.revealVisible .founderPhotoWrapper {
-  clip-path: inset(0 0 0 0) !important;
-  /* Wiped completely open upward! */
-  transform: translateY(0) scale(1) !important;
-}
-
-.manifestoOverlapWrapper.revealVisible .founderPhotoWrapper::after,
-.revealVisible .founderPhotoWrapper::after {
-  clip-path: inset(0 0 100% 0);
-  /* Purple curtain wipes away upward revealing photo */
 }
 
 .founderPhoto {
@@ -1110,10 +1155,12 @@
   margin-right: -50vw;
   background: #0A0A0E;
   color: #FFFFFF;
-  padding: 4rem 0 4rem;
+  padding: 4.5rem 0 5rem;
   margin-top: 3rem;
-  border-radius: 44px 44px 0 0;
-  box-shadow: 0 -25px 70px rgba(0, 0, 0, 0.45);
+  margin-bottom: 4rem;
+  border-radius: 48px;
+  box-shadow: 0 25px 80px rgba(0, 0, 0, 0.5), 0 -25px 80px rgba(0, 0, 0, 0.35);
+  will-change: transform, opacity;
 }
 
 .darkOverlapSheet .labelBadge {
@@ -1132,7 +1179,13 @@
 }
 
 .darkOverlapSheet .manifestoTitle {
-  color: #FFFFFF;
+  color: #FFFFFF !important;
+  opacity: 1 !important;
+}
+
+.darkOverlapSheet .manifestoContent p {
+  color: #FFFFFF !important;
+  opacity: 1 !important;
 }
 
 .darkOverlapContent {

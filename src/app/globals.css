@@ -176,13 +176,16 @@ body {
     inset: 0;
     z-index: 20;
     display: flex;
+    flex-direction: column;
     align-items: center;
     justify-content: center;
+    text-align: center;
     padding: 2rem;
+    margin: 0 auto;
   }
 
   .solutions-fullpage-msg h3 {
-    margin: 0;
+    margin: 0 auto;
     /* no base color — each word span sets its own color */
     font-family: "Poppins", sans-serif;
     font-size: clamp(3rem, 7vw, 7rem);
@@ -282,7 +285,7 @@ body {
   .scroll-overlay-container {
     position: relative;
     z-index: 2;
-    border-radius: 2rem 2rem 0 0;
+    border-radius: 0;
     background-color: var(--black);
     background-image: radial-gradient(circle, var(--bg-grid) 1px, transparent 1px);
     background-position: 0 0;
