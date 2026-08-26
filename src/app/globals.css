@@ -551,18 +551,26 @@ body {
   }
 
   @keyframes marquee {
-    from {
+    0% {
       transform: translateX(0);
     }
-
-    to {
-      transform: translateX(-50%);
+    100% {
+      transform: translateX(-100%);
     }
   }
 
-  .animate-marquee {
+  .marquee-track {
+    display: flex;
     width: max-content;
-    animation: marquee 24s linear infinite;
+  }
+
+  .animate-marquee {
+    display: flex;
+    gap: 3rem;
+    padding-right: 3rem;
+    flex-shrink: 0;
+    animation: marquee 30s linear infinite;
+    will-change: transform;
   }
 
   .animate-marquee:hover,

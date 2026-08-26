@@ -14,9 +14,9 @@ const manifestoParagraphs = [
 ];
 
 function Word({ word, progress, range }) {
-  const opacity = useTransform(progress, range, [0.4, 1]);
-  const color = useTransform(progress, range, ["#a1a1aa", "#000000"]);
-  const fontWeight = useTransform(progress, range, [400, 700]);
+  const opacity = useTransform(progress, range, [0.2, 1]);
+  const color = useTransform(progress, range, ["#4A4A52", "#FFFFFF"]);
+  const fontWeight = useTransform(progress, range, [400, 800]);
 
   return (
     <motion.span
@@ -30,6 +30,47 @@ function Word({ word, progress, range }) {
     >
       {word}
     </motion.span>
+  );
+}
+
+function BlackRollingSheetContainer({ children }) {
+  const containerRef = React.useRef(null);
+  const { scrollYProgress } = useScroll({
+    target: containerRef,
+    offset: ["start end", "start 0.15"]
+  });
+
+  const y = useTransform(scrollYProgress, [0, 1], [90, 0]);
+  const scale = useTransform(scrollYProgress, [0, 1], [0.97, 1]);
+
+  return (
+    <div ref={containerRef} style={{ position: 'relative', zIndex: 10, width: '100%' }}>
+      <motion.div
+        style={{
+          y,
+          scale,
+          backgroundColor: '#0A0A0E',
+          color: '#FFFFFF',
+          width: '100vw',
+          position: 'relative',
+          left: '50%',
+          right: '50%',
+          marginLeft: '-50vw',
+          marginRight: '-50vw',
+          borderRadius: '44px 44px 0 0',
+          padding: '8rem 2rem 6rem',
+          boxShadow: '0 -25px 70px rgba(0, 0, 0, 0.45)',
+          minHeight: '85vh',
+          display: 'flex',
+          flexDirection: 'column',
+          alignItems: 'center',
+          justifyContent: 'center',
+          overflow: 'hidden'
+        }}
+      >
+        {children}
+      </motion.div>
+    </div>
   );
 }
 
@@ -87,11 +128,11 @@ function MaskedLineRevealStatement() {
   const [part3, setPart3] = React.useState('');
   const [part4, setPart4] = React.useState('');
 
+  const [activePart, setActivePart] = React.useState(0);
   const [showUnderline, setShowUnderline] = React.useState(false);
-  const [isFinished, setIsFinished] = React.useState(false);
 
   const full1 = "AntBox is built on a simple idea: the degree was never a skill";
-  const full2 = "test — ";
+  const full2 = "test, ";
   const full3 = "it was a proxy.";
   const full4 = "Nobody built the replacement. So we did.";
 
@@ -99,7 +140,9 @@ function MaskedLineRevealStatement() {
     if (!isInView) return;
 
     let i1 = 0, i2 = 0, i3 = 0, i4 = 0;
-    const speed = 48;
+    const speed = 40;
+
+    setActivePart(1);
 
     const t1 = setInterval(() => {
       if (i1 < full1.length) {
@@ -107,12 +150,14 @@ function MaskedLineRevealStatement() {
         i1++;
       } else {
         clearInterval(t1);
+        setActivePart(2);
         const t2 = setInterval(() => {
           if (i2 < full2.length) {
             setPart2(full2.slice(0, i2 + 1));
             i2++;
           } else {
             clearInterval(t2);
+            setActivePart(3);
             const t3 = setInterval(() => {
               if (i3 < full3.length) {
                 setPart3(full3.slice(0, i3 + 1));
@@ -120,6 +165,7 @@ function MaskedLineRevealStatement() {
               } else {
                 clearInterval(t3);
                 setTimeout(() => {
+                  setActivePart(4);
                   const t4 = setInterval(() => {
                     if (i4 < full4.length) {
                       setPart4(full4.slice(0, i4 + 1));
@@ -127,7 +173,7 @@ function MaskedLineRevealStatement() {
                     } else {
                       clearInterval(t4);
                       setShowUnderline(true);
-                      setTimeout(() => setIsFinished(true), 600);
+                      setTimeout(() => setActivePart(0), 400);
                     }
                   }, speed);
                 }, 180);
@@ -143,26 +189,37 @@ function MaskedLineRevealStatement() {
     };
   }, [isInView]);
 
+  const Cursor = () => (
+    <motion.span
+      animate={{ opacity: [1, 0] }}
+      transition={{ duration: 0.4, repeat: Infinity, repeatType: 'reverse' }}
+      style={{
+        display: 'inline-block',
+        width: '3px',
+        height: '1.05em',
+        backgroundColor: '#BB62DE',
+        marginLeft: '3px',
+        verticalAlign: '-0.12em',
+        borderRadius: '1px'
+      }}
+    />
+  );
+
   return (
     <div ref={containerRef} className={styles.valuesStatement} style={{ minHeight: '160px', textAlign: 'left' }}>
       <p style={{ margin: 0, textAlign: 'left' }}>
         {part1}
+        {activePart === 1 && <Cursor />}
       </p>
 
       <p style={{ margin: 0, marginTop: '0.2rem', textAlign: 'left' }}>
         {part2}
         {part3 && (
-          <span style={{ color: '#BB62DE', fontStyle: 'italic', fontWeight: 700 }}>
+          <span style={{ color: '#D8B4FE', fontStyle: 'italic', fontWeight: 700 }}>
             {part3}
           </span>
         )}
-        {!part4 && !isFinished && part1 && (
-          <motion.span
-            animate={{ opacity: [1, 0] }}
-            transition={{ duration: 0.45, repeat: Infinity, repeatType: 'reverse' }}
-            style={{ display: 'inline-block', width: '2.5px', height: '1.1em', backgroundColor: '#BB62DE', marginLeft: '3px', verticalAlign: '-0.15em', borderRadius: '1px' }}
-          />
-        )}
+        {(activePart === 2 || activePart === 3) && <Cursor />}
       </p>
 
       <p style={{ margin: 0, marginTop: '0.2rem', textAlign: 'left' }}>
@@ -173,13 +230,7 @@ function MaskedLineRevealStatement() {
             </span>
           </ScribbleUnderline>
         )}
-        {!isFinished && part4 && (
-          <motion.span
-            animate={{ opacity: [1, 0] }}
-            transition={{ duration: 0.45, repeat: Infinity, repeatType: 'reverse' }}
-            style={{ display: 'inline-block', width: '2.5px', height: '1.1em', backgroundColor: '#BB62DE', marginLeft: '3px', verticalAlign: '-0.15em', borderRadius: '1px' }}
-          />
-        )}
+        {activePart === 4 && <Cursor />}
       </p>
     </div>
   );
@@ -247,6 +298,77 @@ function RollingImageCardBox({ children }) {
     >
       {children}
     </motion.div>
+  );
+}
+
+function ParallaxCultureCard() {
+  const containerRef = React.useRef(null);
+  const { scrollYProgress } = useScroll({
+    target: containerRef,
+    offset: ["start end", "end start"]
+  });
+
+  // Parallax Zoom transforms for background image
+  const imageY = useTransform(scrollYProgress, [0, 1], ["-18%", "18%"]);
+  const imageScale = useTransform(scrollYProgress, [0, 0.5, 1], [1.38, 1.05, 1.0]);
+
+  // Parallax Zoom transforms for card container
+  const cardY = useTransform(scrollYProgress, [0, 0.5, 1], [80, 0, -40]);
+  const cardScale = useTransform(scrollYProgress, [0, 0.5, 1], [0.88, 1.0, 0.96]);
+
+  // Parallax Zoom transforms for heading typography
+  const textY = useTransform(scrollYProgress, [0, 0.5, 1], [60, 0, -40]);
+  const textScale = useTransform(scrollYProgress, [0, 0.5, 1], [0.85, 1.0, 0.95]);
+  const textOpacity = useTransform(scrollYProgress, [0, 0.25, 0.75, 1], [0.5, 1, 1, 0.7]);
+
+  return (
+    <div ref={containerRef} className={styles.cultureOverlapWrapper}>
+      <div className={styles.cultureSection}>
+        <motion.div
+          style={{ y: cardY, scale: cardScale }}
+          className={styles.cultureHeroCard}
+        >
+          {/* Parallax Zoom Background image wrapper */}
+          <div style={{ position: 'absolute', inset: '-20%', overflow: 'hidden', zIndex: 0 }}>
+            <motion.div style={{ y: imageY, scale: imageScale, width: '100%', height: '100%', position: 'relative' }}>
+              <Image
+                src="/culture-hero-real.jpg"
+                alt="Life at AntBox"
+                fill
+                unoptimized
+                className={styles.cultureHeroImage}
+              />
+            </motion.div>
+          </div>
+
+          <div className={styles.cultureHeroOverlay}></div>
+
+          {/* Parallax Zoom Big stacked heading */}
+          <motion.div style={{ y: textY, scale: textScale, opacity: textOpacity }} className={styles.cultureTextBlock}>
+            <h2 className={styles.cultureStackedHeading}>
+              <span>LIFE</span>
+              <span>AT</span>
+              <span className={styles.cultureAccentLine}>ANTBOX.</span>
+            </h2>
+          </motion.div>
+
+          {/* Bottom row */}
+          <div className={styles.cultureBottomRow}>
+            <div className={styles.cultureSubGroup}>
+              <p className={styles.cultureSubtitle}>
+                But we don't burn out doing it.
+              </p>
+              <a href="#jobs" className={styles.cultureCtaBtn}>
+                Join the team
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                  <line x1="7" y1="17" x2="17" y2="7" /><polyline points="7 7 17 7 17 17" />
+                </svg>
+              </a>
+            </div>
+          </div>
+        </motion.div>
+      </div>
+    </div>
   );
 }
 
@@ -441,51 +563,20 @@ export default function About() {
             We take final and pre-final year students, run them through real-world domain teardowns, and deploy them into fast-growing SaaS teams. We bring verified proof of work, owning candidate readiness so they contribute from Day 0.
           </p>
         </div>
-
-        <RollingImageCardBox>
-          <div className={styles.operatorsImageFrame}>
-            <Image
-              src="/hero-image.png"
-              alt="AntBox Team Operators"
-              fill
-              unoptimized
-              priority
-              className={styles.operatorsImage}
-            />
-          </div>
-        </RollingImageCardBox>
       </div>
 
-      {/* ── Core Values Quote Statement (Placed right below first image container) ── */}
-      <div className={styles.heroQuoteContainer}>
-        <MaskedLineRevealStatement />
-      </div>
+      {/* ── Rolling Black Curtain Sheet (Smooth Scroll Overlay) ── */}
+      <BlackRollingSheetContainer>
+        <div className={styles.heroQuoteContainer}>
+          <MaskedLineRevealStatement />
+        </div>
+      </BlackRollingSheetContainer>
 
       {/* ── Dark Overlapping Card Sheet ── */}
       <div className={styles.darkOverlapSheet}>
         <div className={styles.darkOverlapContent}>
 
-          {/* ── Section 2: Partner / Core Companies Cards (Moving Belt Ticker) ── */}
-          <div className={`${styles.partnerBannerSection} ${styles.reveal}`}>
-            <div className={styles.partnerBannerContent}>
-              <h2 className={styles.partnerBannerTitle}>
-                We are the extended talent arm for 50+ B2B companies
-              </h2>
-              <div className={styles.partnerBannerDivider}></div>
 
-              {/* Moving Belt Ticker Track */}
-              <div className={styles.partnerLogoTickerContainer}>
-                <div className={styles.partnerLogoTrack}>
-                  {[...partnerLogos, ...partnerLogos, ...partnerLogos].map((logo, idx) => (
-                    <div key={idx} className={styles.partnerLogoCard}>
-                      {logo.icon}
-                      {logo.customContent ? logo.customContent : <span style={logo.style}>{logo.name}</span>}
-                    </div>
-                  ))}
-                </div>
-              </div>
-            </div>
-          </div>
 
           {/* ── Section 3: Core Values (Sequential Scroll 3D Cards) ── */}
           <div ref={valuesSectionRef} className={styles.valuesSection}>
@@ -568,49 +659,8 @@ export default function About() {
         </div>
       </div>
 
-      {/* ── Section 5: Culture Section (Full Overlapping Sheet) ── */}
-      <div className={styles.cultureOverlapWrapper}>
-        <div className={styles.cultureSection}>
-          <div className={styles.cultureHeroCard}>
-
-            {/* Background center image */}
-            <Image
-              src="/culture-hero-real.jpg"
-              alt="Life at AntBox"
-              fill
-              unoptimized
-              className={styles.cultureHeroImage}
-            />
-            <div className={styles.cultureHeroOverlay}></div>
-
-            {/* Big stacked heading left */}
-            <div className={styles.cultureTextBlock}>
-              <h2 className={styles.cultureStackedHeading}>
-                <span>LIFE</span>
-                <span>AT</span>
-                <span className={styles.cultureAccentLine}>ANTBOX.</span>
-              </h2>
-            </div>
-
-            {/* Bottom row */}
-            <div className={styles.cultureBottomRow}>
-              {/* Subtitle + CTA bottom-left */}
-              <div className={styles.cultureSubGroup}>
-                <p className={styles.cultureSubtitle}>
-                  But we don't burn out doing it.
-                </p>
-                <a href="#jobs" className={styles.cultureCtaBtn}>
-                  Join the team
-                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-                    <line x1="7" y1="17" x2="17" y2="7" /><polyline points="7 7 17 7 17 17" />
-                  </svg>
-                </a>
-              </div>
-            </div>
-
-          </div>
-        </div>
-      </div>
+      {/* ── Section 5: Culture Section (3D Parallax Scroll Transition) ── */}
+      <ParallaxCultureCard />
     </main>
   );
 }

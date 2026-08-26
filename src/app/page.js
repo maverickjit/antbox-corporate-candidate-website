@@ -80,24 +80,16 @@ function RollingNumber({ value, isAnimating }) {
 }
 
 // Stacked Card in "WHAT WE BRING" — all purple type, opens downwards 01 -> 02 -> 03 -> 04 -> 05 on scroll
+// Stacked Card in "WHAT WE BRING" — opens downwards on scroll
 function StackedBenefitCard({ card, index, totalCards, scrollYProgress }) {
-  // Opening timeline:
-  // Card 0 (01): stays at top y = 0
-  // Card 1 (02): opens downwards to 80px over [0.15, 0.26]
-  // Card 2 (03): opens downwards to 160px over [0.26, 0.37]
-  // Card 3 (04): opens downwards to 240px over [0.37, 0.48]
-  // Card 4 (05): opens downwards to 320px over [0.48, 0.60]
-  // All 5 cards stay fully open and visible from 0.60 to 1.0!
-  // On back-scroll: all cards smoothly slide back UP into the single stack at 01!
-
-  const startT = 0.15 + (index - 1) * 0.11;
-  const endT = startT + 0.11;
-  const targetY = index * 80;
+  const startT = 0.15 + (index - 1) * 0.12;
+  const endT = Math.min(startT + 0.12, 0.85);
+  const targetY = index * 98;
 
   const cardY = useTransform(
     scrollYProgress,
     index === 0
-      ? [0.08, 0.14]
+      ? [0.10, 0.18]
       : [startT, endT],
     index === 0
       ? [0, 0]
@@ -107,14 +99,13 @@ function StackedBenefitCard({ card, index, totalCards, scrollYProgress }) {
   const cardScale = useTransform(
     scrollYProgress,
     index === 0
-      ? [0.08, 0.14]
+      ? [0.10, 0.18]
       : [startT, endT],
     index === 0
       ? [1, 1]
-      : [0.96, 1]
+      : [0.97, 1]
   );
 
-  // zIndex: Card 0 is on top of initial stack (5), Card 4 is at bottom (1)
   const zIndex = totalCards - index;
 
   return (
@@ -129,58 +120,44 @@ function StackedBenefitCard({ card, index, totalCards, scrollYProgress }) {
         zIndex: zIndex,
         borderRadius: '1.25rem',
         overflow: 'hidden',
-        boxShadow: '0 0 40px 8px rgba(142,67,172,0.32), 0 16px 45px rgba(0,0,0,0.55)',
+        boxShadow: '0 12px 30px rgba(0,0,0,0.5)',
       }}
     >
       <div
         style={{
-          minHeight: '74px',
-          background: 'linear-gradient(145deg, #561b6e 0%, #2b0c37 100%)',
+          minHeight: '94px',
+          background: 'linear-gradient(145deg, #441558 0%, #22092c 100%)',
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'space-between',
-          padding: '1.1rem 1.75rem',
+          padding: '1.35rem 2.2rem',
           position: 'relative',
           overflow: 'hidden',
-          border: '1.5px solid rgba(234,182,255,0.45)',
+          border: '1px solid rgba(234,182,255,0.25)',
         }}
       >
-        {/* Dot grid pattern */}
-        <div
-          style={{
-            position: 'absolute',
-            inset: 0,
-            backgroundImage: 'radial-gradient(circle, rgba(255,255,255,0.06) 1px, transparent 1px)',
-            backgroundSize: '20px 20px',
-            pointerEvents: 'none',
-          }}
-        />
-
         {/* Content */}
         <div style={{ position: 'relative', zIndex: 1, display: 'flex', alignItems: 'center', gap: '1.25rem', flex: 1 }}>
-          <span
+          {/* Side vertical accent bar beside card */}
+          <div
             style={{
-              fontSize: '1.85rem',
-              fontWeight: 900,
-              fontFamily: 'Poppins, sans-serif',
-              color: '#ea80fc',
-              letterSpacing: '-0.03em',
-              lineHeight: 1,
+              width: '4px',
+              height: '38px',
+              borderRadius: '2px',
+              background: 'var(--accent-purple)',
               flexShrink: 0,
-              textShadow: '0 0 15px rgba(234,128,252,0.5)',
+              boxShadow: '0 0 10px rgba(187,98,222,0.5)',
             }}
-          >
-            0{index + 1}
-          </span>
+          />
           <div style={{ flex: 1 }}>
             <h4
               style={{
-                margin: '0 0 0.2rem',
+                margin: '0 0 0.25rem',
                 color: '#fff',
                 fontFamily: 'Poppins, sans-serif',
-                fontSize: '1.05rem',
+                fontSize: '1.1rem',
                 fontWeight: 800,
-                letterSpacing: '0.05em',
+                letterSpacing: '0.04em',
                 lineHeight: 1.25,
               }}
             >
@@ -190,7 +167,7 @@ function StackedBenefitCard({ card, index, totalCards, scrollYProgress }) {
               style={{
                 margin: 0,
                 color: '#e9c8ff',
-                fontSize: '0.86rem',
+                fontSize: '0.9rem',
                 lineHeight: 1.45,
               }}
             >
@@ -200,17 +177,17 @@ function StackedBenefitCard({ card, index, totalCards, scrollYProgress }) {
         </div>
 
         {/* Badge icon */}
-        <div style={{ position: 'relative', zIndex: 1, marginLeft: '1rem', flexShrink: 0 }}>
+        <div style={{ position: 'relative', zIndex: 1, marginLeft: '1.25rem', flexShrink: 0 }}>
           <div
             style={{
-              width: '34px',
-              height: '34px',
+              width: '36px',
+              height: '36px',
               borderRadius: '50%',
-              background: 'rgba(234,182,255,0.2)',
+              background: 'rgba(234,182,255,0.18)',
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
-              border: '1px solid rgba(234,182,255,0.45)',
+              border: '1px solid rgba(234,182,255,0.35)',
             }}
           >
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
@@ -231,31 +208,19 @@ function SolutionsSection() {
     offset: ["start start", "end end"]
   });
 
-  // Phase 1: message centered, exits quickly between 0.06 and 0.12 so What We Bring appears fast
-  const messageY = useTransform(scrollYProgress, [0, 0.12], ["0vh", "-100vh"]);
-  const messageOpacity = useTransform(scrollYProgress, [0, 0.08, 0.12], [1, 1, 0]);
-  const messageDisplay = useTransform(scrollYProgress, (v) => (v > 0.12 ? 'none' : 'flex'));
+  // Phase 1: message centered, exits smoothly between 0.04 and 0.14
+  const messageY = useTransform(scrollYProgress, [0.04, 0.14], ["0vh", "-100vh"]);
+  const messageOpacity = useTransform(scrollYProgress, [0.06, 0.14], [1, 0]);
+  const messageDisplay = useTransform(scrollYProgress, (v) => (v > 0.14 ? 'none' : 'flex'));
 
-  // Phase 2: Stacked Cards Deck appears smoothly at [0.10, 0.15] and STAYS visible until CTA
-  const deckOpacity = useTransform(scrollYProgress, [0.10, 0.15], [0, 1]);
+  // Phase 2: Stacked Cards Deck is solid and visible, does NOT fade away
+  const deckOpacity = useTransform(scrollYProgress, [0.10, 0.14], [0, 1]);
   const totalCards = cardData.length;
 
-  // Active step counter for bottom pill indicator
-  const [activeStep, setActiveStep] = useState(0);
-  useEffect(() => {
-    return scrollYProgress.on('change', (latest) => {
-      if (latest < 0.22) setActiveStep(0);
-      else if (latest < 0.33) setActiveStep(1);
-      else if (latest < 0.44) setActiveStep(2);
-      else if (latest < 0.55) setActiveStep(3);
-      else setActiveStep(4);
-    });
-  }, [scrollYProgress]);
-
   return (
-    <section className="solutions-section-pinned" ref={sectionRef} style={{ height: '320vh' }}>
+    <section className="solutions-section-pinned" ref={sectionRef} style={{ height: '190vh' }}>
       <div className="solutions-sticky-inner">
-        {/* Phase 1: big message — immediately visible, scrolls away fast */}
+        {/* Phase 1: big message */}
         <motion.div className="solutions-fullpage-msg" style={{ opacity: messageOpacity, y: messageY, display: messageDisplay }}>
           <h3>
             <span className="msg-line">
@@ -271,7 +236,7 @@ function SolutionsSection() {
           </h3>
         </motion.div>
 
-        {/* Phase 2: Stacked Cards Deck revealed downwards (01 -> 02 -> 03 -> 04 -> 05) */}
+        {/* Phase 2: Stacked Cards Deck revealed downwards */}
         <motion.div
           style={{
             opacity: deckOpacity,
@@ -280,7 +245,7 @@ function SolutionsSection() {
             flexDirection: 'column',
             alignItems: 'center',
             padding: '0 1.5rem',
-            maxWidth: '920px',
+            maxWidth: '1020px',
           }}
         >
           <h2 className="section-title heading-serif text-center" style={{ color: '#fff', marginBottom: '1.75rem' }}>
@@ -288,7 +253,7 @@ function SolutionsSection() {
           </h2>
 
           {/* Stacked Deck Container */}
-          <div style={{ position: 'relative', width: '100%', maxWidth: '820px', height: '400px' }}>
+          <div style={{ position: 'relative', width: '100%', maxWidth: '1020px', height: '500px' }}>
             {cardData.map((card, i) => (
               <StackedBenefitCard
                 key={i}
@@ -299,28 +264,11 @@ function SolutionsSection() {
               />
             ))}
           </div>
-
-          {/* Progress dots indicator */}
-          <div style={{ display: 'flex', gap: '0.6rem', marginTop: '1.5rem', alignItems: 'center' }}>
-            {cardData.map((_, i) => (
-              <div
-                key={i}
-                style={{
-                  width: i === activeStep ? '2rem' : '0.5rem',
-                  height: '0.45rem',
-                  borderRadius: '999px',
-                  background: i === activeStep ? 'var(--accent-purple)' : 'rgba(255,255,255,0.2)',
-                  transition: 'all 0.35s cubic-bezier(0.4, 0, 0.2, 1)',
-                }}
-              />
-            ))}
-          </div>
         </motion.div>
       </div>
     </section>
   );
 }
-
 
 
 
@@ -384,13 +332,13 @@ function CandidateFriction() {
     offset: ["start center", "end center"]
   });
 
-  const lineScaleX = useTransform(scrollYProgress, [0.25, 0.75], [0, 1]);
+  const lineScaleX = useTransform(scrollYProgress, [0.15, 0.65], [0, 1]);
   const [activeStep, setActiveStep] = useState(0);
 
   useEffect(() => {
     return scrollYProgress.onChange(latest => {
-      if (latest < 0.4) setActiveStep(0);
-      else if (latest < 0.6) setActiveStep(1);
+      if (latest < 0.35) setActiveStep(0);
+      else if (latest < 0.55) setActiveStep(1);
       else setActiveStep(2);
     });
   }, [scrollYProgress]);
@@ -408,7 +356,7 @@ function CandidateFriction() {
   }, []);
 
   return (
-    <section className="problems-section candidate-friction" ref={sectionRef} style={{ minHeight: '200vh' }}>
+    <section className="problems-section candidate-friction" ref={sectionRef} style={{ minHeight: '135vh' }}>
       <div style={{ position: 'sticky', top: '0', height: '100vh', display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'flex-start', background: 'transparent', padding: '0 clamp(2rem, 5vw, 5rem)' }}>
         <h2
           ref={titleRef}
@@ -432,10 +380,10 @@ function CandidateFriction() {
           <span
             style={{
               display: 'block',
-              fontFamily: '"Times New Roman", Times, serif',
-              fontStyle: 'italic',
-              color: 'transparent',
-              WebkitTextStroke: '2px var(--accent-purple)',
+              fontFamily: '"Poppins", sans-serif',
+              fontStyle: 'normal',
+              fontWeight: 800,
+              color: 'var(--accent-purple)',
               transformStyle: 'preserve-3d',
               transition: 'transform 0.9s cubic-bezier(0.22,1,0.36,1)',
               transform: flipped ? 'rotateY(0deg)' : 'rotateY(-90deg)',
@@ -465,7 +413,7 @@ function CandidateFriction() {
                   letterSpacing: '-0.05em',
                   color: activeStep >= 0 ? 'var(--accent-purple)' : 'rgba(255,255,255,0.2)',
                   marginBottom: '1rem',
-                  textShadow: activeStep >= 0 ? '0 0 30px rgba(187,98,222,0.45)' : 'none',
+                  textShadow: 'none',
                   transition: 'all 0.4s ease',
                 }}
               >
@@ -492,7 +440,7 @@ function CandidateFriction() {
                   letterSpacing: '-0.05em',
                   color: activeStep >= 1 ? 'var(--accent-purple)' : 'rgba(255,255,255,0.2)',
                   marginBottom: '1rem',
-                  textShadow: activeStep >= 1 ? '0 0 30px rgba(187,98,222,0.45)' : 'none',
+                  textShadow: 'none',
                   transition: 'all 0.4s ease',
                 }}
               >
@@ -519,7 +467,7 @@ function CandidateFriction() {
                   letterSpacing: '-0.05em',
                   color: activeStep >= 2 ? 'var(--accent-purple)' : 'rgba(255,255,255,0.2)',
                   marginBottom: '1rem',
-                  textShadow: activeStep >= 2 ? '0 0 30px rgba(187,98,222,0.45)' : 'none',
+                  textShadow: 'none',
                   transition: 'all 0.4s ease',
                 }}
               >
@@ -538,31 +486,35 @@ function CandidateFriction() {
 
 
 // Combined Scene: Hero ("Where talent IS Built not found") + "What Corporates Face"
-// 1. "Built" zooms in smoothly, and "What Corporates Face" appears directly from behind as soon as Built disappears.
-// 2. Numbers roll into place with slot machine digit animation.
-// 3. "What Corporates Face" stays pinned and still while the dark "We built antbox..." sheet covers it smoothly.
+// 1. Initial state (scroll=0): ONLY "Where talent IS Built not found" is visible. WCF opacity is 0.
+// 2. Scroll: "Where talent / IS / not found" fly away.
+// 3. "BUILT" zooms in and dissolves; "WHAT CORPORATES FACE" appears directly behind "BUILT".
+// 4. "WHAT CORPORATES FACE" remains completely still until covered by dark curtain.
 function CorporateHeroAndProblems({ scrollProgress }) {
-  // Hero text fly-out (0.0 to 0.35)
-  const leftX = useTransform(scrollProgress, [0, 0.35], ["0vw", "-100vw"]);
-  const rightX = useTransform(scrollProgress, [0, 0.35], ["0vw", "100vw"]);
-  const isX = useTransform(scrollProgress, [0, 0.35], ["0vw", "-50vw"]);
-  const topOpacity = useTransform(scrollProgress, [0, 0.28], [1, 0]);
-  const isOpacity = useTransform(scrollProgress, [0, 0.28], [1, 0]);
+  // 1. Hero text fly-out (0 to 0.22)
+  const leftX = useTransform(scrollProgress, [0, 0.22], ["0vw", "-60vw"]);
+  const rightX = useTransform(scrollProgress, [0, 0.22], ["0vw", "60vw"]);
+  const isX = useTransform(scrollProgress, [0, 0.22], ["0vw", "-35vw"]);
+  const topOpacity = useTransform(scrollProgress, [0, 0.18], [1, 0]);
+  const isOpacity = useTransform(scrollProgress, [0, 0.18], [1, 0]);
 
-  // "Built" zoom: smooth scale up to 45x and fades out cleanly
-  const builtScale = useTransform(scrollProgress, [0, 0.22, 0.46], [1, 2.5, 45]);
-  const builtOpacity = useTransform(scrollProgress, [0, 0.34, 0.46], [1, 1, 0]);
-  const heroOpacity = useTransform(scrollProgress, [0.38, 0.46], [1, 0]);
-  // Hero layer vanishes at exactly 0.46 revealing WCF underneath
-  const heroDisplay = useTransform(scrollProgress, (v) => (v > 0.46 ? 'none' : 'flex'));
-  const heroPointerEvents = useTransform(scrollProgress, (v) => (v > 0.46 ? 'none' : 'auto'));
+  // 2. "Built" zoom & clean dissolve (0.04 to 0.30)
+  const builtScale = useTransform(scrollProgress, [0.04, 0.30], [1, 25]);
+  const builtOpacity = useTransform(scrollProgress, [0.04, 0.22, 0.30], [1, 1, 0]);
 
-  // Stats roll animation: trigger when hero starts fading
+  // 3. "What Corporates Face" is 100% solid, stationary at its place
+  const wcfOpacity = useTransform(scrollProgress, (v) => (v > 0.01 ? 1 : 0));
+
+  // Hide hero overlay completely at 0.30
+  const heroDisplay = useTransform(scrollProgress, (v) => (v > 0.30 ? 'none' : 'flex'));
+  const heroPointerEvents = useTransform(scrollProgress, (v) => (v > 0.30 ? 'none' : 'auto'));
+
+  // Trigger stats roll animation
   const [statsVisible, setStatsVisible] = useState(false);
 
   useEffect(() => {
     return scrollProgress.on('change', (latest) => {
-      if (latest >= 0.38) {
+      if (latest >= 0.10) {
         setStatsVisible(true);
       } else {
         setStatsVisible(false);
@@ -572,10 +524,10 @@ function CorporateHeroAndProblems({ scrollProgress }) {
 
   return (
     <div style={{ position: 'relative', width: '100%', height: '100%', overflow: 'hidden', background: 'var(--cream)' }}>
-      {/* Layer 1: "What Corporates Face" — always visible (opacity:1), revealed when hero fades away */}
-      <div
+      {/* Layer 1: "What Corporates Face" — 100% solid opacity, stationary until covered by dark curtain */}
+      <motion.div
         style={{
-          opacity: 1,
+          opacity: wcfOpacity,
           position: 'absolute',
           inset: 0,
           zIndex: 2,
@@ -583,15 +535,14 @@ function CorporateHeroAndProblems({ scrollProgress }) {
           flexDirection: 'column',
           justifyContent: 'center',
           alignItems: 'center',
-          padding: '3rem 1.5rem',
-          background: 'var(--cream)',
+          padding: '2rem 1.5rem 1rem',
         }}
       >
         <div className="w-full max-w-[1400px] mx-auto px-6 md:px-12">
-          <h2 className="section-title heading-serif text-center" style={{ color: 'var(--black)', marginBottom: '1rem' }}>
+          <h2 className="section-title heading-serif text-center" style={{ color: 'var(--black)', marginBottom: '0.5rem' }}>
             WHAT <span style={{ color: 'var(--accent-purple)' }}>CORPORATES</span> FACE
           </h2>
-          <div className="problems-intro text-center" style={{ marginBottom: '3rem' }}>
+          <div className="problems-intro text-center" style={{ marginBottom: '2rem' }}>
             <p className="problems-lead">One rushed interview. One resume. One gut call.</p>
           </div>
           <div className="problems-grid">
@@ -633,22 +584,20 @@ function CorporateHeroAndProblems({ scrollProgress }) {
             </div>
           </div>
         </div>
-      </div>
+      </motion.div>
 
-      {/* Layer 2: Hero Section ("Where talent IS Built not found") */}
+      {/* Layer 2: Hero Section ("Where talent IS Built not found") on top */}
       <motion.div
-        className="flex flex-col items-center justify-center"
+        className="flex flex-col items-center justify-center pointer-events-none"
         style={{
-          opacity: heroOpacity,
           display: heroDisplay,
           pointerEvents: heroPointerEvents,
           position: 'absolute',
           inset: 0,
           zIndex: 5,
-          background: 'var(--cream)',
         }}
       >
-        <div className="flex flex-col items-center justify-center gap-2 md:gap-4 font-black tracking-[-0.03em] uppercase leading-[1.05] text-center w-full" style={{ fontFamily: 'Poppins, sans-serif' }}>
+        <div className="flex flex-col items-center justify-center gap-2 md:gap-4 font-black tracking-[-0.03em] uppercase leading-[1.05] text-center w-full relative z-10" style={{ fontFamily: 'Poppins, sans-serif' }}>
           <motion.div
             style={{ x: leftX, opacity: topOpacity }}
             className="text-on-surface text-[clamp(36px,8vw,120px)] whitespace-nowrap block"
@@ -689,19 +638,31 @@ function CorporateHeroAndProblems({ scrollProgress }) {
     </div>
   );
 }
-
 function CorporateCTA() {
   const sectionRef = useRef(null);
   const { scrollYProgress } = useScroll({
     target: sectionRef,
-    offset: ["start 85%", "end 100%"]
+    offset: ["start end", "end end"]
   });
 
-  const clipPercent = useTransform(scrollYProgress, [0, 1], [100, 0]);
+  const clipPercent = useTransform(scrollYProgress, [0.3, 0.85], [100, 0]);
   const clipPathValue = useMotionTemplate`inset(${clipPercent}% 0 0 0)`;
 
   return (
-    <section ref={sectionRef} style={{ position: 'relative', height: '100dvh', minHeight: '100dvh', margin: 0, padding: 0, overflow: 'hidden' }}>
+    <section
+      ref={sectionRef}
+      style={{
+        position: 'relative',
+        height: '100dvh',
+        minHeight: '100dvh',
+        margin: 0,
+        padding: 0,
+        overflow: 'hidden',
+        borderTopLeftRadius: '2.5rem',
+        borderTopRightRadius: '2.5rem',
+        boxShadow: '0 -30px 80px rgba(0, 0, 0, 0.85)',
+      }}
+    >
       {/* Base layer — light yellow/cream */}
       <div style={{
         position: 'absolute', inset: 0, background: 'var(--cream)',
@@ -743,40 +704,46 @@ function CorporateCTA() {
 }
 
 function CorporateView({ activeTab, setActiveTab }) {
-  // Track scroll ONLY over the spacer div — this way heroProgress 0→1 spans just 250vh.
-  // The sticky "What Corporates Face" layer is fully revealed at progress ~0.48 (≈120vh into spacer).
-  // The dark overlay doesn't enter the viewport until the spacer ends (at total ~350vh of scroll),
-  // so there is ~130vh of comfortable viewing of "What Corporates Face" before it gets covered.
-  const heroSpacerRef = useRef(null);
+  const containerRef = useRef(null);
   const { scrollYProgress: heroProgress } = useScroll({
-    target: heroSpacerRef,
-    offset: ["start start", "end start"]
+    target: containerRef,
+    offset: ["start start", "end end"]
   });
 
   return (
     <div className="page-wrapper" style={{ position: 'relative' }}>
-      {/* Sticky viewport — stays pinned at top:0 for the ENTIRE scroll duration of page-wrapper */}
-      <div
-        style={{
-          position: 'sticky',
-          top: 0,
-          height: '100vh',
-          width: '100vw',
-          marginLeft: 'calc(-50vw + 50%)',
-          zIndex: 1,
-          overflow: 'hidden',
-          background: 'var(--cream)',
-        }}
-      >
-        <CorporateHeroAndProblems scrollProgress={heroProgress} />
+      {/* Scroll track container: 260vh total scroll distance */}
+      <div ref={containerRef} style={{ position: 'relative', height: '260vh' }}>
+        {/* Sticky viewport — stays pinned at top:0 for the ENTIRE duration of containerRef */}
+        <div
+          style={{
+            position: 'sticky',
+            top: 0,
+            height: '100vh',
+            width: '100vw',
+            marginLeft: 'calc(-50vw + 50%)',
+            zIndex: 1,
+            overflow: 'hidden',
+            background: 'var(--cream)',
+          }}
+        >
+          <CorporateHeroAndProblems scrollProgress={heroProgress} />
+        </div>
       </div>
 
-      {/* Spacer — heroProgress tracks THIS div only (0→1 over 250vh).
-          Hero animation completes by ~0.48 (120vh). Dark overlay enters at end of spacer (~350vh total). */}
-      <div ref={heroSpacerRef} style={{ height: '250vh' }} />
-
-      {/* Dark section — rolls up over the pinned "What Corporates Face" like a curtain */}
-      <div className="scroll-overlay-container" style={{ position: 'relative', zIndex: 10, background: 'var(--black)' }}>
+      {/* Dark section — rolls up and hovers over the pinned "What Corporates Face" with shadow and rounded corners */}
+      <div
+        className="scroll-overlay-container"
+        style={{
+          position: 'relative',
+          zIndex: 10,
+          background: 'var(--black)',
+          marginTop: '-100vh',
+          boxShadow: '0 -35px 80px rgba(0, 0, 0, 0.95)',
+          borderTopLeftRadius: '2.5rem',
+          borderTopRightRadius: '2.5rem',
+        }}
+      >
         <SolutionsSection />
         <CorporateCTA />
       </div>
@@ -784,107 +751,110 @@ function CorporateView({ activeTab, setActiveTab }) {
   );
 }
 
-// Sub-component: each card handles its own scroll-driven transforms (fixes hooks-in-loop)
+// Sub-component: each card handles its own semi-circle arc animation attached to the left side
 function HowItWorksCard({ step, index, totalCards, scrollYProgress }) {
   const segmentSize = 1 / totalCards;
-  const start = index * segmentSize;
-  const end = start + segmentSize;
+  const center = (index + 0.5) * segmentSize;
+  const range = segmentSize * 1.3;
 
+  const start = Math.max(0, center - range);
+  const end = Math.min(1, center + range);
+
+  // Y moves along the vertical semi-circle path from bottom to top
   const cardY = useTransform(
     scrollYProgress,
-    [Math.max(0, start - segmentSize * 0.5), start + segmentSize * 0.1, end - segmentSize * 0.1, Math.min(1, end + segmentSize * 0.3)],
-    ['80vh', '0vh', '0vh', '-80vh']
+    [start, center - segmentSize * 0.4, center, center + segmentSize * 0.4, end],
+    ['65vh', '22vh', '0vh', '-22vh', '-65vh']
   );
+
+  // X creates the semi-circle bulge attached to the left edge
+  const cardX = useTransform(
+    scrollYProgress,
+    [start, center - segmentSize * 0.4, center, center + segmentSize * 0.4, end],
+    ['-90px', '20px', '60px', '20px', '-90px']
+  );
+
+  // Tangent rotation along the semi-circle curve
+  const cardRotate = useTransform(
+    scrollYProgress,
+    [start, center, end],
+    [-22, 0, 22]
+  );
+
+  const cardScale = useTransform(
+    scrollYProgress,
+    [start, center - segmentSize * 0.35, center, center + segmentSize * 0.35, end],
+    [0.82, 0.94, 1.02, 0.94, 0.82]
+  );
+
   const cardOpacity = useTransform(
     scrollYProgress,
-    [Math.max(0, start - segmentSize * 0.5), start, end - segmentSize * 0.1, end],
-    [0, 1, 1, 0]
+    [start, center - segmentSize * 0.5, center, center + segmentSize * 0.5, end],
+    [0, 0.9, 1, 0.9, 0]
   );
-  const cardScale = useTransform(scrollYProgress, [start, end - segmentSize * 0.1], [0.92, 1]);
 
   return (
     <motion.div
       style={{
         position: 'absolute',
         width: 'min(500px, 92%)',
-        borderRadius: '28px',
+        left: 'clamp(1rem, 4vw, 3.5rem)',
+        borderRadius: '26px',
         overflow: 'hidden',
+        x: cardX,
         y: cardY,
+        rotate: cardRotate,
         opacity: cardOpacity,
         scale: cardScale,
-        boxShadow: `0 40px 100px rgba(0,0,0,0.7), 0 0 0 1.5px ${step.accent}55`,
+        boxShadow: '0 30px 70px rgba(0,0,0,0.5)',
+        border: '1px solid rgba(187, 98, 222, 0.35)',
+        transformOrigin: 'left center',
+        background: '#240a2f',
       }}
     >
-      {/* Big gap statement area — the main card visual */}
+      {/* Big gap statement area — solid brand purple, completely opaque */}
       <div style={{
-        minHeight: '320px',
-        background: `linear-gradient(145deg, ${step.color} 0%, ${step.accent}33 60%, ${step.color} 100%)`,
+        minHeight: '260px',
+        background: '#240a2f',
         display: 'flex',
         flexDirection: 'column',
         alignItems: 'flex-start',
-        justifyContent: 'space-between',
-        padding: '2.5rem',
+        justifyContent: 'center',
+        padding: '2.5rem 2.25rem',
         position: 'relative',
-        overflow: 'hidden',
       }}>
-        {/* Decorative dot grid */}
-        <div style={{
-          position: 'absolute', inset: 0,
-          backgroundImage: 'radial-gradient(circle, rgba(255,255,255,0.07) 1px, transparent 1px)',
-          backgroundSize: '24px 24px',
-        }} />
-        {/* Decorative large emoji watermark */}
-        <span style={{
-          position: 'absolute', right: '1.5rem', bottom: '1rem',
-          fontSize: '7rem', opacity: 0.12, zIndex: 0, pointerEvents: 'none',
-        }}>{step.emoji}</span>
-        {/* Step number badge */}
-        <span style={{
-          display: 'inline-block',
-          background: 'rgba(255,255,255,0.12)',
-          border: `1px solid ${step.accent}66`,
-          color: step.accent,
-          padding: '0.3rem 1rem',
-          borderRadius: '50px',
-          fontSize: '0.75rem',
-          fontWeight: 800,
-          letterSpacing: '2px',
-          textTransform: 'uppercase',
-          position: 'relative', zIndex: 1,
-        }}>{step.label}</span>
         {/* The GAP text — big and bold */}
         <p style={{
           fontFamily: 'Poppins, sans-serif',
           fontWeight: 700,
-          fontSize: 'clamp(1.2rem, 2.2vw, 1.6rem)',
-          color: '#fff',
+          fontSize: 'clamp(1.2rem, 2.1vw, 1.5rem)',
+          color: '#ffffff',
           lineHeight: 1.45,
-          margin: '1.5rem 0 0',
-          position: 'relative', zIndex: 1,
-          maxWidth: '400px',
+          margin: 0,
+          maxWidth: '420px',
         }}>{step.gap}</p>
       </div>
-      {/* Footer bar — THE GAP badge + solution teaser */}
+
+      {/* Footer bar — THE GAP badge */}
       <div style={{
-        background: '#111116',
-        padding: '1.5rem 2.5rem',
-        borderTop: `2px solid ${step.accent}`,
+        background: '#180620',
+        padding: '1.15rem 2.25rem',
+        borderTop: '2px solid var(--accent-purple)',
         display: 'flex',
         alignItems: 'center',
-        justifyContent: 'space-between',
-        gap: '1rem',
       }}>
         <span style={{
-          display: 'inline-block', background: step.accent,
-          color: 'var(--purple-ink)', padding: '0.4rem 1.25rem',
-          borderRadius: '50px', fontSize: '0.7rem', fontWeight: 900,
-          letterSpacing: '1.5px', textTransform: 'uppercase', flexShrink: 0,
+          display: 'inline-block',
+          background: 'var(--accent-purple)',
+          color: '#ffffff',
+          padding: '0.35rem 1.15rem',
+          borderRadius: '50px',
+          fontSize: '0.72rem',
+          fontWeight: 900,
+          letterSpacing: '1.5px',
+          textTransform: 'uppercase',
+          flexShrink: 0,
         }}>THE GAP</span>
-        <p style={{
-          fontFamily: 'Poppins, sans-serif', fontWeight: 600, fontSize: '0.85rem',
-          color: 'rgba(255,255,255,0.45)', margin: 0, textAlign: 'right',
-          lineHeight: 1.3,
-        }}>Solution: {step.solution}</p>
       </div>
     </motion.div>
   );
@@ -956,7 +926,7 @@ function CandidateHowItWorks() {
       ref={sectionRef}
       style={{
         position: 'relative',
-        height: `${(totalCards + 1) * 100}vh`,
+        height: '175vh',
         background: '#F7F5EE',
       }}
     >
@@ -968,91 +938,13 @@ function CandidateHowItWorks() {
         display: 'flex',
         overflow: 'hidden',
       }}>
-        {/* LEFT — sticky solution panel */}
-        <div style={{
-          flex: '0 0 50%',
-          display: 'flex',
-          flexDirection: 'column',
-          justifyContent: 'center',
-          padding: 'clamp(2rem,5vw,5rem)',
-          position: 'relative',
-          zIndex: 2,
-        }}>
-          {/* HOW IT title */}
-          <h2 style={{
-            fontFamily: 'Poppins, sans-serif',
-            fontSize: 'clamp(3rem,7vw,7rem)',
-            fontWeight: 900,
-            letterSpacing: '-0.05em',
-            lineHeight: 0.9,
-            color: 'var(--black)',
-            margin: '0 0 3rem',
-            textTransform: 'uppercase',
-          }}>
-            HOW<br />
-            <span style={{ color: 'transparent', WebkitTextStroke: '2px var(--accent-purple)', fontStyle: 'italic', fontFamily: 'Times New Roman, serif' }}>IT WORKS</span>
-          </h2>
-
-          {/* Animated solution text */}
-          <AnimatePresence mode="wait">
-            <motion.div
-              key={activeStep}
-              initial={{ opacity: 0, y: 30 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -20 }}
-              transition={{ duration: 0.45, ease: [0.22, 1, 0.36, 1] }}
-            >
-              <span style={{
-                display: 'inline-block',
-                background: steps[activeStep].accent,
-                color: 'var(--purple-ink)',
-                padding: '0.3rem 1rem',
-                borderRadius: '50px',
-                fontSize: '0.75rem',
-                fontWeight: 800,
-                letterSpacing: '2px',
-                marginBottom: '1.5rem',
-                textTransform: 'uppercase',
-              }}>{steps[activeStep].label} / {totalCards}</span>
-              <h3 style={{
-                fontFamily: 'Poppins, sans-serif',
-                fontSize: 'clamp(1.5rem,3vw,2.5rem)',
-                fontWeight: 800,
-                color: 'var(--black)',
-                lineHeight: 1.15,
-                marginBottom: '1.25rem',
-              }}>{steps[activeStep].solution}</h3>
-              <p style={{
-                fontFamily: 'Century Gothic, sans-serif',
-                fontSize: '1.1rem',
-                color: '#545454',
-                lineHeight: 1.7,
-                maxWidth: '440px',
-              }}>{steps[activeStep].body}</p>
-
-              {/* Progress dots */}
-              <div style={{ display: 'flex', gap: '0.5rem', marginTop: '2rem' }}>
-                {steps.map((_, i) => (
-                  <div key={i} style={{
-                    width: i === activeStep ? '2rem' : '0.5rem',
-                    height: '0.5rem',
-                    borderRadius: '999px',
-                    background: i === activeStep ? steps[activeStep].accent : 'rgba(0,0,0,0.1)',
-                    transition: 'all 0.4s ease',
-                  }} />
-                ))}
-              </div>
-            </motion.div>
-          </AnimatePresence>
-        </div>
-
-        {/* RIGHT — scrolling image cards column */}
+        {/* LEFT — scrolling cards with semi-circle animation attached to left edge */}
         <div style={{
           flex: '0 0 50%',
           position: 'relative',
           display: 'flex',
           alignItems: 'center',
-          justifyContent: 'center',
+          justifyContent: 'flex-start',
           overflow: 'hidden',
         }}>
           {steps.map((step, i) => (
@@ -1064,6 +956,76 @@ function CandidateHowItWorks() {
               scrollYProgress={scrollYProgress}
             />
           ))}
+        </div>
+
+        {/* RIGHT — HOW IT WORKS title and active solution panel */}
+        <div style={{
+          flex: '0 0 50%',
+          display: 'flex',
+          flexDirection: 'column',
+          justifyContent: 'center',
+          padding: 'clamp(2rem,5vw,5rem)',
+          position: 'relative',
+          zIndex: 2,
+        }}>
+          {/* HOW IT WORKS title */}
+          <h2 style={{
+            fontFamily: 'Poppins, sans-serif',
+            fontSize: 'clamp(2.75rem,6vw,5.5rem)',
+            fontWeight: 900,
+            letterSpacing: '-0.05em',
+            lineHeight: 0.92,
+            color: 'var(--black)',
+            margin: '0 0 2.5rem',
+            textTransform: 'uppercase',
+          }}>
+            HOW<br />
+            <span style={{ color: 'var(--accent-purple)' }}>IT WORKS</span>
+          </h2>
+
+          {/* Animated solution text with sideways vertical accent bar */}
+          <AnimatePresence mode="wait">
+            <motion.div
+              key={activeStep}
+              initial={{ opacity: 0, y: 24 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -16 }}
+              transition={{ duration: 0.4, ease: [0.22, 1, 0.36, 1] }}
+              style={{
+                display: 'flex',
+                alignItems: 'stretch',
+                gap: '1.5rem',
+                maxWidth: '520px',
+              }}
+            >
+              {/* Sideways vertical accent bar */}
+              <div
+                style={{
+                  width: '4px',
+                  borderRadius: '999px',
+                  background: steps[activeStep].accent || 'var(--accent-purple)',
+                  flexShrink: 0,
+                }}
+              />
+
+              <div>
+                <h3 style={{
+                  fontFamily: 'Poppins, sans-serif',
+                  fontSize: 'clamp(1.5rem,2.8vw,2.35rem)',
+                  fontWeight: 800,
+                  color: 'var(--black)',
+                  lineHeight: 1.2,
+                  marginBottom: '1rem',
+                }}>{steps[activeStep].solution}</h3>
+                <p style={{
+                  fontFamily: 'Century Gothic, sans-serif',
+                  fontSize: '1.05rem',
+                  color: '#545454',
+                  lineHeight: 1.65,
+                }}>{steps[activeStep].body}</p>
+              </div>
+            </motion.div>
+          </AnimatePresence>
         </div>
       </div>
     </section>
@@ -1150,17 +1112,17 @@ function CompanyLogoBadge({ company }) {
 
   return (
     <div
-      className="company-box relative inline-flex items-center gap-2 cursor-pointer transition-all duration-300"
+      className="relative shrink-0 flex items-center gap-2 cursor-pointer font-bold text-sm select-none"
       style={{
-        fontSize: '1.15rem',
-        fontWeight: '800',
-        background: isHovered ? 'rgba(255,255,255,0.08)' : 'rgba(255,255,255,0.04)',
+        background: isHovered ? 'rgba(255, 255, 255, 0.08)' : 'rgba(255, 255, 255, 0.04)',
         color: '#fff',
-        border: isHovered ? `1px solid ${company.color}99` : '1px solid rgba(255,255,255,0.08)',
+        border: isHovered ? `1px solid ${company.color}` : '1px solid rgba(255,255,255,0.08)',
         borderRadius: '12px',
         padding: '0.9rem 2rem',
-        boxShadow: isHovered ? `0 8px 30px ${company.color}25` : 'none',
+        boxShadow: isHovered ? `0 8px 30px ${company.color}35` : 'none',
         transform: isHovered ? 'translateY(-2px)' : 'none',
+        zIndex: isHovered ? 50 : 1,
+        transition: 'border 0.2s, box-shadow 0.2s, background 0.2s, transform 0.2s',
       }}
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
@@ -1168,46 +1130,46 @@ function CompanyLogoBadge({ company }) {
       <span style={{ color: company.color }}>{company.symbol}</span>
       <span>{company.name}</span>
 
-      {/* Floating brief card on hover */}
+      {/* Floating brief card on hover — compact sizing */}
       <AnimatePresence>
         {isHovered && (
           <motion.div
-            initial={{ opacity: 0, y: 10, scale: 0.95 }}
+            initial={{ opacity: 0, y: 8, scale: 0.95 }}
             animate={{ opacity: 1, y: 0, scale: 1 }}
-            exit={{ opacity: 0, y: 6, scale: 0.95 }}
-            transition={{ duration: 0.22, ease: [0.16, 1, 0.3, 1] }}
+            exit={{ opacity: 0, y: 5, scale: 0.95 }}
+            transition={{ duration: 0.18, ease: [0.16, 1, 0.3, 1] }}
             style={{
               position: 'absolute',
-              bottom: 'calc(100% + 14px)',
+              bottom: 'calc(100% + 12px)',
               left: '50%',
               transform: 'translateX(-50%)',
-              width: '280px',
+              width: '235px',
               background: '#16161a',
-              border: `1px solid ${company.color}55`,
-              borderRadius: '16px',
-              padding: '1.15rem 1.25rem',
-              boxShadow: `0 20px 50px rgba(0,0,0,0.85), 0 0 25px ${company.color}22`,
-              zIndex: 100,
+              border: `1px solid ${company.color}88`,
+              borderRadius: '14px',
+              padding: '0.75rem 0.9rem',
+              boxShadow: `0 15px 40px rgba(0,0,0,0.95), 0 0 20px ${company.color}25`,
+              zIndex: 999,
               pointerEvents: 'none',
               textAlign: 'left',
               whiteSpace: 'normal',
             }}
           >
             {/* Header */}
-            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '0.5rem' }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', fontWeight: 800, fontSize: '1rem', color: '#fff' }}>
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '0.35rem' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '0.35rem', fontWeight: 800, fontSize: '0.88rem', color: '#fff' }}>
                 <span style={{ color: company.color }}>{company.symbol}</span>
                 {company.name}
               </div>
               <span
                 style={{
-                  fontSize: '0.72rem',
-                  padding: '0.2rem 0.55rem',
+                  fontSize: '0.65rem',
+                  padding: '0.15rem 0.45rem',
                   borderRadius: '999px',
                   background: 'rgba(255,255,255,0.08)',
                   color: company.color,
                   fontWeight: 600,
-                  border: `1px solid ${company.color}33`,
+                  border: `1px solid ${company.color}44`,
                 }}
               >
                 {company.category}
@@ -1215,14 +1177,14 @@ function CompanyLogoBadge({ company }) {
             </div>
 
             {/* Description */}
-            <p style={{ margin: '0 0 0.75rem', fontSize: '0.82rem', color: '#a3a3a3', lineHeight: 1.45, fontWeight: 400 }}>
+            <p style={{ margin: '0 0 0.45rem', fontSize: '0.74rem', color: '#b3b3b3', lineHeight: 1.35, fontWeight: 400 }}>
               {company.desc}
             </p>
 
             {/* Footer */}
-            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', paddingTop: '0.5rem', borderTop: '1px solid rgba(255,255,255,0.08)', fontSize: '0.75rem' }}>
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', paddingTop: '0.35rem', borderTop: '1px solid rgba(255,255,255,0.08)', fontSize: '0.68rem' }}>
               <span style={{ color: '#888' }}>Roles: <strong style={{ color: '#e5e5e5', fontWeight: 600 }}>{company.roles}</strong></span>
-              <span style={{ color: 'var(--accent-purple)', fontWeight: 700, background: 'rgba(187,98,222,0.12)', padding: '0.15rem 0.45rem', borderRadius: '4px' }}>
+              <span style={{ color: 'var(--accent-purple)', fontWeight: 700, background: 'rgba(187,98,222,0.15)', padding: '0.1rem 0.35rem', borderRadius: '4px' }}>
                 ✓ {company.hired}
               </span>
             </div>
@@ -1236,9 +1198,9 @@ function CompanyLogoBadge({ company }) {
                 transform: 'translateX(-50%)',
                 width: 0,
                 height: 0,
-                borderLeft: '7px solid transparent',
-                borderRight: '7px solid transparent',
-                borderTop: '7px solid #16161a',
+                borderLeft: '6px solid transparent',
+                borderRight: '6px solid transparent',
+                borderTop: '6px solid #16161a',
               }}
             />
           </motion.div>
@@ -1255,57 +1217,68 @@ function CompanyMarqueeSection() {
       style={{
         width: '100vw',
         marginLeft: 'calc(-50vw + 50%)',
-        padding: '11rem 0 6rem',
+        padding: '2rem 0 3.5rem',
         overflow: 'visible',
         background: 'var(--black)',
         position: 'relative',
-        zIndex: 5,
+        zIndex: 20,
       }}
     >
       <div className="w-full text-center" style={{ overflow: 'visible' }}>
-        <div className="company-logos relative w-full" style={{ opacity: 0.95, overflow: 'visible' }}>
-          <div className="flex gap-12 whitespace-nowrap animate-marquee" style={{ overflow: 'visible' }}>
-            {[...Array(3)].map((_, groupIndex) => (
-              <React.Fragment key={groupIndex}>
-                {hiringCompanies.map((company, cIndex) => (
-                  <CompanyLogoBadge key={`${groupIndex}-${cIndex}`} company={company} />
-                ))}
-              </React.Fragment>
-            ))}
+        <div className="company-logos relative w-full flex" style={{ overflow: 'visible', paddingTop: '55px', paddingBottom: '10px' }}>
+          <div className="marquee-track flex" style={{ overflow: 'visible' }}>
+            <div className="flex gap-12 shrink-0 animate-marquee" style={{ display: 'flex', alignItems: 'center', overflow: 'visible' }}>
+              {hiringCompanies.map((company, cIndex) => (
+                <CompanyLogoBadge key={`a-${cIndex}`} company={company} />
+              ))}
+            </div>
+            <div className="flex gap-12 shrink-0 animate-marquee" aria-hidden="true" style={{ display: 'flex', alignItems: 'center', overflow: 'visible' }}>
+              {hiringCompanies.map((company, cIndex) => (
+                <CompanyLogoBadge key={`b-${cIndex}`} company={company} />
+              ))}
+            </div>
           </div>
         </div>
-        <p className="caption" style={{ marginTop: '3.5rem', color: '#888', fontStyle: 'italic', fontSize: '1.1rem' }}>
-          Where AntBox candidates get hired
-        </p>
       </div>
     </section>
   );
 }
 
 function CandidateView() {
+  const heroRef = useRef(null);
+  const { scrollYProgress } = useScroll({
+    target: heroRef,
+    offset: ["start start", "end start"]
+  });
+
+  const heroTextY = useTransform(scrollYProgress, [0, 1], ["0%", "28%"]);
+  const heroPhotoY = useTransform(scrollYProgress, [0, 1], ["0%", "14%"]);
+  const heroOpacity = useTransform(scrollYProgress, [0, 0.85], [1, 0.1]);
+  const heroScale = useTransform(scrollYProgress, [0, 1], [1, 0.93]);
+
   return (
     <div className="page-wrapper candidate-view">
-      <div className="sticky-container candidate-hero-bg" style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+      <div ref={heroRef} className="candidate-hero-bg" style={{ position: 'relative', minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', overflow: 'hidden' }}>
 
-        <main
+        <motion.main
+          style={{ opacity: heroOpacity, scale: heroScale }}
           className="candidate-hero-section w-full max-w-[1240px] mx-auto px-6 sm:px-10 py-12 grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-14 items-center justify-center"
-          style={{ minHeight: '100vh', display: 'grid' }}
         >
-          {/* Left: Centered Typography */}
-          <div className="flex flex-col justify-center text-left py-4">
+          {/* Left: Centered Typography with Parallax */}
+          <motion.div style={{ y: heroTextY }} className="flex flex-col justify-center text-left py-4">
             <h1 className="hero-title heading-serif" style={{ color: '#fff', fontSize: 'clamp(2.75rem, 5.5vw, 5.5rem)', textTransform: 'uppercase', lineHeight: 1.02 }}>
               <span style={{ display: 'block' }}>CAMPUS TO</span>
-              <span className="text-stroke-purple-italic" style={{ display: 'block' }}>CORPORATE</span>
+              <span style={{ display: 'block', color: 'var(--accent-purple)' }}>CORPORATE</span>
               <span style={{ display: 'block' }}>WITHOUT THE</span>
               <span style={{ display: 'block', color: 'var(--accent-purple)' }}>GUESSWORK</span>
             </h1>
             <p className="hero-subtitle" style={{ color: 'rgba(255, 255, 255, 0.75)', fontSize: 'clamp(1.1rem, 2vw, 1.35rem)', marginTop: '1.75rem', fontWeight: 500, lineHeight: 1.5, maxWidth: '520px' }}>
               Stop applying blindly. Start building real proof of work.
             </p>
-          </div>
+          </motion.div>
 
-          {/* Right: Full-bleed Hero Photo Card (No black letterboxing) */}
-          <div className="flex items-center justify-center w-full">
+          {/* Right: Full-bleed Hero Photo Card with Parallax */}
+          <motion.div style={{ y: heroPhotoY }} className="flex items-center justify-center w-full">
             <div
               className="relative w-full overflow-hidden"
               style={{
@@ -1336,11 +1309,11 @@ function CandidateView() {
                 }}
               />
             </div>
-          </div>
-        </main>
+          </motion.div>
+        </motion.main>
       </div>
 
-      <div className="scroll-overlay-container candidate-overlay">
+      <div className="candidate-content-flow" style={{ position: 'relative', zIndex: 2 }}>
         <CandidateFriction />
 
         {/* Social Proof Marquee with pause on hover & company brief popups */}

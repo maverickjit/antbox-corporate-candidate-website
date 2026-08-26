@@ -5,70 +5,6 @@
   width: 100%;
 }
 
-/* ── Operators Hero Section ── */
-.operatorsHeroSection {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 3rem;
-  align-items: center;
-  padding: 4rem 0 3rem;
-  margin-bottom: 1rem;
-}
-
-.operatorsHeaderBlock {
-  display: flex;
-  flex-direction: column;
-  gap: 1.25rem;
-  justify-content: center;
-}
-
-.operatorsTitle {
-  font-family: 'Poppins', sans-serif;
-  font-size: clamp(2rem, 3.5vw, 3rem);
-  font-weight: 800;
-  line-height: 1.15;
-  letter-spacing: -0.04em;
-  color: #222226;
-  margin: 0;
-}
-
-.operatorsHighlight {
-  color: #BB62DE;
-  font-style: italic;
-}
-
-.operatorsSubtitle {
-  font-family: 'Century Gothic', sans-serif;
-  font-size: 1.05rem;
-  line-height: 1.7;
-  color: #545454;
-  margin: 0;
-  max-width: 520px;
-}
-
-/* Card box wrapper — receives the scroll-driven y/scale from framer */
-.operatorsImageCardBox {
-  width: 100%;
-  border-radius: 24px;
-  overflow: hidden;
-  box-shadow: 0 24px 60px -12px rgba(0, 0, 0, 0.2), 0 0 0 1px rgba(0,0,0,0.06);
-}
-
-/* The actual frame that gives the Next.js fill Image its dimensions */
-.operatorsImageFrame {
-  position: relative;
-  width: 100%;
-  aspect-ratio: 4 / 3;
-  overflow: hidden;
-  background: #f0eee8;
-}
-
-/* The Next.js Image itself */
-.operatorsImage {
-  object-fit: cover;
-  object-position: center top;
-}
-
 /* Scroll reveal animation */
 .reveal {
   opacity: 0;
@@ -82,11 +18,25 @@
   transform: translateY(0) !important;
 }
 
-.stagger1 { transition-delay: 0.1s; }
-.stagger2 { transition-delay: 0.2s; }
-.stagger3 { transition-delay: 0.3s; }
-.stagger4 { transition-delay: 0.4s; }
-.stagger5 { transition-delay: 0.5s; }
+.stagger1 {
+  transition-delay: 0.1s;
+}
+
+.stagger2 {
+  transition-delay: 0.2s;
+}
+
+.stagger3 {
+  transition-delay: 0.3s;
+}
+
+.stagger4 {
+  transition-delay: 0.4s;
+}
+
+.stagger5 {
+  transition-delay: 0.5s;
+}
 
 .heroSection {
   display: flex;
@@ -111,8 +61,11 @@
 
 .imageOverlay {
   position: absolute;
-  top: 0; left: 0; right: 0; bottom: 0;
-  background: linear-gradient(to bottom, rgba(0,0,0,0.2) 0%, rgba(0,0,0,0.05) 50%, rgba(0,0,0,0.3) 100%);
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(to bottom, rgba(0, 0, 0, 0.2) 0%, rgba(0, 0, 0, 0.05) 50%, rgba(0, 0, 0, 0.3) 100%);
   z-index: 1;
 }
 
@@ -150,7 +103,7 @@
   line-height: 1.25;
   color: #fff;
   max-width: 1000px;
-  text-shadow: 0 8px 32px rgba(0,0,0,0.8);
+  text-shadow: 0 8px 32px rgba(0, 0, 0, 0.8);
 }
 
 .heroQuoteAccent {
@@ -229,7 +182,7 @@
   border-radius: 28px;
   overflow: hidden;
   border: none;
-  box-shadow: 0 15px 30px rgba(0,0,0,0.3);
+  box-shadow: 0 15px 30px rgba(0, 0, 0, 0.3);
 }
 
 .founderPhoto {
@@ -239,7 +192,7 @@
 .valuesSection {
   position: relative;
   width: 100%;
-  height: 280vh;
+  height: 145vh;
   margin: 1.5rem 0 3rem;
   opacity: 1 !important;
 }
@@ -261,13 +214,13 @@
   max-width: 1060px;
   margin: 2rem auto 3.5rem;
   padding: 1.5rem 1rem;
-  text-align: center;
+  text-align: left;
   background: transparent;
   border: none;
   box-shadow: none;
   display: flex;
   flex-direction: column;
-  align-items: center;
+  align-items: flex-start;
   justify-content: center;
 }
 
@@ -296,19 +249,42 @@
 }
 
 .valuesStatement {
+  width: 100%;
   max-width: 1000px;
   margin: 0 auto;
+  text-align: left;
 }
 
 .valuesStatement p {
   font-family: var(--font-primary);
   font-size: 2.25rem;
   line-height: 1.4;
-  color: #1e1e24;
+  color: #FFFFFF;
   font-weight: 700;
   letter-spacing: -0.03em;
-  text-align: center;
+  text-align: left;
 }
+
+.purpleHighlightSpanItalic {
+  display: inline-block;
+  background: rgba(224, 86, 253, 0.22);
+  color: #BB62DE;
+  font-style: italic;
+  font-weight: 700;
+  padding: 0.05em 0.35em;
+  border-radius: 6px;
+}
+
+.purpleHighlightSpan {
+  display: inline-block;
+  background: rgba(224, 86, 253, 0.22);
+  color: #1e1e24;
+  font-weight: 700;
+  padding: 0.05em 0.35em;
+  border-radius: 6px;
+}
+
+
 
 .quoteAccent {
   color: var(--accent-purple);
@@ -351,19 +327,27 @@
 }
 
 @keyframes highlightSweepAnim {
-  0%, 15% {
+
+  0%,
+  15% {
     background-size: 0% 80%;
   }
-  65%, 100% {
+
+  65%,
+  100% {
     background-size: 100% 80%;
   }
 }
 
 @keyframes highlightSweepStrongAnim {
-  0%, 20% {
+
+  0%,
+  20% {
     background-size: 0% 38%;
   }
-  70%, 100% {
+
+  70%,
+  100% {
     background-size: 100% 38%;
   }
 }
@@ -445,7 +429,8 @@
   position: relative;
   overflow: hidden;
   color: #000000;
-  margin-left: -55px; /* Overlap effect: cards layer over each other! */
+  margin-left: -55px;
+  /* Overlap effect: cards layer over each other! */
   z-index: 1;
 }
 
@@ -516,6 +501,7 @@
     padding-right: 1.5rem;
     scrollbar-width: none;
   }
+
   .inspoCardsContainer::-webkit-scrollbar {
     display: none;
   }
@@ -540,15 +526,19 @@
   .grid {
     grid-template-columns: 1fr;
   }
+
   .heroQuote {
     font-size: 2rem;
   }
+
   .imageContainer {
     height: 380px;
   }
+
   .valuesStatement p {
     font-size: 1.4rem;
   }
+
   .valuesSection {
     padding: 2rem;
   }
@@ -612,13 +602,13 @@
   min-height: 480px;
   border-radius: 28px;
   overflow: hidden;
-  border: 1px solid var(--panel-border);
-  box-shadow: 0 20px 45px rgba(0, 0, 0, 0.14);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  box-shadow: 0 20px 45px rgba(0, 0, 0, 0.35);
   background: #0E0C13;
-  clip-path: inset(100% 0 0 0); /* Hidden: Wiped closed from bottom to top */
-  transform: translateY(30px) scale(0.96);
-  transition: clip-path 1.25s cubic-bezier(0.77, 0, 0.175, 1), transform 1.25s cubic-bezier(0.77, 0, 0.175, 1), opacity 0.8s ease;
-  will-change: clip-path, transform;
+  clip-path: inset(0 0 0 0);
+  transform: none;
+  opacity: 1;
+  transition: transform 0.5s ease, box-shadow 0.5s ease;
 }
 
 /* Purple curtain overlay that wipes up ahead of the image reveal */
@@ -636,13 +626,15 @@
 /* Clip Wipe Up Reveal when scrolled into view */
 .manifestoOverlapWrapper.revealVisible .founderPhotoWrapper,
 .revealVisible .founderPhotoWrapper {
-  clip-path: inset(0 0 0 0) !important; /* Wiped completely open upward! */
+  clip-path: inset(0 0 0 0) !important;
+  /* Wiped completely open upward! */
   transform: translateY(0) scale(1) !important;
 }
 
 .manifestoOverlapWrapper.revealVisible .founderPhotoWrapper::after,
 .revealVisible .founderPhotoWrapper::after {
-  clip-path: inset(0 0 100% 0); /* Purple curtain wipes away upward revealing photo */
+  clip-path: inset(0 0 100% 0);
+  /* Purple curtain wipes away upward revealing photo */
 }
 
 .founderPhoto {
@@ -655,12 +647,20 @@
     grid-template-columns: 1fr;
     gap: 2.5rem;
   }
+
   .manifestoOverlapWrapper {
     padding: 2.5rem 1.5rem;
   }
 }
 
 
+
+.cultureOverlapWrapper {
+  position: relative;
+  width: 100%;
+  margin-top: 4rem;
+  margin-bottom: 5rem;
+}
 
 .cultureSection {
   margin-bottom: 3rem;
@@ -688,12 +688,10 @@
 .cultureHeroOverlay {
   position: absolute;
   inset: 0;
-  background: linear-gradient(
-    to right,
-    rgba(0, 0, 0, 0.65) 0%,
-    rgba(0, 0, 0, 0.35) 45%,
-    rgba(0, 0, 0, 0.15) 100%
-  );
+  background: linear-gradient(to right,
+      rgba(0, 0, 0, 0.65) 0%,
+      rgba(0, 0, 0, 0.35) 45%,
+      rgba(0, 0, 0, 0.15) 100%);
   z-index: 1;
 }
 
@@ -820,6 +818,7 @@
   .cultureHeroCard {
     height: 460px;
   }
+
   .cultureStackedHeading {
     font-size: 3.8rem;
   }
@@ -829,13 +828,16 @@
   .cultureHeroCard {
     height: 500px;
   }
+
   .cultureStackedHeading {
     font-size: 2.8rem;
   }
+
   .cultureStatCircle {
     width: 100px;
     height: 100px;
   }
+
   .cultureStatNum {
     font-size: 1.5rem;
   }
@@ -866,8 +868,13 @@
 }
 
 @keyframes scrollCultureCarousel {
-  0% { transform: translateX(0); }
-  100% { transform: translateX(-50%); }
+  0% {
+    transform: translateX(0);
+  }
+
+  100% {
+    transform: translateX(-50%);
+  }
 }
 
 .cultureCarouselItem {
@@ -877,27 +884,27 @@
   border-radius: 14px;
   overflow: hidden;
   flex-shrink: 0;
-  border: 1px solid rgba(255,255,255,0.07);
+  border: 1px solid rgba(255, 255, 255, 0.07);
   transition: transform 0.3s ease, box-shadow 0.3s ease;
   cursor: pointer;
 }
 
 .cultureCarouselItem:hover {
   transform: translateY(-5px);
-  box-shadow: 0 12px 30px rgba(0,0,0,0.4);
-  border-color: rgba(187,98,222,0.35);
+  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.4);
+  border-color: rgba(187, 98, 222, 0.35);
 }
 
 .cultureCarouselItemOverlay {
   position: absolute;
   inset: 0;
-  background: linear-gradient(to top, rgba(0,0,0,0.7) 0%, rgba(0,0,0,0.05) 55%);
+  background: linear-gradient(to top, rgba(0, 0, 0, 0.7) 0%, rgba(0, 0, 0, 0.05) 55%);
   z-index: 1;
   transition: background 0.3s ease;
 }
 
 .cultureCarouselItem:hover .cultureCarouselItemOverlay {
-  background: linear-gradient(to top, rgba(0,0,0,0.45) 0%, rgba(0,0,0,0) 55%);
+  background: linear-gradient(to top, rgba(0, 0, 0, 0.45) 0%, rgba(0, 0, 0, 0) 55%);
 }
 
 .cultureCarouselItemLabel {
@@ -930,7 +937,7 @@
   right: 0;
   width: 500px;
   height: 500px;
-  background: radial-gradient(circle, rgba(178, 130, 243, 0.15) 0%, rgba(255,255,255,0) 70%);
+  background: radial-gradient(circle, rgba(178, 130, 243, 0.15) 0%, rgba(255, 255, 255, 0) 70%);
   pointer-events: none;
   z-index: 0;
 }
@@ -976,26 +983,28 @@
 }
 
 .filterBtn {
-  background: rgba(255, 255, 255, 0.03);
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  background: rgba(0, 0, 0, 0.05);
+  border: 1px solid rgba(0, 0, 0, 0.12);
   padding: 0.6rem 1.5rem;
   border-radius: 30px;
   font-size: 0.9rem;
   font-weight: 500;
-  color: var(--text-secondary);
+  color: var(--text-secondary, #555555);
   cursor: pointer;
   transition: all 0.2s ease;
 }
 
 .filterBtn:hover {
-  background: rgba(255, 255, 255, 0.1);
-  color: var(--text-primary);
+  background: rgba(0, 0, 0, 0.08);
+  color: var(--text-primary, #111111);
 }
 
 .filterBtn.active {
-  background: var(--text-primary);
-  color: var(--bg-color);
+  background: #3D3C3C;
+  color: #FFFFFF !important;
+  border-color: #3D3C3C;
   font-weight: 600;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
 }
 
 .jobsList {
@@ -1081,14 +1090,38 @@
   }
 }
 
-/* ── Seamless Light Section Wrapper ── */
+/* ── Seamless Dynamic Dark Section Wrapper ── */
 .darkOverlapSheet {
   position: relative;
   z-index: 10;
-  width: 100%;
-  background: transparent;
-  padding: 1rem 0 3rem;
-  color: var(--text-primary);
+  width: 100vw;
+  left: 50%;
+  right: 50%;
+  margin-left: -50vw;
+  margin-right: -50vw;
+  background: #0A0A0E;
+  color: #FFFFFF;
+  padding: 2rem 0 4rem;
+  margin-top: 0;
+}
+
+.darkOverlapSheet .labelBadge {
+  color: #D8B4FE;
+  border-color: rgba(216, 180, 254, 0.35);
+  background: rgba(216, 180, 254, 0.12);
+}
+
+.darkOverlapSheet .stepDot {
+  background: rgba(255, 255, 255, 0.25);
+}
+
+.darkOverlapSheet .stepDotActive {
+  background: #C084FC;
+  box-shadow: 0 0 12px rgba(192, 132, 252, 0.7);
+}
+
+.darkOverlapSheet .manifestoTitle {
+  color: #FFFFFF;
 }
 
 .darkOverlapContent {
@@ -1104,6 +1137,9 @@
   margin: 3.5rem 0 4.5rem;
   padding: 2.5rem 0;
   background: transparent;
+  border: none;
+  border-radius: 0;
+  box-shadow: none;
   color: var(--text-primary);
   overflow: hidden;
   transition: transform 0.8s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.8s ease;
@@ -1129,7 +1165,7 @@
   margin-bottom: 2rem;
   width: 100%;
   max-width: 100%;
-  white-space: nowrap; /* Ensures headline fits in one single line! */
+  white-space: nowrap;
   text-align: center;
 }
 
@@ -1150,7 +1186,7 @@
   width: 100%;
   max-width: 1000px;
   height: 1px;
-  background: var(--panel-border);
+  background: var(--panel-border, rgba(0, 0, 0, 0.08));
   margin-bottom: 2.25rem;
 }
 
@@ -1181,6 +1217,7 @@
   0% {
     transform: translateX(0);
   }
+
   100% {
     transform: translateX(-33.3333%);
   }
@@ -1215,42 +1252,69 @@
     padding: 1.5rem 0;
     margin: 2.5rem 0;
   }
+
   .partnerBannerTitle {
     font-size: 1.65rem;
     margin-bottom: 1.25rem;
   }
+
   .partnerBannerDivider {
     margin-bottom: 1.5rem;
   }
+
   .partnerLogoTrack {
     gap: 0.75rem;
     animation-duration: 20s;
   }
+
   .partnerLogoCard {
     padding: 0.65rem 1rem;
   }
 }
 
-/* ── Operators Highlight Section (Reference Style) ── */
-.operatorsHeroSection {
+.darkQuoteWrapper {
+  position: relative;
+  width: 100vw;
+  left: 50%;
+  right: 50%;
+  margin-left: -50vw;
+  margin-right: -50vw;
+  padding: 10rem 2rem 8rem;
+  transition: background-color 0.4s ease, color 0.4s ease;
+  min-height: 90vh;
   display: flex;
   flex-direction: column;
   align-items: center;
+  justify-content: center;
+  overflow: hidden;
+}
+
+/* ── Operators Highlight Section (Reference Style) ── */
+.operatorsHeroSection {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
   width: 100%;
+  min-height: calc(100vh - 80px);
   text-align: center;
-  margin-bottom: 4rem;
+  margin-bottom: 0;
 }
 
 .operatorsHeaderBlock {
-  min-height: calc(82vh - 60px);
+  position: sticky;
+  top: 110px;
   max-width: 980px;
+  width: 100%;
   margin: 0 auto;
   text-align: center;
   display: flex;
   flex-direction: column;
   justify-content: center;
   align-items: center;
-  padding: 2rem 0;
+  padding: 2rem 1.5rem;
+  z-index: 1;
 }
 
 @keyframes lineStaggerFadeIn {
@@ -1258,6 +1322,7 @@
     opacity: 0;
     transform: translateY(28px);
   }
+
   to {
     opacity: 1;
     transform: translateY(0);
@@ -1293,13 +1358,26 @@
   animation: lineStaggerFadeIn 0.85s cubic-bezier(0.16, 1, 0.3, 1) 0.28s both;
 }
 
+/* Card Box Container rolling over top section */
+.operatorsImageCardBox {
+  position: relative;
+  z-index: 10;
+  width: 100%;
+  max-width: 1140px;
+  margin: 0 auto;
+  padding: 1.25rem;
+  background: var(--bg-color, #FDFBF7);
+  border-radius: 36px 36px 28px 28px;
+  border: 1px solid rgba(0, 0, 0, 0.08);
+  box-shadow: 0 -35px 90px rgba(0, 0, 0, 0.16), 0 -2px 10px rgba(0, 0, 0, 0.04);
+}
+
 .operatorsImageFrame {
   position: relative;
   width: 100%;
-  max-width: 1060px;
-  height: min(540px, 70vh);
-  margin: 3rem auto 0;
-  border-radius: 24px;
+  height: min(560px, 72vh);
+  margin: 0 auto;
+  border-radius: 22px;
   overflow: hidden;
   background: rgba(0, 0, 0, 0.4);
   border: 1px solid var(--panel-border, rgba(255, 255, 255, 0.1));
@@ -1318,17 +1396,34 @@
 
 @media (max-width: 768px) {
   .operatorsHeroSection {
-    margin: 3rem 0;
+    margin: 2rem 0;
     gap: 1.25rem;
   }
+
+  .operatorsHeaderBlock {
+    position: relative;
+    top: 0;
+    min-height: auto;
+    padding: 1.5rem 0;
+  }
+
   .operatorsTitle {
     font-size: 1.85rem;
   }
+
   .operatorsSubtitle {
     font-size: 0.95rem;
   }
+
+  .operatorsImageCardBox {
+    padding: 0.65rem;
+    border-radius: 20px;
+    box-shadow: 0 -15px 40px rgba(0, 0, 0, 0.12);
+  }
+
   .operatorsImageFrame {
     border-radius: 16px;
     aspect-ratio: 4 / 3;
+    height: auto;
   }
 }

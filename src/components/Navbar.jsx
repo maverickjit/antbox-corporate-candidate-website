@@ -1,12 +1,16 @@
 "use client";
 import React, { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
+import { usePathname } from 'next/navigation';
 import { motion } from 'framer-motion';
 import { useTab } from '../context/TabContext';
 
 const emptySubscribe = () => () => {};
 
 export default function Navbar() {
+  const pathname = usePathname();
+  const isHome = pathname === '/';
+
   const { activeTab, setActiveTab } = useTab();
   const [isScrolled, setIsScrolled] = useState(false);
   const mounted = React.useSyncExternalStore(
@@ -28,23 +32,24 @@ export default function Navbar() {
 
   // Update toggle slider indicator position
   useEffect(() => {
-    if (!mounted) return;
+    if (!mounted || !isHome) return;
     const pill = pillRef.current;
     const activeBtn = activeTab === 'corporates' ? corpBtnRef.current : candBtnRef.current;
     if (!pill || !activeBtn) return;
     pill.style.left = activeBtn.offsetLeft + 'px';
     pill.style.width = activeBtn.offsetWidth + 'px';
-  }, [activeTab, mounted, isScrolled]);
+  }, [activeTab, mounted, isScrolled, isHome]);
 
   if (!mounted) return null;
 
   const isCorporate = activeTab === 'corporates';
   // If navbar background is currently dark (black pill or transparent over candidate dark hero)
-  const isDarkNav = isScrolled ? isCorporate : !isCorporate;
+  const isDarkNav = isHome ? (isScrolled ? isCorporate : !isCorporate) : false;
 
   // Background style
   const getNavBackground = () => {
     if (!isScrolled) return 'transparent';
+    if (!isHome) return '#f7f5ee';
     return isCorporate
       ? 'linear-gradient(180deg, rgba(20, 20, 26, 0.96) 0%, rgba(10, 10, 14, 0.98) 100%)'
       : '#f7f5ee';
@@ -53,6 +58,7 @@ export default function Navbar() {
   // Border style (consistent property to prevent React style conflicts)
   const getNavBorder = () => {
     if (!isScrolled) return '1px solid transparent';
+    if (!isHome) return '1px solid rgba(0, 0, 0, 0.12)';
     return isCorporate
       ? '1px solid rgba(255, 255, 255, 0.16)'
       : '1px solid rgba(0, 0, 0, 0.12)';
@@ -61,6 +67,7 @@ export default function Navbar() {
   // Box shadow
   const getNavBoxShadow = () => {
     if (!isScrolled) return 'none';
+    if (!isHome) return '0 16px 40px -8px rgba(0,0,0,0.15), 0 0 20px rgba(187,98,222,0.15), inset 0 1px 0 rgba(255,255,255,0.8)';
     return isCorporate
       ? '0 16px 40px -8px rgba(0,0,0,0.85), 0 0 24px rgba(187,98,222,0.25), inset 0 1px 0 rgba(255,255,255,0.2)'
       : '0 16px 40px -8px rgba(0,0,0,0.35), 0 0 20px rgba(187,98,222,0.2), inset 0 1px 0 rgba(255,255,255,0.8)';
@@ -131,69 +138,71 @@ export default function Navbar() {
           </Link>
         </div>
 
-        {/* Center Column: Perfectly Centered Corporate / Candidate Toggle Button */}
+        {/* Center Column: Corporate / Candidate Toggle Button (Only on Homepage) */}
         <div className="flex items-center justify-center">
-          <div
-            className="relative flex items-center"
-            style={{
-              background: isDarkNav ? 'rgba(255, 255, 255, 0.08)' : 'rgba(0, 0, 0, 0.06)',
-              borderRadius: '9999px',
-              padding: '3px',
-              border: isDarkNav ? '1px solid rgba(255, 255, 255, 0.12)' : '1px solid rgba(0, 0, 0, 0.1)',
-              boxShadow: isDarkNav ? 'inset 0 1.5px 3px rgba(0,0,0,0.4)' : 'inset 0 1.5px 3px rgba(0,0,0,0.06)',
-              transition: 'background 0.3s ease, border 0.3s ease',
-            }}
-          >
-            {/* Sliding purple indicator */}
+          {isHome && (
             <div
-              ref={pillRef}
+              className="relative flex items-center"
               style={{
-                position: 'absolute',
-                top: '3px',
-                bottom: '3px',
-                background: 'linear-gradient(135deg, #c069e4 0%, #8e43ac 100%)',
+                background: isDarkNav ? 'rgba(255, 255, 255, 0.08)' : 'rgba(0, 0, 0, 0.06)',
                 borderRadius: '9999px',
-                transition: 'left 0.28s cubic-bezier(0.4, 0, 0.2, 1), width 0.28s cubic-bezier(0.4, 0, 0.2, 1)',
-                boxShadow: '0 2px 10px rgba(192, 105, 228, 0.5), inset 0 1px 0 rgba(255,255,255,0.3)',
+                padding: '3px',
+                border: isDarkNav ? '1px solid rgba(255, 255, 255, 0.12)' : '1px solid rgba(0, 0, 0, 0.1)',
+                boxShadow: isDarkNav ? 'inset 0 1.5px 3px rgba(0,0,0,0.4)' : 'inset 0 1.5px 3px rgba(0,0,0,0.06)',
+                transition: 'background 0.3s ease, border 0.3s ease',
               }}
-            />
-            <button
-              ref={corpBtnRef}
-              type="button"
-              className="relative z-10 font-semibold tracking-wide transition-colors duration-200"
-              style={{
-                padding: isScrolled ? '6px 16px' : '7px 20px',
-                borderRadius: '9999px',
-                fontSize: isScrolled ? '0.84rem' : '0.9rem',
-                color: activeTab === 'corporates' ? '#ffffff' : (isDarkNav ? 'rgba(255, 255, 255, 0.65)' : 'rgba(0, 0, 0, 0.65)'),
-                border: 'none',
-                background: 'transparent',
-                cursor: 'pointer',
-                fontFamily: 'var(--font-poppins)',
-              }}
-              onClick={() => setActiveTab('corporates')}
             >
-              Corporates
-            </button>
-            <button
-              ref={candBtnRef}
-              type="button"
-              className="relative z-10 font-semibold tracking-wide transition-colors duration-200"
-              style={{
-                padding: isScrolled ? '6px 16px' : '7px 20px',
-                borderRadius: '9999px',
-                fontSize: isScrolled ? '0.84rem' : '0.9rem',
-                color: activeTab === 'candidates' ? '#ffffff' : (isDarkNav ? 'rgba(255, 255, 255, 0.65)' : 'rgba(0, 0, 0, 0.65)'),
-                border: 'none',
-                background: 'transparent',
-                cursor: 'pointer',
-                fontFamily: 'var(--font-poppins)',
-              }}
-              onClick={() => setActiveTab('candidates')}
-            >
-              Candidates
-            </button>
-          </div>
+              {/* Sliding purple indicator */}
+              <div
+                ref={pillRef}
+                style={{
+                  position: 'absolute',
+                  top: '3px',
+                  bottom: '3px',
+                  background: 'linear-gradient(135deg, #c069e4 0%, #8e43ac 100%)',
+                  borderRadius: '9999px',
+                  transition: 'left 0.28s cubic-bezier(0.4, 0, 0.2, 1), width 0.28s cubic-bezier(0.4, 0, 0.2, 1)',
+                  boxShadow: '0 2px 10px rgba(192, 105, 228, 0.5), inset 0 1px 0 rgba(255,255,255,0.3)',
+                }}
+              />
+              <button
+                ref={corpBtnRef}
+                type="button"
+                className="relative z-10 font-semibold tracking-wide transition-colors duration-200"
+                style={{
+                  padding: isScrolled ? '6px 16px' : '7px 20px',
+                  borderRadius: '9999px',
+                  fontSize: isScrolled ? '0.84rem' : '0.9rem',
+                  color: activeTab === 'corporates' ? '#ffffff' : (isDarkNav ? 'rgba(255, 255, 255, 0.65)' : 'rgba(0, 0, 0, 0.65)'),
+                  border: 'none',
+                  background: 'transparent',
+                  cursor: 'pointer',
+                  fontFamily: 'var(--font-poppins)',
+                }}
+                onClick={() => setActiveTab('corporates')}
+              >
+                Corporates
+              </button>
+              <button
+                ref={candBtnRef}
+                type="button"
+                className="relative z-10 font-semibold tracking-wide transition-colors duration-200"
+                style={{
+                  padding: isScrolled ? '6px 16px' : '7px 20px',
+                  borderRadius: '9999px',
+                  fontSize: isScrolled ? '0.84rem' : '0.9rem',
+                  color: activeTab === 'candidates' ? '#ffffff' : (isDarkNav ? 'rgba(255, 255, 255, 0.65)' : 'rgba(0, 0, 0, 0.65)'),
+                  border: 'none',
+                  background: 'transparent',
+                  cursor: 'pointer',
+                  fontFamily: 'var(--font-poppins)',
+                }}
+                onClick={() => setActiveTab('candidates')}
+              >
+                Candidates
+              </button>
+            </div>
+          )}
         </div>
 
         {/* Right Column: Nav Links & CTA Button */}

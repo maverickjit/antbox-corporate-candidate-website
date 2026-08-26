@@ -1,5 +1,6 @@
 "use client";
 import React, { createContext, useContext, useState, useEffect } from 'react';
+import { usePathname } from 'next/navigation';
 
 const TabContext = createContext({
   activeTab: 'corporates',
@@ -8,14 +9,16 @@ const TabContext = createContext({
 
 export function TabProvider({ children }) {
   const [activeTab, setActiveTab] = useState('corporates');
+  const pathname = usePathname();
 
   useEffect(() => {
-    if (activeTab === 'candidates') {
+    // Only apply candidate dark theme class to body on the homepage
+    if (pathname === '/' && activeTab === 'candidates') {
       document.body.classList.add('theme-candidate');
     } else {
       document.body.classList.remove('theme-candidate');
     }
-  }, [activeTab]);
+  }, [activeTab, pathname]);
 
   return (
     <TabContext.Provider value={{ activeTab, setActiveTab }}>
