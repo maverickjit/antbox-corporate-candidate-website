@@ -334,10 +334,9 @@ function WhatWeBringSection() {
   const totalCards = cardData.length;
 
   // Dynamic vertical drum centering so active card is always vertically centered within viewport safe area
-  // (Prevents card 01 from hitting the top pill bar and card 05 from hitting the bottom edge)
   const drumY = useTransform(scrollYProgress, (progress) => {
     const current = progress * (totalCards - 1);
-    return `${(2 - current) * 44}px`;
+    return `${(2 - current) * 36}px`;
   });
 
   return (
@@ -358,10 +357,10 @@ function WhatWeBringSection() {
           display: 'flex',
           flexDirection: 'column',
           alignItems: 'center',
-          justifyContent: 'center',
+          justifyContent: 'flex-start',
           overflow: 'hidden',
-          paddingTop: 'clamp(6rem, 13vh, 8.5rem)',
-          paddingBottom: 'clamp(2.5rem, 5vh, 4rem)',
+          paddingTop: 'clamp(100px, 14vh, 125px)',
+          paddingBottom: 'clamp(2rem, 4vh, 3.5rem)',
           paddingLeft: '1.5rem',
           paddingRight: '1.5rem',
         }}
@@ -374,7 +373,7 @@ function WhatWeBringSection() {
             display: 'flex',
             flexDirection: 'column',
             alignItems: 'center',
-            justifyContent: 'center',
+            justifyContent: 'flex-start',
             position: 'relative',
           }}
         >
@@ -383,12 +382,12 @@ function WhatWeBringSection() {
             style={{
               color: '#ffffff',
               marginTop: '0',
-              marginBottom: 'clamp(1rem, 2.5vh, 2rem)',
-              fontSize: 'clamp(2.4rem, 4.8vw, 4.2rem)',
+              marginBottom: 'clamp(1.2rem, 2.5vh, 2.2rem)',
+              fontSize: 'clamp(1.9rem, 3.4vw, 2.75rem)',
               textAlign: 'center',
               textTransform: 'uppercase',
-              letterSpacing: '-0.03em',
-              lineHeight: 1.05,
+              letterSpacing: '-0.02em',
+              lineHeight: 1.1,
             }}
           >
             WHAT WE <span style={{ color: 'var(--accent-purple)' }}>BRING</span>
