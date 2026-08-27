@@ -79,125 +79,176 @@ function RollingNumber({ value, isAnimating }) {
   );
 }
 
-// Stacked Card in "WHAT WE BRING" — opens downwards on scroll
-function StackedBenefitCard({ card, index, totalCards, scrollYProgress }) {
-  const startT = 0.08 + (index - 1) * 0.16;
-  const endT = Math.min(startT + 0.16, 0.90);
-  const targetY = index * 84;
+// 3D Typographic Roller Item in "WHAT WE BRING" (Pure text roller matching bringcards.mp4)
+function BringTypographyRollerItem({ card, index, totalCards, scrollYProgress }) {
+  // Signed distance from active center focal point
+  const signedRel = useTransform(scrollYProgress, (progress) => {
+    const current = progress * (totalCards - 1);
+    return index - current;
+  });
 
-  const cardY = useTransform(
-    scrollYProgress,
-    index === 0
-      ? [0, 0.10]
-      : [startT, endT],
-    index === 0
-      ? [0, 0]
-      : [0, targetY]
-  );
+  const absRel = useTransform(signedRel, (s) => Math.abs(s));
 
-  const cardScale = useTransform(
-    scrollYProgress,
-    index === 0
-      ? [0, 0.10]
-      : [startT, endT],
-    index === 0
-      ? [1, 1]
-      : [0.97, 1]
-  );
+  // 3D Half-roller curvature (curves back into screen above and below center)
+  const rotateX = useTransform(signedRel, (s) => {
+    const clamped = Math.max(-2.5, Math.min(2.5, s));
+    return `${-clamped * 18}deg`;
+  });
 
-  const zIndex = totalCards - index;
+  const translateZ = useTransform(absRel, (dist) => {
+    return `${Math.max(-70, 16 - dist * 38)}px`;
+  });
+
+  const textScale = useTransform(absRel, [0, 0.45, 1.2], [1.04, 0.94, 0.88]);
+  // Active item 100% visible; inactive items are faint ghost text (rarely visible)
+  const textOpacity = useTransform(absRel, [0, 0.35, 0.8], [1.0, 0.16, 0.06]);
+
+  // Smoothly reveal full explanation text when item is active on scroll
+  const descOpacity = useTransform(absRel, [0, 0.38, 0.7], [1.0, 0.25, 0]);
+  const descY = useTransform(absRel, [0, 0.38], [0, 6]);
+
+  const zIndex = useTransform(absRel, (dist) => Math.round(50 - dist * 10));
 
   return (
     <motion.div
       style={{
-        position: 'absolute',
-        top: 0,
-        left: 0,
-        right: 0,
-        y: cardY,
-        scale: cardScale,
+        opacity: textOpacity,
+        scale: textScale,
+        rotateX: rotateX,
+        z: translateZ,
         zIndex: zIndex,
-        borderRadius: '1.25rem',
-        overflow: 'hidden',
-        boxShadow: '0 12px 30px rgba(0,0,0,0.5)',
+        transformStyle: 'preserve-3d',
+        transformOrigin: 'center center',
+        width: '100%',
+        padding: '0.65rem 0',
+        display: 'flex',
+        flexDirection: 'column',
+        alignItems: 'center',
+        textAlign: 'center',
+        cursor: 'default',
       }}
     >
-      <div
+      {/* Main Title Typography */}
+      <div style={{ display: 'inline-flex', alignItems: 'center', justifyContent: 'center', gap: '0.75rem' }}>
+        <span
+          style={{
+            fontFamily: 'Poppins, sans-serif',
+            fontSize: 'clamp(0.9rem, 1.2vw, 1.2rem)',
+            fontWeight: 800,
+            color: 'var(--accent-purple)',
+            letterSpacing: '0.04em',
+          }}
+        >
+          0{index + 1}
+        </span>
+        <h3
+          style={{
+            margin: 0,
+            color: '#ffffff',
+            fontFamily: 'Poppins, sans-serif',
+            fontSize: 'clamp(1.5rem, 2.5vw, 2.2rem)',
+            fontWeight: 800,
+            letterSpacing: '-0.02em',
+            lineHeight: 1.15,
+            textTransform: 'uppercase',
+          }}
+        >
+          {card.title}
+        </h3>
+      </div>
+
+      {/* Sub-description explanation smoothly reveals on scroll */}
+      <motion.div
         style={{
-          minHeight: '94px',
-          background: 'linear-gradient(145deg, #381146 0%, #1e0627 100%)',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'space-between',
-          padding: '1.35rem 2.2rem',
-          position: 'relative',
-          overflow: 'hidden',
-          border: '1px solid rgba(187, 98, 222, 0.4)',
-          opacity: 1,
+          opacity: descOpacity,
+          y: descY,
+          maxWidth: '620px',
+          marginTop: '0.45rem',
+          padding: '0 1rem',
         }}
       >
-        {/* Content */}
-        <div style={{ position: 'relative', zIndex: 1, display: 'flex', alignItems: 'center', gap: '1.25rem', flex: 1 }}>
-          {/* Side vertical accent bar beside card */}
-          <div
-            style={{
-              width: '4px',
-              height: '38px',
-              borderRadius: '2px',
-              background: 'var(--accent-purple)',
-              flexShrink: 0,
-              boxShadow: '0 0 10px rgba(187,98,222,0.5)',
-            }}
-          />
-          <div style={{ flex: 1 }}>
-            <h4
-              style={{
-                margin: '0 0 0.25rem',
-                color: '#fff',
-                fontFamily: 'Poppins, sans-serif',
-                fontSize: '1.1rem',
-                fontWeight: 800,
-                letterSpacing: '0.04em',
-                lineHeight: 1.25,
-              }}
-            >
-              {card.title}
-            </h4>
-            <p
-              style={{
-                margin: 0,
-                color: '#e9c8ff',
-                fontSize: '0.9rem',
-                lineHeight: 1.45,
-              }}
-            >
-              {card.desc}
-            </p>
-          </div>
-        </div>
-
-        {/* Badge icon */}
-        <div style={{ position: 'relative', zIndex: 1, marginLeft: '1.25rem', flexShrink: 0 }}>
-          <div
-            style={{
-              width: '36px',
-              height: '36px',
-              borderRadius: '50%',
-              background: 'rgba(234,182,255,0.18)',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              border: '1px solid rgba(234,182,255,0.35)',
-            }}
-          >
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-              <line x1="7" y1="17" x2="17" y2="7"></line>
-              <polyline points="7 7 17 7 17 17"></polyline>
-            </svg>
-          </div>
-        </div>
-      </div>
+        <p
+          style={{
+            margin: 0,
+            color: '#e2beff',
+            fontSize: 'clamp(0.92rem, 1.15vw, 1.06rem)',
+            lineHeight: 1.5,
+            fontWeight: 500,
+            fontFamily: 'Century Gothic, sans-serif',
+          }}
+        >
+          {card.desc}
+        </p>
+      </motion.div>
     </motion.div>
+  );
+}
+
+// Vertical ruler tick track on the right edge matching bringcards.mp4 (elongated across all text items)
+function BringSideScrollTicker({ scrollYProgress }) {
+  const totalTicks = 38;
+
+  return (
+    <div
+      style={{
+        position: 'absolute',
+        right: 'clamp(0.75rem, 2.5vw, 3rem)',
+        top: '50%',
+        transform: 'translateY(-50%)',
+        height: 'clamp(360px, 46vh, 440px)',
+        display: 'flex',
+        flexDirection: 'column',
+        alignItems: 'flex-end',
+        justifyContent: 'space-between',
+        pointerEvents: 'none',
+        zIndex: 20,
+      }}
+    >
+      {Array.from({ length: totalTicks }).map((_, i) => {
+        const tickPos = i / (totalTicks - 1);
+        return (
+          <TickerLine
+            key={i}
+            tickPos={tickPos}
+            scrollYProgress={scrollYProgress}
+            isMajor={i % 5 === 0}
+          />
+        );
+      })}
+    </div>
+  );
+}
+
+function TickerLine({ tickPos, scrollYProgress, isMajor }) {
+  const opacity = useTransform(scrollYProgress, (p) => {
+    const dist = Math.abs(p - tickPos);
+    if (dist < 0.04) return 1.0;
+    if (dist < 0.12) return 0.55;
+    return isMajor ? 0.30 : 0.15;
+  });
+
+  const width = useTransform(scrollYProgress, (p) => {
+    const dist = Math.abs(p - tickPos);
+    if (dist < 0.04) return '18px';
+    if (dist < 0.10) return isMajor ? '13px' : '9px';
+    return isMajor ? '9px' : '5px';
+  });
+
+  const color = useTransform(scrollYProgress, (p) => {
+    const dist = Math.abs(p - tickPos);
+    return dist < 0.04 ? 'var(--accent-purple)' : 'rgba(255, 255, 255, 0.7)';
+  });
+
+  return (
+    <motion.div
+      style={{
+        height: '1.5px',
+        width: width,
+        backgroundColor: color,
+        opacity: opacity,
+        borderRadius: '1px',
+      }}
+    />
   );
 }
 
@@ -272,7 +323,7 @@ function WeBuiltAntboxSection() {
   );
 }
 
-// 2. Dedicated Page: "WHAT WE BRING" Pinned Section
+// 2. Dedicated Page: "WHAT WE BRING" Scroll-Highlight Section matching bringcards.mp4
 function WhatWeBringSection() {
   const sectionRef = useRef(null);
   const { scrollYProgress } = useScroll({
@@ -287,7 +338,7 @@ function WhatWeBringSection() {
       ref={sectionRef}
       style={{
         position: 'relative',
-        height: '210vh',
+        height: '240vh',
         background: 'transparent',
       }}
     >
@@ -300,9 +351,9 @@ function WhatWeBringSection() {
           display: 'flex',
           flexDirection: 'column',
           alignItems: 'center',
-          justifyContent: 'flex-start',
+          justifyContent: 'center',
           overflow: 'hidden',
-          paddingTop: 'clamp(6.5rem, 14vh, 9rem)',
+          paddingTop: 'clamp(5.5rem, 11vh, 7.5rem)',
           paddingBottom: '2rem',
           paddingLeft: '1.5rem',
           paddingRight: '1.5rem',
@@ -311,7 +362,7 @@ function WhatWeBringSection() {
         <div
           style={{
             width: '100%',
-            maxWidth: '1080px',
+            maxWidth: '1060px',
             margin: '0 auto',
             display: 'flex',
             flexDirection: 'column',
@@ -323,18 +374,31 @@ function WhatWeBringSection() {
             className="section-title heading-serif text-center"
             style={{
               color: '#ffffff',
-              marginBottom: '2.5rem',
-              fontSize: 'clamp(2.4rem, 4.8vw, 4rem)',
+              marginTop: '0.25rem',
+              marginBottom: 'clamp(1.5rem, 3vh, 2.5rem)',
+              fontSize: 'clamp(2.8rem, 5.5vw, 4.6rem)',
               textAlign: 'center',
+              textTransform: 'uppercase',
+              letterSpacing: '-0.03em',
+              lineHeight: 1.05,
             }}
           >
             WHAT WE <span style={{ color: 'var(--accent-purple)' }}>BRING</span>
           </h2>
 
-          {/* Stacked Deck Container */}
-          <div style={{ position: 'relative', width: '100%', maxWidth: '1020px', height: '440px' }}>
+          {/* 3D Half-Roller Cards Stage (Cards bulged from screen) */}
+          <div
+            style={{
+              display: 'flex',
+              flexDirection: 'column',
+              gap: '0.75rem',
+              width: '100%',
+              perspective: '1200px',
+              transformStyle: 'preserve-3d',
+            }}
+          >
             {cardData.map((card, i) => (
-              <StackedBenefitCard
+              <BringTypographyRollerItem
                 key={i}
                 card={card}
                 index={i}
@@ -343,6 +407,9 @@ function WhatWeBringSection() {
               />
             ))}
           </div>
+
+          {/* Vertical scroll ticker / ruler track on the right */}
+          <BringSideScrollTicker scrollYProgress={scrollYProgress} />
         </div>
       </div>
     </section>
@@ -450,13 +517,13 @@ function CandidateFriction() {
   }, []);
 
   return (
-    <section className="problems-section candidate-friction" ref={sectionRef} style={{ minHeight: '110vh' }}>
-      <div style={{ position: 'sticky', top: '0', height: '100vh', display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'flex-start', background: 'transparent', padding: '0 clamp(2rem, 5vw, 5rem)' }}>
+    <section className="problems-section candidate-friction" ref={sectionRef} style={{ minHeight: '85vh', padding: '4.5rem 0 2rem', display: 'flex', alignItems: 'center' }}>
+      <div style={{ width: '100%', display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'flex-start', background: 'transparent', padding: '0 clamp(2rem, 5vw, 5rem)' }}>
         <h2
           ref={titleRef}
           className="friction-header"
           style={{
-            marginBottom: '1rem',
+            marginBottom: '0.85rem',
             textAlign: 'left',
             perspective: '800px',
             display: 'block',
@@ -486,7 +553,7 @@ function CandidateFriction() {
           >FRICTION</span>
         </h2>
 
-        <div className="process-layout" style={{ width: '100%', marginTop: '1.25rem' }}>
+        <div className="process-layout" style={{ width: '100%', marginTop: '1rem' }}>
           <div className="process-timeline" style={{ display: 'flex', gap: '2.5rem', width: '100%', position: 'relative' }}>
             <motion.div className="process-timeline-active-line" style={{ position: 'absolute', top: 0, left: 0, height: '2px', background: 'var(--accent-purple)', zIndex: 2, transformOrigin: 'left', scaleX: lineScaleX, width: '100%' }}></motion.div>
 
@@ -513,8 +580,8 @@ function CandidateFriction() {
               >
                 01
               </div>
-              <h3 className="tc-heading" style={{ fontSize: '1.4rem', fontWeight: 800, color: 'var(--cream)', marginBottom: '0.5rem' }}>Outdated Campus Tech Stack</h3>
-              <p className="tc-body" style={{ color: '#a6a6a6', fontSize: '1.02rem', lineHeight: 1.6 }}>AI and tech evolve every 12 months, but university courses take years to update. What you learn in class often falls short of what top companies demand on Day 1.</p>
+              <h3 className="tc-heading" style={{ fontSize: '1.35rem', fontWeight: 800, color: 'var(--cream)', marginBottom: '0.5rem' }}>Outdated Campus Tech Stack</h3>
+              <p className="tc-body" style={{ color: '#a6a6a6', fontSize: '0.98rem', lineHeight: 1.6 }}>AI and tech evolve every 12 months, but university courses take years to update. What you learn in class often falls short of what top companies demand on Day 1.</p>
             </motion.div>
 
             {/* Step 02 */}
@@ -540,8 +607,8 @@ function CandidateFriction() {
               >
                 02
               </div>
-              <h3 className="tc-heading" style={{ fontSize: '1.4rem', fontWeight: 800, color: 'var(--cream)', marginBottom: '0.5rem' }}>Judged in Hours After 4 Years</h3>
-              <p className="tc-body" style={{ color: '#a6a6a6', fontSize: '1.02rem', lineHeight: 1.6 }}>Traditional hiring compresses your entire degree into a single resume screening or a 30-minute interview, leading to higher drop-offs and missed opportunities.</p>
+              <h3 className="tc-heading" style={{ fontSize: '1.35rem', fontWeight: 800, color: 'var(--cream)', marginBottom: '0.5rem' }}>Judged in Hours After 4 Years</h3>
+              <p className="tc-body" style={{ color: '#a6a6a6', fontSize: '0.98rem', lineHeight: 1.6 }}>Traditional hiring compresses your entire degree into a single resume screening or a 30-minute interview, leading to higher drop-offs and missed opportunities.</p>
             </motion.div>
 
             {/* Step 03 */}
@@ -549,7 +616,7 @@ function CandidateFriction() {
               className={`process-step ${activeStep >= 2 ? 'active' : ''}`}
               animate={{ opacity: activeStep >= 2 ? 1 : 0.35, y: activeStep >= 2 ? 0 : 15 }}
               transition={{ duration: 0.4, ease: "easeOut" }}
-              style={{ flex: 1, position: 'relative', paddingTop: '1.5rem' }}
+              style={{ flex: 1, position: 'relative', paddingTop: '0.85rem' }}
             >
               <div
                 className="process-number"
@@ -560,15 +627,15 @@ function CandidateFriction() {
                   lineHeight: 1,
                   letterSpacing: '-0.05em',
                   color: activeStep >= 2 ? 'var(--accent-purple)' : 'rgba(255,255,255,0.2)',
-                  marginBottom: '1rem',
+                  marginBottom: '0.75rem',
                   textShadow: 'none',
                   transition: 'all 0.4s ease',
                 }}
               >
                 03
               </div>
-              <h3 className="tc-heading" style={{ fontSize: '1.4rem', fontWeight: 800, color: 'var(--cream)', marginBottom: '0.6rem' }}>The Experience Needed Paradox</h3>
-              <p className="tc-body" style={{ color: '#a6a6a6', fontSize: '1.02rem', lineHeight: 1.6 }}>Companies expect prior experience for entry-level roles, but few give you the chance to gain it. Over 77% of grads end up learning everything from scratch on the job.</p>
+              <h3 className="tc-heading" style={{ fontSize: '1.35rem', fontWeight: 800, color: 'var(--cream)', marginBottom: '0.5rem' }}>The Experience Needed Paradox</h3>
+              <p className="tc-body" style={{ color: '#a6a6a6', fontSize: '0.98rem', lineHeight: 1.6 }}>Companies expect prior experience for entry-level roles, but few give you the chance to gain it. Over 77% of grads end up learning everything from scratch on the job.</p>
             </motion.div>
           </div>
         </div>
@@ -593,21 +660,19 @@ function CorporateHeroAndProblems({ scrollProgress }) {
   const isOpacity = useTransform(scrollProgress, [0, 0.03], [1, 0]);
   const peripheralDisplay = useTransform(scrollProgress, (v) => (v >= 0.035 ? 'none' : 'block'));
 
-  // 2. "Built" starts zooming immediately from scroll=0, smoothly expanding up to 26x
-  const builtScale = useTransform(scrollProgress, [0, 0.28], [1, 26]);
-  const builtOpacity = useTransform(scrollProgress, [0, 0.20, 0.28], [1, 1, 0]);
+  // 2. "Built" starts zooming immediately from scroll=0, smoothly expanding up to 32x
+  const builtScale = useTransform(scrollProgress, [0, 0.28], [1, 32]);
+  const builtOpacity = useTransform(scrollProgress, [0, 0.22, 0.28], [1, 1, 0]);
 
-  // 3. WCF stays completely hidden at first (0 -> 0.06),
-  // begins appearing minimized (scale: 0.82 -> 1.0) and heavily blurred (16px -> 0px) through the gap between U & I in Built,
-  // then expands to normal solid page as Built ends (by 0.26)
-  const wcfScale = useTransform(scrollProgress, [0, 0.06, 0.20, 0.28], [0.82, 0.85, 0.98, 1]);
-  const wcfBlur = useTransform(scrollProgress, [0, 0.06, 0.16, 0.26], [16, 12, 4, 0]);
+  // 3. WCF stays completely hidden until Built is huge (0 -> 0.09), then enters strictly through gap between U & I
+  const wcfScale = useTransform(scrollProgress, [0, 0.09, 0.20, 0.28], [0.65, 0.65, 0.95, 1]);
+  const wcfBlur = useTransform(scrollProgress, [0, 0.09, 0.18, 0.26], [24, 20, 4, 0]);
   const wcfFilter = useMotionTemplate`blur(${wcfBlur}px)`;
 
   const wcfOpacity = useTransform(
     scrollProgress,
-    [0, 0.06, 0.10, 0.20, 0.26],
-    [0, 0, 0.70, 0.95, 1]
+    [0, 0.09, 0.14, 0.22, 0.28],
+    [0, 0, 0.65, 0.95, 1]
   );
 
   // Hide hero overlay completely after Built passes
@@ -629,7 +694,7 @@ function CorporateHeroAndProblems({ scrollProgress }) {
 
   return (
     <div style={{ position: 'relative', width: '100%', height: '100%', overflow: 'hidden', background: 'var(--cream)' }}>
-      {/* Layer 1: "What Corporates Face" — starts minimized & blurred through gap of Built, expands to normal solid page */}
+      {/* Layer 1: "What Corporates Face" — starts diminished & blurred through gap of Built, expands to normal solid page */}
       <motion.div
         style={{
           opacity: wcfOpacity,
@@ -717,7 +782,7 @@ function CorporateHeroAndProblems({ scrollProgress }) {
               IS
             </motion.div>
             <motion.div
-              style={{ scale: builtScale, opacity: builtOpacity, transformOrigin: 'center center', zIndex: 50 }}
+              style={{ scale: builtScale, opacity: builtOpacity, transformOrigin: '47.5% 50%', zIndex: 50 }}
               className="text-[var(--accent-purple)] pointer-events-none"
             >
               Built
@@ -870,48 +935,39 @@ function HowItWorksCard({ step, index, totalCards, scrollYProgress }) {
     return index - currentPos;
   });
 
-  // True circular semi-circle arc math with Radius R = 500px
+  // Generous 330px vertical spacing ensuring adjacent cards never collide or overlap
   const cardY = useTransform(relPos, (rel) => {
-    const clampedRel = Math.max(-2.8, Math.min(2.8, rel));
-    return `${Math.sin(clampedRel * 0.44) * 500}px`;
+    return `${rel * 330}px`;
   });
 
   const cardX = useTransform(relPos, (rel) => {
-    const clampedRel = Math.max(-2.8, Math.min(2.8, rel));
-    const offset = 500 * (1 - Math.cos(clampedRel * 0.44));
-    return `${offset}px`;
+    return `${Math.pow(Math.abs(rel), 1.7) * 44}px`;
   });
 
-  // Tangent rotation along the semi-circle wheel curve around its attachment point
-  const cardRotate = useTransform(relPos, (rel) => {
-    const clampedRel = Math.max(-2.8, Math.min(2.8, rel));
-    return clampedRel * 24;
-  });
-
-  // Scale: 1.02 at focal center, smooth taper outward
+  // Fixed horizontal orientation at all times (cards stay level, no tilting)
   const cardScale = useTransform(relPos, (rel) => {
     const dist = Math.abs(rel);
-    return Math.max(0.76, 1.02 - dist * 0.12);
+    return Math.max(0.86, 1.0 - dist * 0.08);
   });
 
-  // Active card is crystal clear, all other cards remain softly blurred
+  // Active main card is 100% solid and crystal clear; all other cards remain softly blurred
   const cardBlur = useTransform(relPos, (rel) => {
     const dist = Math.abs(rel);
     if (dist <= 0.35) return 0;
-    return Math.min(8, (dist - 0.35) * 5.5);
+    return Math.min(8, (dist - 0.35) * 6.5);
   });
   const cardFilter = useMotionTemplate`blur(${cardBlur}px)`;
 
-  // Opacity: 1 at focal center, above & below cards remain clearly visible on the semi-circle
+  // Opacity: 1 at focal center, blurred above/below cards remain visible in place
   const cardOpacity = useTransform(relPos, (rel) => {
     const dist = Math.abs(rel);
     if (dist <= 0.4) return 1;
-    if (dist >= 2.4) return 0;
-    return Math.max(0.3, 1 - (dist - 0.4) * 0.35);
+    if (dist >= 2.2) return 0;
+    return Math.max(0.38, 1 - (dist - 0.4) * 0.35);
   });
 
   const zIndex = useTransform(relPos, (rel) => {
-    return Math.round(50 - Math.abs(rel) * 10);
+    return Math.round(50 - Math.abs(rel) * 12);
   });
 
   // Point scale on axis line
@@ -924,13 +980,13 @@ function HowItWorksCard({ step, index, totalCards, scrollYProgress }) {
     <motion.div
       style={{
         position: 'absolute',
-        width: 'min(450px, 88%)',
+        width: 'min(430px, 86%)',
         right: 'clamp(2rem, 4.5vw, 4rem)',
-        borderRadius: '26px',
+        borderRadius: '24px',
         overflow: 'visible',
         x: cardX,
         y: cardY,
-        rotate: cardRotate,
+        rotate: 0,
         opacity: cardOpacity,
         filter: cardFilter,
         scale: cardScale,
@@ -959,52 +1015,40 @@ function HowItWorksCard({ step, index, totalCards, scrollYProgress }) {
       {/* Card body */}
       <div
         style={{
-          borderRadius: '26px',
+          borderRadius: '24px',
           overflow: 'hidden',
-          boxShadow: '0 30px 70px rgba(0,0,0,0.5)',
+          boxShadow: '0 25px 60px rgba(0,0,0,0.5)',
           border: '1px solid rgba(187, 98, 222, 0.35)',
           background: '#240a2f',
         }}
       >
-        {/* Big gap statement area — solid brand purple, completely opaque */}
+        {/* Gap statement area — solid brand purple, completely opaque */}
         <div style={{
-          minHeight: '230px',
+          minHeight: '170px',
           background: '#240a2f',
           display: 'flex',
           flexDirection: 'column',
           alignItems: 'flex-start',
           justifyContent: 'center',
-          padding: '2.25rem 2.25rem',
+          padding: '1.85rem 1.85rem',
           position: 'relative',
         }}>
-          {/* Step indicator tag on card */}
-          <div style={{ display: 'flex', alignItems: 'center', gap: '0.65rem', marginBottom: '0.9rem' }}>
-            <span style={{
-              fontFamily: 'Poppins, sans-serif',
-              fontSize: '1rem',
-              fontWeight: 800,
-              color: 'var(--accent-purple)',
-              letterSpacing: '1px',
-            }}>{step.label}</span>
-            <span style={{ width: '22px', height: '1.5px', background: 'rgba(187, 98, 222, 0.5)' }}></span>
-          </div>
-
           {/* The GAP text — big and bold */}
           <p style={{
             fontFamily: 'Poppins, sans-serif',
             fontWeight: 700,
-            fontSize: 'clamp(1.15rem, 1.9vw, 1.4rem)',
+            fontSize: 'clamp(1.05rem, 1.6vw, 1.25rem)',
             color: '#ffffff',
-            lineHeight: 1.45,
+            lineHeight: 1.42,
             margin: 0,
-            maxWidth: '420px',
+            maxWidth: '390px',
           }}>{step.gap}</p>
         </div>
 
         {/* Footer bar — THE GAP badge */}
         <div style={{
           background: '#180620',
-          padding: '1rem 2.25rem',
+          padding: '0.75rem 1.85rem',
           borderTop: '2px solid var(--accent-purple)',
           display: 'flex',
           alignItems: 'center',
@@ -1013,9 +1057,9 @@ function HowItWorksCard({ step, index, totalCards, scrollYProgress }) {
             display: 'inline-block',
             background: 'var(--accent-purple)',
             color: '#ffffff',
-            padding: '0.35rem 1.15rem',
+            padding: '0.3rem 1rem',
             borderRadius: '50px',
-            fontSize: '0.72rem',
+            fontSize: '0.68rem',
             fontWeight: 900,
             letterSpacing: '1.5px',
             textTransform: 'uppercase',
@@ -1069,32 +1113,30 @@ function CandidateHowItWorks() {
       body: 'Land job offers faster with complete confidence. Step into your role on Day 1 ready to deliver, without the fear of revoked offers or post-hiring lag.',
       color: '#200840',
       accent: '#d580ff'
-
     },
   ];
 
-  // For each card, determine which step it maps to (0-1 range per card)
   const totalCards = steps.length;
-
-  // Active step driven by scroll
   const [activeStep, setActiveStep] = useState(0);
+
+  // For each card, determine which step it maps to (0-1 range per card)
   useEffect(() => {
-    return scrollYProgress.on('change', (latest) => {
-      const idx = Math.min(Math.round(latest * (totalCards - 1)), totalCards - 1);
+    return scrollYProgress.onChange(latest => {
+      const stepSize = 1 / totalCards;
+      const idx = Math.min(Math.floor(latest / stepSize), totalCards - 1);
       setActiveStep(idx);
     });
   }, [scrollYProgress, totalCards]);
 
   return (
-    <section
-      ref={sectionRef}
-      style={{
-        position: 'relative',
-        height: '155vh',
-        background: '#F7F5EE',
-      }}
-    >
-      {/* Sticky wrapper — fills viewport */}
+    <section ref={sectionRef} style={{
+      position: 'relative',
+      height: '135vh',
+      width: '100vw',
+      marginLeft: 'calc(-50vw + 50%)',
+      background: 'var(--cream)',
+      zIndex: 10,
+    }}>
       <div style={{
         position: 'sticky',
         top: 0,
@@ -1104,22 +1146,22 @@ function CandidateHowItWorks() {
       }}>
         {/* LEFT — Title pushed down from navbar, expanded left section */}
         <div style={{
-          flex: '0 0 58%',
+          flex: '0 0 56%',
           position: 'relative',
           display: 'flex',
           flexDirection: 'column',
           justifyContent: 'center',
-          padding: 'clamp(2.5rem, 6vw, 7.5rem)',
+          padding: 'clamp(2rem, 5vw, 6rem)',
           zIndex: 2,
         }}>
-          {/* Top Title: HOW IT WORKS — enlarged and clear of navbar */}
-          <div style={{ position: 'absolute', top: 'clamp(5rem, 10vh, 7.5rem)', left: 'clamp(2.5rem, 6vw, 7.5rem)' }}>
+          {/* Top Title: HOW IT WORKS — balanced modern scale */}
+          <div style={{ position: 'absolute', top: 'clamp(4.2rem, 7.5vh, 5.8rem)', left: 'clamp(2rem, 5vw, 6rem)' }}>
             <h2 style={{
               fontFamily: 'Poppins, sans-serif',
-              fontSize: 'clamp(3.8rem, 6.8vw, 6.2rem)',
+              fontSize: 'clamp(2.4rem, 4.2vw, 3.6rem)',
               fontWeight: 900,
-              letterSpacing: '-0.05em',
-              lineHeight: 0.9,
+              letterSpacing: '-0.04em',
+              lineHeight: 1.0,
               color: 'var(--black)',
               margin: 0,
               textTransform: 'uppercase',
@@ -1128,8 +1170,8 @@ function CandidateHowItWorks() {
             </h2>
           </div>
 
-          {/* Active Solution Container — enlarged and filling the space */}
-          <div style={{ width: '100%', maxWidth: '750px', marginTop: '6rem' }}>
+          {/* Active Solution Container — perfectly proportioned */}
+          <div style={{ width: '100%', maxWidth: '580px', marginTop: '2.5rem' }}>
             <AnimatePresence mode="wait">
               <motion.div
                 key={activeStep}
@@ -1140,11 +1182,11 @@ function CandidateHowItWorks() {
                 style={{ width: '100%' }}
               >
                 {/* Heading with side vertical accent bar */}
-                <div style={{ display: 'flex', alignItems: 'center', gap: '1.35rem', marginBottom: '1.5rem' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '1.15rem', marginBottom: '1.25rem' }}>
                   <div
                     style={{
-                      width: '6px',
-                      height: 'clamp(2.6rem, 4vw, 3.6rem)',
+                      width: '5px',
+                      height: 'clamp(2.2rem, 3.2vw, 2.8rem)',
                       borderRadius: '999px',
                       background: steps[activeStep].accent || 'var(--accent-purple)',
                       flexShrink: 0,
@@ -1152,10 +1194,10 @@ function CandidateHowItWorks() {
                   />
                   <h3 style={{
                     fontFamily: 'Poppins, sans-serif',
-                    fontSize: 'clamp(2.1rem, 3.6vw, 3.2rem)',
+                    fontSize: 'clamp(1.5rem, 2.5vw, 2.1rem)',
                     fontWeight: 800,
                     color: 'var(--black)',
-                    lineHeight: 1.15,
+                    lineHeight: 1.2,
                     margin: 0,
                     letterSpacing: '-0.02em',
                   }}>{steps[activeStep].solution}</h3>
@@ -1164,10 +1206,10 @@ function CandidateHowItWorks() {
                 {/* Description body underneath */}
                 <p style={{
                   fontFamily: 'Century Gothic, sans-serif',
-                  fontSize: 'clamp(1.2rem, 1.8vw, 1.55rem)',
+                  fontSize: 'clamp(1.02rem, 1.35vw, 1.18rem)',
                   color: '#383838',
-                  lineHeight: 1.62,
-                  paddingLeft: '1.75rem',
+                  lineHeight: 1.6,
+                  paddingLeft: '1.45rem',
                   margin: 0,
                   fontWeight: 400,
                 }}>{steps[activeStep].body}</p>
@@ -1303,10 +1345,10 @@ function CompanyLogoBadge({ company }) {
         border: isHovered ? `1px solid ${company.color}` : '1px solid rgba(255,255,255,0.08)',
         borderRadius: '12px',
         padding: '0.9rem 2rem',
-        boxShadow: isHovered ? `0 8px 30px ${company.color}35` : 'none',
+        boxShadow: 'none',
         transform: isHovered ? 'translateY(-2px)' : 'none',
         zIndex: isHovered ? 50 : 1,
-        transition: 'border 0.2s, box-shadow 0.2s, background 0.2s, transform 0.2s',
+        transition: 'border 0.2s, background 0.2s, transform 0.2s',
       }}
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
@@ -1314,46 +1356,48 @@ function CompanyLogoBadge({ company }) {
       <span style={{ color: company.color }}>{company.symbol}</span>
       <span>{company.name}</span>
 
-      {/* Floating brief card on hover — compact sizing */}
+      {/* Floating brief card on hover */}
       <AnimatePresence>
         {isHovered && (
           <motion.div
-            initial={{ opacity: 0, y: 8, scale: 0.95 }}
+            initial={{ opacity: 0, y: -6, scale: 0.96 }}
             animate={{ opacity: 1, y: 0, scale: 1 }}
-            exit={{ opacity: 0, y: 5, scale: 0.95 }}
+            exit={{ opacity: 0, y: -6, scale: 0.96 }}
             transition={{ duration: 0.18, ease: [0.16, 1, 0.3, 1] }}
             style={{
               position: 'absolute',
-              bottom: 'calc(100% + 12px)',
+              top: 'calc(100% + 12px)',
               left: '50%',
               transform: 'translateX(-50%)',
-              width: '235px',
+              width: '250px',
               background: '#16161a',
               border: `1px solid ${company.color}88`,
               borderRadius: '14px',
               padding: '0.75rem 0.9rem',
-              boxShadow: `0 15px 40px rgba(0,0,0,0.95), 0 0 20px ${company.color}25`,
-              zIndex: 999,
+              boxShadow: 'none',
+              zIndex: 9999,
               pointerEvents: 'none',
               textAlign: 'left',
               whiteSpace: 'normal',
             }}
           >
             {/* Header */}
-            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '0.35rem' }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '0.35rem', fontWeight: 800, fontSize: '0.88rem', color: '#fff' }}>
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '0.5rem', marginBottom: '0.35rem' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '0.35rem', fontWeight: 800, fontSize: '0.88rem', color: '#fff', whiteSpace: 'nowrap' }}>
                 <span style={{ color: company.color }}>{company.symbol}</span>
                 {company.name}
               </div>
               <span
                 style={{
-                  fontSize: '0.65rem',
+                  fontSize: '0.62rem',
                   padding: '0.15rem 0.45rem',
                   borderRadius: '999px',
                   background: 'rgba(255,255,255,0.08)',
                   color: company.color,
                   fontWeight: 600,
                   border: `1px solid ${company.color}44`,
+                  whiteSpace: 'nowrap',
+                  flexShrink: 0,
                 }}
               >
                 {company.category}
@@ -1373,18 +1417,18 @@ function CompanyLogoBadge({ company }) {
               </span>
             </div>
 
-            {/* Downward triangle pointer */}
+            {/* Upward triangle pointer */}
             <div
               style={{
                 position: 'absolute',
-                top: '100%',
+                bottom: '100%',
                 left: '50%',
                 transform: 'translateX(-50%)',
                 width: 0,
                 height: 0,
                 borderLeft: '6px solid transparent',
                 borderRight: '6px solid transparent',
-                borderTop: '6px solid #16161a',
+                borderBottom: '6px solid #16161a',
               }}
             />
           </motion.div>
@@ -1404,7 +1448,7 @@ function CompanyMarqueeSection() {
       style={{
         width: '100vw',
         marginLeft: 'calc(-50vw + 50%)',
-        padding: '0 0 2.5rem',
+        padding: '0 0 1.5rem',
         overflow: 'visible',
         background: 'var(--black)',
         position: 'relative',
@@ -1416,9 +1460,9 @@ function CompanyMarqueeSection() {
         style={{
           width: '100%',
           overflow: 'hidden',
-          paddingTop: '180px',
-          marginTop: '-140px',
-          paddingBottom: '20px',
+          paddingTop: '25px',
+          paddingBottom: '160px',
+          marginBottom: '-135px',
           maskImage: 'linear-gradient(to right, transparent 0%, black 5%, black 95%, transparent 100%)',
           WebkitMaskImage: 'linear-gradient(to right, transparent 0%, black 5%, black 95%, transparent 100%)',
         }}

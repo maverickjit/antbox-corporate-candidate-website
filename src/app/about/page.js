@@ -33,6 +33,52 @@ function Word({ word, progress, range }) {
   );
 }
 
+function TypingSubtitle({ text }) {
+  const containerRef = React.useRef(null);
+  const isInView = useInView(containerRef, { once: true, amount: 0.3 });
+  const [displayedLength, setDisplayedLength] = useState(0);
+  const [isTypingComplete, setIsTypingComplete] = useState(false);
+
+  useEffect(() => {
+    if (!isInView) return;
+
+    let index = 0;
+    const speed = 18; // smooth typing animation speed
+
+    const timer = setInterval(() => {
+      index++;
+      setDisplayedLength(index);
+      if (index >= text.length) {
+        setIsTypingComplete(true);
+        clearInterval(timer);
+      }
+    }, speed);
+
+    return () => clearInterval(timer);
+  }, [isInView, text]);
+
+  return (
+    <p ref={containerRef} className={styles.operatorsSubtitle}>
+      <span>{text.slice(0, displayedLength)}</span>
+      {!isTypingComplete && (
+        <motion.span
+          animate={{ opacity: [1, 0] }}
+          transition={{ duration: 0.35, repeat: Infinity, repeatType: "reverse" }}
+          style={{
+            display: 'inline-block',
+            width: '2.5px',
+            height: '1.1em',
+            backgroundColor: '#8B5CF6',
+            marginLeft: '3px',
+            verticalAlign: '-0.15em',
+            borderRadius: '1px'
+          }}
+        />
+      )}
+    </p>
+  );
+}
+
 function HorizontalSwipeValuesSection({ values }) {
   const containerRef = React.useRef(null);
   const [revealedCount, setRevealedCount] = React.useState(1);
@@ -42,20 +88,20 @@ function HorizontalSwipeValuesSection({ values }) {
     offset: ["start start", "end end"]
   });
 
-  // Phase 1 (0.00 -> 0.10): Roll up entrance animation for Panel 1 black sheet
-  const sheetY = useTransform(scrollYProgress, [0.0, 0.10], [100, 0]);
-  const sheetRadius = useTransform(scrollYProgress, [0.0, 0.10], ["44px 44px 0 0", "0px 0px 0px 0px"]);
+  // Phase 1 (0.00 -> 0.15): Roll up entrance animation for Panel 1 black sheet
+  const sheetY = useTransform(scrollYProgress, [0.0, 0.15], [100, 0]);
+  const sheetRadius = useTransform(scrollYProgress, [0.0, 0.15], ["44px 44px 0 0", "0px 0px 0px 0px"]);
 
-  // Phase 2 (0.12 -> 0.28): Horizontal Swipe from Panel 1 (Black) to Panel 2 (White)
-  const panelX = useTransform(scrollYProgress, [0.12, 0.28], ["0vw", "-100vw"]);
+  // Phase 2 (0.18 -> 0.40): Horizontal Swipe from Panel 1 (Black) to Panel 2 (White)
+  const panelX = useTransform(scrollYProgress, [0.18, 0.40], ["0vw", "-100vw"]);
 
-  // Phase 3 (0.28 -> 0.58): Card reveal sequence inside Panel 2
+  // Phase 3 (0.40 -> 0.95): Card reveal sequence inside Panel 2
   useEffect(() => {
     const unsubscribe = scrollYProgress.on("change", (latest) => {
-      if (latest < 0.28) {
+      if (latest < 0.40) {
         setRevealedCount(1);
-      } else if (latest <= 0.58) {
-        const cardProgress = (latest - 0.28) / 0.30;
+      } else if (latest <= 0.95) {
+        const cardProgress = (latest - 0.40) / 0.55;
         const step = Math.floor(cardProgress * 5) + 1;
         const count = Math.min(Math.max(step, 1), 5);
         setRevealedCount(count);
@@ -66,26 +112,17 @@ function HorizontalSwipeValuesSection({ values }) {
     return () => unsubscribe();
   }, [scrollYProgress]);
 
-  // Phase 4 (0.58 -> 0.82): 3D Perspective Shift towards Bottom-Left for Panel 3 (Founders Manifesto)
-  // Panel 2 (White 5 Cards) tilts 3D & flies top-right
-  const panel2PerspectiveX = useTransform(scrollYProgress, [0.58, 0.82], ["0vw", "75vw"]);
-  const panel2PerspectiveY = useTransform(scrollYProgress, [0.58, 0.82], ["0vh", "-65vh"]);
-  const panel2Scale = useTransform(scrollYProgress, [0.58, 0.82], [1.0, 0.76]);
-  const panel2RotateZ = useTransform(scrollYProgress, [0.58, 0.82], [0, 9]);
-  const panel2RotateX = useTransform(scrollYProgress, [0.58, 0.82], [0, 18]);
-  const panel2Opacity = useTransform(scrollYProgress, [0.58, 0.78], [1, 0]);
-
-  // Panel 3 (Founders Manifesto) perspective-zooms in from Bottom-Left (-75vw x, +65vh y)
-  const manifestoX = useTransform(scrollYProgress, [0.58, 0.82], ["-75vw", "0vw"]);
-  const manifestoY = useTransform(scrollYProgress, [0.58, 0.82], ["65vh", "0vh"]);
-  const manifestoScale = useTransform(scrollYProgress, [0.58, 0.82], [0.76, 1.0]);
-  const manifestoRotateZ = useTransform(scrollYProgress, [0.58, 0.82], [-9, 0]);
-  const manifestoRotateX = useTransform(scrollYProgress, [0.58, 0.82], [-18, 0]);
-  const manifestoOpacity = useTransform(scrollYProgress, [0.58, 0.78], [0, 1]);
+  // Smooth Natural Day to Night Background Transition (0.68 -> 0.94)
+  // Automatically & naturally changes BG color from Light Day (#FDFBF7) -> Dusk (#1A162B) -> Night (#0A0A0E)
+  const panelBg = useTransform(
+    scrollYProgress,
+    [0.68, 0.94],
+    ["#FDFBF7", "#0A0A0E"]
+  );
 
   return (
-    <div ref={containerRef} className={styles.horizontalSwipeTrack} style={{ height: '480vh' }}>
-      <div className={styles.horizontalStickyViewport} style={{ perspective: '1400px', overflow: 'hidden' }}>
+    <div ref={containerRef} className={styles.horizontalSwipeTrack} style={{ height: '360vh' }}>
+      <div className={styles.horizontalStickyViewport}>
         <motion.div
           style={{ x: panelX }}
           className={styles.horizontalPanelContainer}
@@ -100,17 +137,9 @@ function HorizontalSwipeValuesSection({ values }) {
             </div>
           </motion.div>
 
-          {/* ── PANEL 2: Full-Screen White Section with 5 Cards (Tilts Top-Right on Perspective Shift) ── */}
+          {/* ── PANEL 2: Full-Screen Section with 5 Cards (Smooth Day-to-Night BG Transition) ── */}
           <motion.div
-            style={{
-              x: panel2PerspectiveX,
-              y: panel2PerspectiveY,
-              scale: panel2Scale,
-              rotateZ: panel2RotateZ,
-              rotateX: panel2RotateX,
-              opacity: panel2Opacity,
-              transformOrigin: "top right"
-            }}
+            style={{ backgroundColor: panelBg }}
             className={styles.panelWhiteCards}
           >
             <div className={styles.valuesStickyContainer}>
@@ -167,127 +196,111 @@ function HorizontalSwipeValuesSection({ values }) {
             </div>
           </motion.div>
         </motion.div>
+      </div>
+    </div>
+  );
+}
 
-        {/* ── PANEL 3: Founders Manifesto (3D Perspective Zooms in from Bottom-Left) ── */}
-        <motion.div
-          style={{
-            position: 'absolute',
-            inset: 0,
-            zIndex: 20,
-            x: manifestoX,
-            y: manifestoY,
-            scale: manifestoScale,
-            rotateZ: manifestoRotateZ,
-            rotateX: manifestoRotateX,
-            opacity: 1,
-            background: 'linear-gradient(180deg, #130F26 0%, #0A0A0E 100%)',
-            transformOrigin: "bottom left"
-          }}
-        >
-          {/* Vibrant Ambient Radial Glow Spotlights */}
-          <div style={{
-            position: 'absolute',
-            top: '-15%',
-            left: '50%',
-            transform: 'translateX(-50%)',
-            width: '750px',
-            height: '750px',
-            background: 'radial-gradient(circle, rgba(187, 98, 222, 0.25) 0%, rgba(147, 51, 234, 0.08) 50%, transparent 70%)',
-            pointerEvents: 'none',
-            zIndex: 0,
-            filter: 'blur(55px)'
-          }} />
-          <div style={{
-            position: 'absolute',
-            bottom: '-10%',
-            right: '10%',
-            width: '600px',
-            height: '600px',
-            background: 'radial-gradient(circle, rgba(192, 132, 252, 0.20) 0%, rgba(139, 92, 246, 0.05) 50%, transparent 70%)',
-            pointerEvents: 'none',
-            zIndex: 0,
-            filter: 'blur(55px)'
-          }} />
+function FoundersManifestoSection() {
+  const sectionRef = React.useRef(null);
+  const isInView = useInView(sectionRef, { once: true, amount: 0.15 });
 
-          <div className={styles.darkOverlapSheet} style={{ margin: 0, minHeight: '100vh', height: '100vh', borderRadius: 0, background: 'transparent', display: 'flex', alignItems: 'center', justifyContent: 'center', position: 'relative', zIndex: 1 }}>
-            <div className={styles.darkOverlapContent} style={{ paddingTop: '2rem', paddingBottom: '2rem', width: '100%', maxWidth: '1050px', margin: '0 auto', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
+  return (
+    <div
+      ref={sectionRef}
+      style={{
+        position: 'relative',
+        width: '100vw',
+        left: '50%',
+        right: '50%',
+        marginLeft: '-50vw',
+        marginRight: '-50vw',
+        zIndex: 10,
+        overflow: 'hidden',
+        background: '#0A0A0E'
+      }}
+    >
+      <motion.div
+        initial={{ opacity: 0, y: 40 }}
+        animate={{ opacity: isInView ? 1 : 0, y: isInView ? 0 : 40 }}
+        transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
+        className={styles.darkOverlapSheet}
+        style={{ margin: 0, padding: '5.5rem 0 6rem', borderRadius: 0, background: '#0A0A0E' }}
+      >
+        <div className={styles.darkOverlapContent} style={{ width: '100%', maxWidth: '1050px', margin: '0 auto', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
 
-              {/* Centered Heading (ORIGIN & VISION badge removed) */}
-              <div style={{ textAlign: 'center', marginBottom: '1.75rem' }}>
-                <h2 className={styles.manifestoTitle} style={{
-                  fontSize: '2.4rem',
-                  fontWeight: 800,
-                  letterSpacing: '-0.03em',
-                  textAlign: 'center',
-                  background: 'linear-gradient(135deg, #FFFFFF 0%, #F3E8FF 50%, #C084FC 100%)',
-                  WebkitBackgroundClip: 'text',
-                  WebkitTextFillColor: 'transparent',
-                  filter: 'drop-shadow(0 4px 15px rgba(192, 132, 252, 0.35))'
+          {/* Centered Heading */}
+          <div style={{ textAlign: 'center', marginBottom: '2.5rem' }}>
+            <h2 className={styles.manifestoTitle} style={{
+              fontSize: '2.5rem',
+              fontWeight: 800,
+              letterSpacing: '-0.03em',
+              textAlign: 'center',
+              background: 'linear-gradient(135deg, #FFFFFF 0%, #F3E8FF 50%, #C084FC 100%)',
+              WebkitBackgroundClip: 'text',
+              WebkitTextFillColor: 'transparent'
+            }}>
+              Founders Manifesto
+            </h2>
+          </div>
+
+          {/* Centered 2-Column Grid (Founder Photo + Manifesto Content) */}
+          <div className={styles.manifestoSection} style={{ display: 'grid', gridTemplateColumns: '310px 1fr', gap: '2.75rem', alignItems: 'center', width: '100%', maxWidth: '1040px', margin: '0 auto' }}>
+            <div className={styles.manifestoImageContainer} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
+              <div className={styles.founderPhotoWrapper} style={{
+                border: '1px solid rgba(255, 255, 255, 0.15)',
+                boxShadow: '0 15px 35px rgba(0, 0, 0, 0.4)',
+                borderRadius: '22px',
+                width: '100%',
+                maxWidth: '310px',
+                height: '335px'
+              }}>
+                <Image
+                  src="/founder-photo-portrait.jpg"
+                  alt="Rohit Singh - Founder & CEO"
+                  fill
+                  unoptimized
+                  className={styles.founderPhoto}
+                />
+              </div>
+
+              {/* Signature Name Block Below Image */}
+              <div style={{
+                marginTop: '0.85rem',
+                display: 'flex',
+                flexDirection: 'column',
+                alignItems: 'center',
+                textAlign: 'center'
+              }}>
+                <span style={{
+                  fontFamily: "'Caveat', 'Dancing Script', 'Brush Script MT', cursive",
+                  fontSize: '1.75rem',
+                  fontWeight: 700,
+                  color: '#E9D5FF',
+                  letterSpacing: '0.5px',
+                  lineHeight: 1,
+                  marginBottom: '0.2rem'
                 }}>
-                  Founders Manifesto
-                </h2>
+                  Rohit Singh
+                </span>
+                <span style={{
+                  fontSize: '0.72rem',
+                  fontWeight: 700,
+                  letterSpacing: '2px',
+                  textTransform: 'uppercase',
+                  color: '#A1A1AA'
+                }}>
+                  Founder & CEO
+                </span>
               </div>
-
-              {/* Centered 2-Column Grid (Founder Photo + Manifesto Content) */}
-              <div className={styles.manifestoSection} style={{ display: 'grid', gridTemplateColumns: '310px 1fr', gap: '2.75rem', alignItems: 'center', width: '100%', maxWidth: '1040px', margin: '0 auto' }}>
-                <div className={styles.manifestoImageContainer} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
-                  <div className={styles.founderPhotoWrapper} style={{
-                    border: '1.5px solid rgba(192, 132, 252, 0.5)',
-                    boxShadow: '0 20px 50px -10px rgba(187, 98, 222, 0.4), 0 0 30px rgba(147, 51, 234, 0.3)',
-                    borderRadius: '22px',
-                    width: '100%',
-                    maxWidth: '310px',
-                    height: '335px'
-                  }}>
-                    <Image
-                      src="/founder-photo-portrait.jpg"
-                      alt="Rohit Singh - Founder & CEO"
-                      fill
-                      unoptimized
-                      className={styles.founderPhoto}
-                    />
-                  </div>
-
-                  {/* Signature Name Block Below Image */}
-                  <div style={{
-                    marginTop: '0.75rem',
-                    display: 'flex',
-                    flexDirection: 'column',
-                    alignItems: 'center',
-                    textAlign: 'center'
-                  }}>
-                    <span style={{
-                      fontFamily: "'Caveat', 'Dancing Script', 'Brush Script MT', cursive",
-                      fontSize: '1.75rem',
-                      fontWeight: 700,
-                      color: '#E9D5FF',
-                      letterSpacing: '0.5px',
-                      lineHeight: 1,
-                      marginBottom: '0.2rem',
-                      filter: 'drop-shadow(0 0 10px rgba(192, 132, 252, 0.5))'
-                    }}>
-                      Rohit Singh
-                    </span>
-                    <span style={{
-                      fontSize: '0.72rem',
-                      fontWeight: 700,
-                      letterSpacing: '2px',
-                      textTransform: 'uppercase',
-                      color: '#A1A1AA'
-                    }}>
-                      Founder & CEO
-                    </span>
-                  </div>
-                </div>
-                <div className={styles.manifestoContent}>
-                  <ContinuousScrollManifesto progress={scrollYProgress} />
-                </div>
-              </div>
-
+            </div>
+            <div className={styles.manifestoContent}>
+              <ContinuousScrollManifesto />
             </div>
           </div>
-        </motion.div>
-      </div>
+
+        </div>
+      </motion.div>
     </div>
   );
 }
@@ -337,7 +350,7 @@ function ScribbleUnderline({ children, color = "#BB62DE", active = false }) {
   );
 }
 
-function TypingCursor() {
+function StatementCursor() {
   return (
     <motion.span
       animate={{ opacity: [1, 0] }}
@@ -367,43 +380,43 @@ function MaskedLineRevealStatement() {
   const full3 = "it was a proxy.";
   const full4 = "Nobody built the replacement. So we did.";
 
-  const totalChars = full1.length + full2.length + full3.length + full4.length;
+  const l1 = full1.length;
+  const l2 = full2.length;
+  const l3 = full3.length;
+  const l4 = full4.length;
+  const totalChars = l1 + l2 + l3 + l4;
 
   useEffect(() => {
     if (!isInView) return;
 
     let current = 0;
-    const interval = setInterval(() => {
+    const speed = 36;
+    const timer = setInterval(() => {
       current++;
       setCharCount(current);
       if (current >= totalChars) {
-        clearInterval(interval);
+        clearInterval(timer);
         setShowUnderline(true);
       }
-    }, 38);
+    }, speed);
 
-    return () => clearInterval(interval);
+    return () => clearInterval(timer);
   }, [isInView, totalChars]);
 
-  // Derive slice lengths from single source of truth charCount
-  const p1Len = full1.length;
-  const p2Len = full2.length;
-  const p3Len = full3.length;
+  const part1 = full1.slice(0, Math.min(charCount, l1));
+  const part2 = charCount > l1 ? full2.slice(0, Math.min(charCount - l1, l2)) : '';
+  const part3 = charCount > l1 + l2 ? full3.slice(0, Math.min(charCount - l1 - l2, l3)) : '';
+  const part4 = charCount > l1 + l2 + l3 ? full4.slice(0, Math.min(charCount - l1 - l2 - l3, l4)) : '';
 
-  const part1 = full1.slice(0, Math.min(charCount, p1Len));
-  const part2 = charCount > p1Len ? full2.slice(0, Math.min(charCount - p1Len, p2Len)) : '';
-  const part3 = charCount > p1Len + p2Len ? full3.slice(0, Math.min(charCount - p1Len - p2Len, p3Len)) : '';
-  const part4 = charCount > p1Len + p2Len + p3Len ? full4.slice(0, charCount - p1Len - p2Len - p3Len) : '';
-
-  const isTyping1 = charCount > 0 && charCount <= p1Len;
-  const isTyping23 = charCount > p1Len && charCount <= p1Len + p2Len + p3Len;
-  const isTyping4 = charCount > p1Len + p2Len + p3Len && charCount < totalChars;
+  const isTyping1 = charCount > 0 && charCount <= l1;
+  const isTyping23 = charCount > l1 && charCount <= l1 + l2 + l3;
+  const isTyping4 = charCount > l1 + l2 + l3 && charCount < totalChars;
 
   return (
     <div ref={containerRef} className={styles.valuesStatement} style={{ minHeight: '160px', textAlign: 'center' }}>
       <p style={{ margin: 0, textAlign: 'center' }}>
         {part1}
-        {isTyping1 && <TypingCursor />}
+        {isTyping1 && <StatementCursor />}
       </p>
 
       <p style={{ margin: 0, marginTop: '0.2rem', textAlign: 'center' }}>
@@ -413,7 +426,7 @@ function MaskedLineRevealStatement() {
             {part3}
           </span>
         )}
-        {isTyping23 && <TypingCursor />}
+        {isTyping23 && <StatementCursor />}
       </p>
 
       <p style={{ margin: 0, marginTop: '0.2rem', textAlign: 'center' }}>
@@ -424,7 +437,7 @@ function MaskedLineRevealStatement() {
             </span>
           </ScribbleUnderline>
         )}
-        {isTyping4 && <TypingCursor />}
+        {isTyping4 && <StatementCursor />}
       </p>
     </div>
   );
@@ -434,10 +447,6 @@ function ManifestoWord({ word, progress, range }) {
   const opacity = useTransform(progress, range, [0.85, 1]);
   const color = useTransform(progress, range, ["#D4D4DE", "#FFFFFF"]);
   const fontWeight = useTransform(progress, range, [500, 700]);
-  const textShadow = useTransform(progress, range, [
-    "0 0 0px rgba(255,255,255,0)",
-    "0 0 16px rgba(255,255,255,0.95), 0 0 30px rgba(216,180,254,0.6)"
-  ]);
 
   return (
     <motion.span
@@ -445,7 +454,6 @@ function ManifestoWord({ word, progress, range }) {
         opacity,
         color,
         fontWeight,
-        textShadow,
         display: 'inline-block',
         marginRight: '0.28em'
       }}
@@ -455,14 +463,12 @@ function ManifestoWord({ word, progress, range }) {
   );
 }
 
-function ContinuousScrollManifesto({ progress }) {
+function ContinuousScrollManifesto() {
   const containerRef = React.useRef(null);
-  const localScroll = useScroll({
+  const { scrollYProgress } = useScroll({
     target: containerRef,
-    offset: ["start 0.85", "end 0.40"]
+    offset: ["start 0.85", "end 0.35"]
   });
-
-  const scrollProgress = progress || localScroll.scrollYProgress;
 
   const parsedParagraphs = React.useMemo(() => {
     let globalIndexCounter = 0;
@@ -484,14 +490,14 @@ function ContinuousScrollManifesto({ progress }) {
       {parsedParagraphs.map((paraWords, pIndex) => (
         <p key={pIndex} style={{ lineHeight: 1.6, fontSize: '0.98rem', margin: 0 }}>
           {paraWords.map(({ word, globalIndex }) => {
-            const start = progress ? 0.78 + (globalIndex / totalWords) * 0.20 : globalIndex / totalWords;
-            const end = progress ? Math.min(1.0, start + (1 / totalWords) * 2.5) : Math.min(1, start + (1 / totalWords) * 3);
+            const start = globalIndex / totalWords;
+            const end = Math.min(1, start + (1 / totalWords) * 3);
             return (
               <ManifestoWord
                 key={globalIndex}
                 word={word}
-                progress={scrollProgress}
-                range={[Math.max(0, start - 0.01), end]}
+                progress={scrollYProgress}
+                range={[Math.max(0, start - 0.02), end]}
               />
             );
           })}
@@ -792,16 +798,17 @@ export default function About() {
           <h2 className={styles.operatorsTitle}>
             We are operators who have <span className={styles.operatorsHighlight}>vetted, trained, and deployed</span> top talent for B2B companies.
           </h2>
-          <p className={styles.operatorsSubtitle}>
-            We take final and pre-final year students, run them through real-world domain teardowns, and deploy them into fast-growing SaaS teams. We bring verified proof of work, owning candidate readiness so they contribute from Day 0.
-          </p>
+          <TypingSubtitle text="We take final and pre-final year students, run them through real-world domain teardowns, and deploy them into fast-growing SaaS teams. We bring verified proof of work, owning candidate readiness so they contribute from Day 0." />
         </div>
       </div>
 
-      {/* ── Section 2: Pinned 3D Perspective Track (Black Quote -> White 5 Cards -> Founders Manifesto) ── */}
+      {/* ── Section 2: Pinned Horizontal Swipe Track (Black Quote -> White 5 Cards) ── */}
       <HorizontalSwipeValuesSection values={values} />
 
-      {/* ── Section 3: Culture Section (3D Parallax Scroll Transition) ── */}
+      {/* ── Section 3: Founders Manifesto (Normal Vertical Scroll Section) ── */}
+      <FoundersManifestoSection />
+
+      {/* ── Section 4: Culture Section (3D Parallax Scroll Transition) ── */}
       <ParallaxCultureCard />
     </main>
   );
