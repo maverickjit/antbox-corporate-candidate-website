@@ -333,12 +333,19 @@ function WhatWeBringSection() {
 
   const totalCards = cardData.length;
 
+  // Dynamic vertical drum centering so active card is always vertically centered within viewport safe area
+  // (Prevents card 01 from hitting the top pill bar and card 05 from hitting the bottom edge)
+  const drumY = useTransform(scrollYProgress, (progress) => {
+    const current = progress * (totalCards - 1);
+    return `${(2 - current) * 44}px`;
+  });
+
   return (
     <section
       ref={sectionRef}
       style={{
         position: 'relative',
-        height: '240vh',
+        height: '260vh',
         background: 'transparent',
       }}
     >
@@ -353,8 +360,8 @@ function WhatWeBringSection() {
           alignItems: 'center',
           justifyContent: 'center',
           overflow: 'hidden',
-          paddingTop: 'clamp(5.5rem, 11vh, 7.5rem)',
-          paddingBottom: '2rem',
+          paddingTop: 'clamp(6rem, 13vh, 8.5rem)',
+          paddingBottom: 'clamp(2.5rem, 5vh, 4rem)',
           paddingLeft: '1.5rem',
           paddingRight: '1.5rem',
         }}
@@ -367,16 +374,17 @@ function WhatWeBringSection() {
             display: 'flex',
             flexDirection: 'column',
             alignItems: 'center',
-            justifyContent: 'flex-start',
+            justifyContent: 'center',
+            position: 'relative',
           }}
         >
           <h2
             className="section-title heading-serif text-center"
             style={{
               color: '#ffffff',
-              marginTop: '0.25rem',
-              marginBottom: 'clamp(1.5rem, 3vh, 2.5rem)',
-              fontSize: 'clamp(2.8rem, 5.5vw, 4.6rem)',
+              marginTop: '0',
+              marginBottom: 'clamp(1rem, 2.5vh, 2rem)',
+              fontSize: 'clamp(2.4rem, 4.8vw, 4.2rem)',
               textAlign: 'center',
               textTransform: 'uppercase',
               letterSpacing: '-0.03em',
@@ -386,15 +394,16 @@ function WhatWeBringSection() {
             WHAT WE <span style={{ color: 'var(--accent-purple)' }}>BRING</span>
           </h2>
 
-          {/* 3D Half-Roller Cards Stage (Cards bulged from screen) */}
-          <div
+          {/* 3D Half-Roller Cards Stage (Cards dynamically centered on scroll) */}
+          <motion.div
             style={{
               display: 'flex',
               flexDirection: 'column',
-              gap: '0.75rem',
+              gap: '0.65rem',
               width: '100%',
               perspective: '1200px',
               transformStyle: 'preserve-3d',
+              y: drumY,
             }}
           >
             {cardData.map((card, i) => (
@@ -406,7 +415,7 @@ function WhatWeBringSection() {
                 scrollYProgress={scrollYProgress}
               />
             ))}
-          </div>
+          </motion.div>
 
           {/* Vertical scroll ticker / ruler track on the right */}
           <BringSideScrollTicker scrollYProgress={scrollYProgress} />
