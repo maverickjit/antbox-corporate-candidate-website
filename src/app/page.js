@@ -300,9 +300,12 @@ function WhatWeBringSection() {
           display: 'flex',
           flexDirection: 'column',
           alignItems: 'center',
-          justifyContent: 'center',
+          justifyContent: 'flex-start',
           overflow: 'hidden',
-          padding: '2rem 1.5rem',
+          paddingTop: 'clamp(6.5rem, 14vh, 9rem)',
+          paddingBottom: '2rem',
+          paddingLeft: '1.5rem',
+          paddingRight: '1.5rem',
         }}
       >
         <div
@@ -313,15 +316,15 @@ function WhatWeBringSection() {
             display: 'flex',
             flexDirection: 'column',
             alignItems: 'center',
-            justifyContent: 'center',
+            justifyContent: 'flex-start',
           }}
         >
           <h2
             className="section-title heading-serif text-center"
             style={{
               color: '#ffffff',
-              marginBottom: '2.25rem',
-              fontSize: 'clamp(2.5rem, 5vw, 4.25rem)',
+              marginBottom: '2.5rem',
+              fontSize: 'clamp(2.4rem, 4.8vw, 4rem)',
               textAlign: 'center',
             }}
           >
@@ -329,7 +332,7 @@ function WhatWeBringSection() {
           </h2>
 
           {/* Stacked Deck Container */}
-          <div style={{ position: 'relative', width: '100%', maxWidth: '1020px', height: '460px' }}>
+          <div style={{ position: 'relative', width: '100%', maxWidth: '1020px', height: '440px' }}>
             {cardData.map((card, i) => (
               <StackedBenefitCard
                 key={i}
@@ -350,44 +353,61 @@ function CandidateCTA() {
   const sectionRef = useRef(null);
   const { scrollYProgress } = useScroll({
     target: sectionRef,
-    offset: ["start 85%", "end 100%"]
+    offset: ["start end", "start 15%"]
   });
 
   const clipPercent = useTransform(scrollYProgress, [0, 1], [100, 0]);
   const clipPathValue = useMotionTemplate`inset(${clipPercent}% 0 0 0)`;
 
   return (
-    <section className="cta-section cta-typographic" ref={sectionRef} style={{ position: 'relative', background: 'var(--cream)', minHeight: '100vh', display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
-      <div style={{ width: '100%', flex: 1, position: 'relative', display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
-        <div style={{ position: 'relative', zIndex: 1, padding: '2rem' }}>
-          <div className="cta-type-inner" style={{ textAlign: 'center', display: 'flex', flexDirection: 'column', alignItems: 'center', margin: '0 auto' }}>
-            <h2 className="cta-type-headline" style={{ color: 'var(--black)', fontSize: 'clamp(3.5rem, 7vw, 6rem)', lineHeight: 1.1 }}>
+    <section
+      className="cta-section cta-typographic"
+      ref={sectionRef}
+      style={{
+        position: 'relative',
+        background: 'var(--cream)',
+        minHeight: '100vh',
+        width: '100vw',
+        marginLeft: 'calc(-50vw + 50%)',
+        zIndex: 10,
+        display: 'flex',
+        flexDirection: 'column',
+        justifyContent: 'center',
+        overflow: 'hidden',
+      }}
+    >
+      <div style={{ width: '100%', height: '100%', minHeight: '100vh', position: 'relative', display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
+        {/* Layer 1: Light Cream base */}
+        <div style={{ position: 'relative', zIndex: 1, padding: '4rem 2rem', width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+          <div className="cta-type-inner" style={{ textAlign: 'center', display: 'flex', flexDirection: 'column', alignItems: 'center', margin: '0 auto', maxWidth: '1200px' }}>
+            <h2 className="cta-type-headline" style={{ color: 'var(--black)', fontSize: 'clamp(3rem, 6.5vw, 5.5rem)', lineHeight: 1.1 }}>
               Ready to Take Control<br />of Your Career Path?
             </h2>
-            <p className="cta-eyebrow" style={{ color: 'var(--text-secondary)', marginTop: '2rem', fontSize: '1.5rem', maxWidth: '750px', lineHeight: 1.5, textTransform: 'none', letterSpacing: '0px' }}>
+            <p className="cta-eyebrow" style={{ color: 'var(--text-secondary)', marginTop: '1.75rem', fontSize: '1.35rem', maxWidth: '750px', lineHeight: 1.5, textTransform: 'none', letterSpacing: '0px' }}>
               Build real proof of work, work on micro-internships, and land your dream job without the guesswork.
             </p>
-            <button className="cta-type-btn" style={{ background: 'var(--purple)', color: '#fff', marginTop: '3rem', padding: '1.5rem 4rem', fontSize: '1.4rem', borderRadius: '9999px' }}>
+            <button className="cta-type-btn" style={{ background: 'var(--purple)', color: '#fff', marginTop: '2.5rem', padding: '1.25rem 3.5rem', fontSize: '1.25rem', borderRadius: '9999px' }}>
               Get Started →
             </button>
           </div>
         </div>
 
+        {/* Layer 2: Full-screen Purple wipe smoothly covering the whole screen */}
         <motion.div
           style={{
             position: 'absolute', top: 0, left: 0, width: '100%', height: '100%',
-            background: 'var(--purple)', zIndex: 2, padding: '2rem',
-            overflow: 'hidden', clipPath: clipPathValue, display: 'flex', flexDirection: 'column', justifyContent: 'center'
+            background: 'var(--purple)', zIndex: 2, padding: '4rem 2rem',
+            overflow: 'hidden', clipPath: clipPathValue, display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center'
           }}
         >
-          <div className="cta-type-inner" style={{ textAlign: 'center', display: 'flex', flexDirection: 'column', alignItems: 'center', margin: '0 auto', width: '100%' }}>
-            <h2 className="cta-type-headline" style={{ color: '#fff', fontSize: 'clamp(3.5rem, 7vw, 6rem)', lineHeight: 1.1 }}>
+          <div className="cta-type-inner" style={{ textAlign: 'center', display: 'flex', flexDirection: 'column', alignItems: 'center', margin: '0 auto', maxWidth: '1200px', width: '100%' }}>
+            <h2 className="cta-type-headline" style={{ color: '#fff', fontSize: 'clamp(3rem, 6.5vw, 5.5rem)', lineHeight: 1.1 }}>
               Ready to Take Control<br />of Your Career Path?
             </h2>
-            <p className="cta-eyebrow" style={{ color: '#f0f0f0', marginTop: '2rem', fontSize: '1.5rem', maxWidth: '750px', lineHeight: 1.5, textTransform: 'none', letterSpacing: '0px' }}>
+            <p className="cta-eyebrow" style={{ color: '#f0f0f0', marginTop: '1.75rem', fontSize: '1.35rem', maxWidth: '750px', lineHeight: 1.5, textTransform: 'none', letterSpacing: '0px' }}>
               Build real proof of work, work on micro-internships, and land your dream job without the guesswork.
             </p>
-            <button className="cta-type-btn" style={{ background: 'var(--black)', color: '#fff', marginTop: '3rem', padding: '1.5rem 4rem', fontSize: '1.4rem', borderRadius: '9999px' }}>
+            <button className="cta-type-btn" style={{ background: 'var(--black)', color: '#fff', marginTop: '2.5rem', padding: '1.25rem 3.5rem', fontSize: '1.25rem', borderRadius: '9999px' }}>
               Get Started →
             </button>
           </div>
@@ -436,7 +456,7 @@ function CandidateFriction() {
           ref={titleRef}
           className="friction-header"
           style={{
-            marginBottom: '3rem',
+            marginBottom: '1rem',
             textAlign: 'left',
             perspective: '800px',
             display: 'block',
@@ -466,7 +486,7 @@ function CandidateFriction() {
           >FRICTION</span>
         </h2>
 
-        <div className="process-layout" style={{ width: '100%', marginTop: '3.5rem' }}>
+        <div className="process-layout" style={{ width: '100%', marginTop: '1.25rem' }}>
           <div className="process-timeline" style={{ display: 'flex', gap: '2.5rem', width: '100%', position: 'relative' }}>
             <motion.div className="process-timeline-active-line" style={{ position: 'absolute', top: 0, left: 0, height: '2px', background: 'var(--accent-purple)', zIndex: 2, transformOrigin: 'left', scaleX: lineScaleX, width: '100%' }}></motion.div>
 
@@ -475,7 +495,7 @@ function CandidateFriction() {
               className={`process-step ${activeStep >= 0 ? 'active' : ''}`}
               animate={{ opacity: activeStep >= 0 ? 1 : 0.35, y: activeStep >= 0 ? 0 : 15 }}
               transition={{ duration: 0.4, ease: "easeOut" }}
-              style={{ flex: 1, position: 'relative', paddingTop: '1.5rem' }}
+              style={{ flex: 1, position: 'relative', paddingTop: '0.85rem' }}
             >
               <div
                 className="process-number"
@@ -486,14 +506,14 @@ function CandidateFriction() {
                   lineHeight: 1,
                   letterSpacing: '-0.05em',
                   color: activeStep >= 0 ? 'var(--accent-purple)' : 'rgba(255,255,255,0.2)',
-                  marginBottom: '1rem',
+                  marginBottom: '0.75rem',
                   textShadow: 'none',
                   transition: 'all 0.4s ease',
                 }}
               >
                 01
               </div>
-              <h3 className="tc-heading" style={{ fontSize: '1.4rem', fontWeight: 800, color: 'var(--cream)', marginBottom: '0.6rem' }}>Outdated Campus Tech Stack</h3>
+              <h3 className="tc-heading" style={{ fontSize: '1.4rem', fontWeight: 800, color: 'var(--cream)', marginBottom: '0.5rem' }}>Outdated Campus Tech Stack</h3>
               <p className="tc-body" style={{ color: '#a6a6a6', fontSize: '1.02rem', lineHeight: 1.6 }}>AI and tech evolve every 12 months, but university courses take years to update. What you learn in class often falls short of what top companies demand on Day 1.</p>
             </motion.div>
 
@@ -502,7 +522,7 @@ function CandidateFriction() {
               className={`process-step ${activeStep >= 1 ? 'active' : ''}`}
               animate={{ opacity: activeStep >= 1 ? 1 : 0.35, y: activeStep >= 1 ? 0 : 15 }}
               transition={{ duration: 0.4, ease: "easeOut" }}
-              style={{ flex: 1, position: 'relative', paddingTop: '1.5rem' }}
+              style={{ flex: 1, position: 'relative', paddingTop: '0.85rem' }}
             >
               <div
                 className="process-number"
@@ -513,14 +533,14 @@ function CandidateFriction() {
                   lineHeight: 1,
                   letterSpacing: '-0.05em',
                   color: activeStep >= 1 ? 'var(--accent-purple)' : 'rgba(255,255,255,0.2)',
-                  marginBottom: '1rem',
+                  marginBottom: '0.75rem',
                   textShadow: 'none',
                   transition: 'all 0.4s ease',
                 }}
               >
                 02
               </div>
-              <h3 className="tc-heading" style={{ fontSize: '1.4rem', fontWeight: 800, color: 'var(--cream)', marginBottom: '0.6rem' }}>Judged in Hours After 4 Years</h3>
+              <h3 className="tc-heading" style={{ fontSize: '1.4rem', fontWeight: 800, color: 'var(--cream)', marginBottom: '0.5rem' }}>Judged in Hours After 4 Years</h3>
               <p className="tc-body" style={{ color: '#a6a6a6', fontSize: '1.02rem', lineHeight: 1.6 }}>Traditional hiring compresses your entire degree into a single resume screening or a 30-minute interview, leading to higher drop-offs and missed opportunities.</p>
             </motion.div>
 
@@ -850,43 +870,44 @@ function HowItWorksCard({ step, index, totalCards, scrollYProgress }) {
     return index - currentPos;
   });
 
-  // Y moves smoothly along vertical arc (bottom -> center -> top)
+  // True circular semi-circle arc math with Radius R = 500px
   const cardY = useTransform(relPos, (rel) => {
-    return `${rel * 36}vh`;
+    const clampedRel = Math.max(-2.8, Math.min(2.8, rel));
+    return `${Math.sin(clampedRel * 0.44) * 500}px`;
   });
 
-  // X creates semi-circle arc: curves inwards (-50px) at center, outward at edges
   const cardX = useTransform(relPos, (rel) => {
-    const clampedRel = Math.max(-2.5, Math.min(2.5, rel));
-    const offset = -50 + Math.pow(clampedRel, 2) * 25;
+    const clampedRel = Math.max(-2.8, Math.min(2.8, rel));
+    const offset = 500 * (1 - Math.cos(clampedRel * 0.44));
     return `${offset}px`;
   });
 
-  // Tangent rotation along the semi-circle wheel curve
+  // Tangent rotation along the semi-circle wheel curve around its attachment point
   const cardRotate = useTransform(relPos, (rel) => {
-    return rel * 14;
+    const clampedRel = Math.max(-2.8, Math.min(2.8, rel));
+    return clampedRel * 24;
   });
 
-  // Scale: 1.04 at focal center, smooth taper outward
+  // Scale: 1.02 at focal center, smooth taper outward
   const cardScale = useTransform(relPos, (rel) => {
     const dist = Math.abs(rel);
-    return Math.max(0.78, 1.04 - dist * 0.14);
+    return Math.max(0.76, 1.02 - dist * 0.12);
   });
 
-  // Active card is crystal clear, all other cards remain blurred
+  // Active card is crystal clear, all other cards remain softly blurred
   const cardBlur = useTransform(relPos, (rel) => {
     const dist = Math.abs(rel);
     if (dist <= 0.35) return 0;
-    return Math.min(10, (dist - 0.35) * 8);
+    return Math.min(8, (dist - 0.35) * 5.5);
   });
   const cardFilter = useMotionTemplate`blur(${cardBlur}px)`;
 
-  // Opacity: 1 at focal center, non-active cards fade smoothly
+  // Opacity: 1 at focal center, above & below cards remain clearly visible on the semi-circle
   const cardOpacity = useTransform(relPos, (rel) => {
     const dist = Math.abs(rel);
     if (dist <= 0.4) return 1;
-    if (dist >= 1.7) return 0;
-    return Math.max(0.35, 1 - (dist - 0.4) / 1.1);
+    if (dist >= 2.4) return 0;
+    return Math.max(0.3, 1 - (dist - 0.4) * 0.35);
   });
 
   const zIndex = useTransform(relPos, (rel) => {
@@ -896,15 +917,15 @@ function HowItWorksCard({ step, index, totalCards, scrollYProgress }) {
   // Point scale on axis line
   const pointScale = useTransform(relPos, (rel) => {
     const dist = Math.abs(rel);
-    return dist <= 0.35 ? 1.35 : 0.85;
+    return dist <= 0.35 ? 1.35 : 0.9;
   });
 
   return (
     <motion.div
       style={{
         position: 'absolute',
-        width: 'min(480px, 90%)',
-        right: 'clamp(2rem, 5vw, 4.5rem)',
+        width: 'min(450px, 88%)',
+        right: 'clamp(2rem, 4.5vw, 4rem)',
         borderRadius: '26px',
         overflow: 'visible',
         x: cardX,
@@ -914,22 +935,22 @@ function HowItWorksCard({ step, index, totalCards, scrollYProgress }) {
         filter: cardFilter,
         scale: cardScale,
         zIndex: zIndex,
-        transformOrigin: 'right center',
+        transformOrigin: 'left center',
       }}
     >
       {/* Point attached to card riding directly on the curved axis line */}
       <motion.div
         style={{
           position: 'absolute',
-          left: '-12px',
+          left: '-10px',
           top: '50%',
           transform: 'translateY(-50%)',
-          width: '16px',
-          height: '16px',
+          width: '18px',
+          height: '18px',
           borderRadius: '50%',
           background: 'var(--accent-purple)',
           border: '3px solid #F7F5EE',
-          boxShadow: '0 0 12px rgba(187, 98, 222, 0.85)',
+          boxShadow: '0 0 14px rgba(187, 98, 222, 0.95)',
           scale: pointScale,
           zIndex: 10,
         }}
@@ -1083,19 +1104,19 @@ function CandidateHowItWorks() {
       }}>
         {/* LEFT — Title pushed down from navbar, expanded left section */}
         <div style={{
-          flex: '0 0 54%',
+          flex: '0 0 58%',
           position: 'relative',
           display: 'flex',
           flexDirection: 'column',
           justifyContent: 'center',
-          padding: 'clamp(2rem, 5vw, 6.5rem)',
+          padding: 'clamp(2.5rem, 6vw, 7.5rem)',
           zIndex: 2,
         }}>
-          {/* Top Title: HOW IT WORKS — pushed down comfortably below navbar */}
-          <div style={{ position: 'absolute', top: 'clamp(5.5rem, 10.5vh, 7.5rem)', left: 'clamp(2rem, 5vw, 6.5rem)' }}>
+          {/* Top Title: HOW IT WORKS — enlarged and clear of navbar */}
+          <div style={{ position: 'absolute', top: 'clamp(5rem, 10vh, 7.5rem)', left: 'clamp(2.5rem, 6vw, 7.5rem)' }}>
             <h2 style={{
               fontFamily: 'Poppins, sans-serif',
-              fontSize: 'clamp(2.6rem, 4.6vw, 4.4rem)',
+              fontSize: 'clamp(3.8rem, 6.8vw, 6.2rem)',
               fontWeight: 900,
               letterSpacing: '-0.05em',
               lineHeight: 0.9,
@@ -1107,8 +1128,8 @@ function CandidateHowItWorks() {
             </h2>
           </div>
 
-          {/* Active Solution Container — perfectly positioned at exact vertical center to align with the active card on right */}
-          <div style={{ width: '100%', maxWidth: '580px', marginTop: '3.5rem' }}>
+          {/* Active Solution Container — enlarged and filling the space */}
+          <div style={{ width: '100%', maxWidth: '750px', marginTop: '6rem' }}>
             <AnimatePresence mode="wait">
               <motion.div
                 key={activeStep}
@@ -1119,11 +1140,11 @@ function CandidateHowItWorks() {
                 style={{ width: '100%' }}
               >
                 {/* Heading with side vertical accent bar */}
-                <div style={{ display: 'flex', alignItems: 'center', gap: '1.25rem', marginBottom: '1.25rem' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '1.35rem', marginBottom: '1.5rem' }}>
                   <div
                     style={{
-                      width: '4.5px',
-                      height: '2.75rem',
+                      width: '6px',
+                      height: 'clamp(2.6rem, 4vw, 3.6rem)',
                       borderRadius: '999px',
                       background: steps[activeStep].accent || 'var(--accent-purple)',
                       flexShrink: 0,
@@ -1131,22 +1152,24 @@ function CandidateHowItWorks() {
                   />
                   <h3 style={{
                     fontFamily: 'Poppins, sans-serif',
-                    fontSize: 'clamp(1.6rem, 2.8vw, 2.35rem)',
+                    fontSize: 'clamp(2.1rem, 3.6vw, 3.2rem)',
                     fontWeight: 800,
                     color: 'var(--black)',
                     lineHeight: 1.15,
                     margin: 0,
+                    letterSpacing: '-0.02em',
                   }}>{steps[activeStep].solution}</h3>
                 </div>
 
                 {/* Description body underneath */}
                 <p style={{
                   fontFamily: 'Century Gothic, sans-serif',
-                  fontSize: '1.12rem',
-                  color: '#545454',
-                  lineHeight: 1.68,
-                  paddingLeft: '1.5rem',
+                  fontSize: 'clamp(1.2rem, 1.8vw, 1.55rem)',
+                  color: '#383838',
+                  lineHeight: 1.62,
+                  paddingLeft: '1.75rem',
                   margin: 0,
+                  fontWeight: 400,
                 }}>{steps[activeStep].body}</p>
               </motion.div>
             </AnimatePresence>
@@ -1155,24 +1178,24 @@ function CandidateHowItWorks() {
 
         {/* RIGHT — circular arc guide line and animated cards matching WOVE structure */}
         <div style={{
-          flex: '0 0 46%',
+          flex: '0 0 42%',
           position: 'relative',
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'flex-end',
-          overflow: 'hidden',
+          overflow: 'visible',
         }}>
-          {/* Subtle curved arc track line in background */}
+          {/* Precise Semi-Circle Track (R = 500px) matching card point trajectory */}
           <div
             style={{
               position: 'absolute',
-              right: '-160px',
+              right: 'calc(clamp(2rem, 4.5vw, 4rem) - 500px)',
               top: '50%',
               transform: 'translateY(-50%)',
-              width: '850px',
-              height: '850px',
+              width: '1000px',
+              height: '1000px',
               borderRadius: '50%',
-              border: '1.5px dashed rgba(187, 98, 222, 0.28)',
+              border: '2px dashed rgba(187, 98, 222, 0.35)',
               pointerEvents: 'none',
               zIndex: 0,
             }}
@@ -1372,32 +1395,44 @@ function CompanyLogoBadge({ company }) {
 }
 
 function CompanyMarqueeSection() {
+  // Triple array duplicate ensures 100% infinite continuous stream with zero gaps at any screen width
+  const marqueeList = [...hiringCompanies, ...hiringCompanies, ...hiringCompanies];
+
   return (
     <section
       className="social-proof-section"
       style={{
         width: '100vw',
         marginLeft: 'calc(-50vw + 50%)',
-        padding: '0.5rem 0 2.5rem',
+        padding: '0 0 2.5rem',
         overflow: 'visible',
         background: 'var(--black)',
         position: 'relative',
         zIndex: 20,
       }}
     >
-      <div className="w-full text-center" style={{ overflow: 'visible' }}>
-        <div className="company-logos relative w-full flex" style={{ overflow: 'visible', paddingTop: '55px', paddingBottom: '10px' }}>
-          <div className="marquee-track flex" style={{ overflow: 'visible' }}>
-            <div className="flex gap-12 shrink-0 animate-marquee" style={{ display: 'flex', alignItems: 'center', overflow: 'visible' }}>
-              {hiringCompanies.map((company, cIndex) => (
-                <CompanyLogoBadge key={`a-${cIndex}`} company={company} />
-              ))}
-            </div>
-            <div className="flex gap-12 shrink-0 animate-marquee" aria-hidden="true" style={{ display: 'flex', alignItems: 'center', overflow: 'visible' }}>
-              {hiringCompanies.map((company, cIndex) => (
-                <CompanyLogoBadge key={`b-${cIndex}`} company={company} />
-              ))}
-            </div>
+      <div
+        className="company-logos-wrapper relative w-full"
+        style={{
+          width: '100%',
+          overflow: 'hidden',
+          paddingTop: '180px',
+          marginTop: '-140px',
+          paddingBottom: '20px',
+          maskImage: 'linear-gradient(to right, transparent 0%, black 5%, black 95%, transparent 100%)',
+          WebkitMaskImage: 'linear-gradient(to right, transparent 0%, black 5%, black 95%, transparent 100%)',
+        }}
+      >
+        <div className="infinite-marquee-track" style={{ overflow: 'visible' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '2.5rem', paddingRight: '2.5rem', flexShrink: 0, overflow: 'visible' }}>
+            {marqueeList.map((company, cIndex) => (
+              <CompanyLogoBadge key={`m1-${cIndex}`} company={company} />
+            ))}
+          </div>
+          <div aria-hidden="true" style={{ display: 'flex', alignItems: 'center', gap: '2.5rem', paddingRight: '2.5rem', flexShrink: 0, overflow: 'visible' }}>
+            {marqueeList.map((company, cIndex) => (
+              <CompanyLogoBadge key={`m2-${cIndex}`} company={company} />
+            ))}
           </div>
         </div>
       </div>
@@ -1409,69 +1444,126 @@ function CandidateView() {
   const heroRef = useRef(null);
   const { scrollYProgress } = useScroll({
     target: heroRef,
-    offset: ["start start", "end start"]
+    offset: ["start start", "end end"]
   });
 
-  const heroTextY = useTransform(scrollYProgress, [0, 1], ["0%", "28%"]);
-  const heroPhotoY = useTransform(scrollYProgress, [0, 1], ["0%", "14%"]);
-  const heroOpacity = useTransform(scrollYProgress, [0, 0.85], [1, 0.1]);
-  const heroScale = useTransform(scrollYProgress, [0, 1], [1, 0.93]);
+  // Parallax transforms: Photo starts zoomed in and zooms out to wide view on scroll; text glides with depth
+  const photoScale = useTransform(scrollYProgress, [0, 1], [1.45, 1.0]);
+  const photoY = useTransform(scrollYProgress, [0, 1], ["-6%", "6%"]);
+  const textY = useTransform(scrollYProgress, [0, 1], ["0%", "-35%"]);
 
   return (
     <div className="page-wrapper candidate-view">
-      <div ref={heroRef} className="candidate-hero-bg" style={{ position: 'relative', minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', overflow: 'hidden' }}>
-
-        <motion.main
-          style={{ opacity: heroOpacity, scale: heroScale }}
-          className="candidate-hero-section w-full max-w-[1240px] mx-auto px-6 sm:px-10 py-12 grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-14 items-center justify-center"
+      {/* Pinned Scroll Track for Visible Parallax Zoom */}
+      <div ref={heroRef} style={{ position: 'relative', height: '180vh' }}>
+        <div
+          className="candidate-hero-bg"
+          style={{
+            position: 'sticky',
+            top: 0,
+            height: '100vh',
+            width: '100vw',
+            marginLeft: 'calc(-50vw + 50%)',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            overflow: 'hidden',
+          }}
         >
-          {/* Left: Centered Typography with Parallax */}
-          <motion.div style={{ y: heroTextY }} className="flex flex-col justify-center text-left py-4">
-            <h1 className="hero-title heading-serif" style={{ color: '#fff', fontSize: 'clamp(2.75rem, 5.5vw, 5.5rem)', textTransform: 'uppercase', lineHeight: 1.02 }}>
-              <span style={{ display: 'block' }}>CAMPUS TO</span>
-              <span style={{ display: 'block', color: 'var(--accent-purple)' }}>CORPORATE</span>
-              <span style={{ display: 'block' }}>WITHOUT THE</span>
-              <span style={{ display: 'block', color: 'var(--accent-purple)' }}>GUESSWORK</span>
-            </h1>
-            <p className="hero-subtitle" style={{ color: 'rgba(255, 255, 255, 0.75)', fontSize: 'clamp(1.1rem, 2vw, 1.35rem)', marginTop: '1.75rem', fontWeight: 500, lineHeight: 1.5, maxWidth: '520px' }}>
-              Stop applying blindly. Start building real proof of work.
-            </p>
+          {/* 1. Full-screen Rohit's Photo zooming in clearly as you scroll */}
+          <motion.div
+            style={{
+              position: 'absolute',
+              inset: 0,
+              y: photoY,
+              scale: photoScale,
+              transformOrigin: '20% 25%',
+              zIndex: 1,
+            }}
+          >
+            <img
+              src="/rohits.jpeg"
+              alt="Antbox Candidate Experience"
+              style={{
+                width: '100%',
+                height: '100%',
+                objectFit: 'cover',
+                objectPosition: '14% 18%',
+                display: 'block',
+              }}
+            />
           </motion.div>
 
-          {/* Right: Full-bleed Hero Photo Card with Parallax */}
-          <motion.div style={{ y: heroPhotoY }} className="flex items-center justify-center w-full">
-            <div
-              className="relative w-full overflow-hidden"
+          {/* 2. Gradient overlay: Clear/vivid on Rohit's side (left), high dark opacity on audience side (right) */}
+          <div
+            style={{
+              position: 'absolute',
+              inset: 0,
+              zIndex: 2,
+              background: 'linear-gradient(to right, rgba(10, 10, 14, 0.15) 0%, rgba(10, 10, 14, 0.4) 38%, rgba(10, 10, 14, 0.90) 62%, rgba(10, 10, 14, 0.98) 100%)',
+              pointerEvents: 'none',
+            }}
+          />
+
+          {/* Bottom subtle edge fade into next section */}
+          <div
+            style={{
+              position: 'absolute',
+              bottom: 0,
+              left: 0,
+              right: 0,
+              height: '140px',
+              zIndex: 2,
+              background: 'linear-gradient(to top, var(--black) 0%, transparent 100%)',
+              pointerEvents: 'none',
+            }}
+          />
+
+          {/* 3. Hero Message: Solid, razor-sharp, with multi-plane parallax depth on scroll */}
+          <div
+            className="w-full max-w-[1440px] mx-auto px-6 sm:px-8 py-12 relative flex items-center justify-end"
+            style={{ width: '100%', height: '100%', zIndex: 5, paddingRight: 'clamp(1.5rem, 5vw, 5rem)' }}
+          >
+            <motion.div
               style={{
-                height: 'clamp(380px, 52vh, 520px)',
-                borderRadius: '24px',
-                border: '1px solid rgba(255, 255, 255, 0.16)',
-                boxShadow: '0 24px 60px -12px rgba(0, 0, 0, 0.75), 0 0 32px rgba(187, 98, 222, 0.2)',
-                background: '#16161a',
+                maxWidth: '540px',
+                width: '100%',
+                y: textY,
+                opacity: 1,
               }}
+              className="flex flex-col justify-center text-left"
             >
-              <img
-                src="/rohits.jpeg"
-                alt="Antbox Candidate Experience"
+              <h1
+                className="hero-title heading-serif"
                 style={{
-                  width: '100%',
-                  height: '100%',
-                  objectFit: 'cover',
-                  objectPosition: 'center',
-                  display: 'block',
+                  color: '#ffffff',
+                  fontSize: 'clamp(2.75rem, 5.2vw, 5.2rem)',
+                  textTransform: 'uppercase',
+                  lineHeight: 1.02,
+                  letterSpacing: '-0.04em',
                 }}
-              />
-              {/* Subtle edge overlay */}
-              <div
-                className="absolute inset-0 pointer-events-none"
+              >
+                <span style={{ display: 'block' }}>CAMPUS TO</span>
+                <span style={{ display: 'block', color: 'var(--accent-purple)' }}>CORPORATE</span>
+                <span style={{ display: 'block' }}>WITHOUT THE</span>
+                <span style={{ display: 'block', color: 'var(--accent-purple)' }}>GUESSWORK</span>
+              </h1>
+              <p
+                className="hero-subtitle"
                 style={{
-                  boxShadow: 'inset 0 0 20px rgba(0, 0, 0, 0.25)',
-                  borderRadius: '24px',
+                  color: 'rgba(255, 255, 255, 0.9)',
+                  fontSize: 'clamp(1.1rem, 2vw, 1.35rem)',
+                  marginTop: '1.75rem',
+                  fontWeight: 500,
+                  lineHeight: 1.5,
+                  maxWidth: '540px',
                 }}
-              />
-            </div>
-          </motion.div>
-        </motion.main>
+              >
+                Stop applying blindly. Start building real proof of work.
+              </p>
+            </motion.div>
+          </div>
+        </div>
       </div>
 
       <div className="candidate-content-flow" style={{ position: 'relative', zIndex: 2 }}>

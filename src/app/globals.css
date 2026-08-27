@@ -843,4 +843,25 @@ body.theme-candidate .navbar-link:hover {
 
 body.theme-candidate .navbar-icon-btn {
   color: #fff;
+}
+
+/* ── Seamless Infinite Marquee for Company Logos ── */
+@keyframes infiniteMarquee {
+  0% {
+    transform: translate3d(0, 0, 0);
+  }
+  100% {
+    transform: translate3d(-50%, 0, 0);
+  }
+}
+
+.infinite-marquee-track {
+  display: flex;
+  width: max-content;
+  will-change: transform;
+  animation: infiniteMarquee 38s linear infinite;
+}
+
+.infinite-marquee-track:hover {
+  animation-play-state: paused;
 }
