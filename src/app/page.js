@@ -184,21 +184,22 @@ function BringTypographyRollerItem({ card, index, totalCards, scrollYProgress })
   );
 }
 
-// Vertical ruler tick track on the right edge matching bringcards.mp4 (elongated across all text items)
-function BringSideScrollTicker({ scrollYProgress }) {
-  const totalTicks = 38;
+// Vertical ruler tick track on both left & right edges (large and prominently visible on both sides)
+function BringSideScrollTicker({ scrollYProgress, side = 'right' }) {
+  const totalTicks = 34;
+  const isLeft = side === 'left';
 
   return (
     <div
       style={{
         position: 'absolute',
-        right: 'clamp(0.75rem, 2.5vw, 3rem)',
+        [isLeft ? 'left' : 'right']: 'clamp(1rem, 3.5vw, 4.5rem)',
         top: '50%',
         transform: 'translateY(-50%)',
-        height: 'clamp(360px, 46vh, 440px)',
+        height: 'clamp(440px, 58vh, 600px)',
         display: 'flex',
         flexDirection: 'column',
-        alignItems: 'flex-end',
+        alignItems: isLeft ? 'flex-start' : 'flex-end',
         justifyContent: 'space-between',
         pointerEvents: 'none',
         zIndex: 20,
@@ -211,7 +212,8 @@ function BringSideScrollTicker({ scrollYProgress }) {
             key={i}
             tickPos={tickPos}
             scrollYProgress={scrollYProgress}
-            isMajor={i % 5 === 0}
+            isMajor={i % 4 === 0}
+            isLeft={isLeft}
           />
         );
       })}
@@ -219,34 +221,40 @@ function BringSideScrollTicker({ scrollYProgress }) {
   );
 }
 
-function TickerLine({ tickPos, scrollYProgress, isMajor }) {
+function TickerLine({ tickPos, scrollYProgress, isMajor, isLeft }) {
   const opacity = useTransform(scrollYProgress, (p) => {
     const dist = Math.abs(p - tickPos);
     if (dist < 0.04) return 1.0;
-    if (dist < 0.12) return 0.55;
-    return isMajor ? 0.30 : 0.15;
+    if (dist < 0.12) return 0.70;
+    return isMajor ? 0.45 : 0.28;
   });
 
   const width = useTransform(scrollYProgress, (p) => {
     const dist = Math.abs(p - tickPos);
-    if (dist < 0.04) return '18px';
-    if (dist < 0.10) return isMajor ? '13px' : '9px';
-    return isMajor ? '9px' : '5px';
+    if (dist < 0.04) return '38px';
+    if (dist < 0.10) return isMajor ? '28px' : '20px';
+    return isMajor ? '22px' : '14px';
   });
 
   const color = useTransform(scrollYProgress, (p) => {
     const dist = Math.abs(p - tickPos);
-    return dist < 0.04 ? 'var(--accent-purple)' : 'rgba(255, 255, 255, 0.7)';
+    return dist < 0.04 ? 'var(--accent-purple)' : 'rgba(255, 255, 255, 0.85)';
+  });
+
+  const shadow = useTransform(scrollYProgress, (p) => {
+    const dist = Math.abs(p - tickPos);
+    return dist < 0.04 ? '0 0 12px rgba(187, 98, 222, 0.9)' : 'none';
   });
 
   return (
     <motion.div
       style={{
-        height: '1.5px',
+        height: isMajor ? '3px' : '2px',
         width: width,
         backgroundColor: color,
+        boxShadow: shadow,
         opacity: opacity,
-        borderRadius: '1px',
+        borderRadius: '2px',
       }}
     />
   );
@@ -365,6 +373,10 @@ function WhatWeBringSection() {
           paddingRight: '1.5rem',
         }}
       >
+        {/* Large Prominent Scroll Tickers on BOTH Sides */}
+        <BringSideScrollTicker scrollYProgress={scrollYProgress} side="left" />
+        <BringSideScrollTicker scrollYProgress={scrollYProgress} side="right" />
+
         <div
           style={{
             width: '100%',
@@ -415,9 +427,6 @@ function WhatWeBringSection() {
               />
             ))}
           </motion.div>
-
-          {/* Vertical scroll ticker / ruler track on the right */}
-          <BringSideScrollTicker scrollYProgress={scrollYProgress} />
         </div>
       </div>
     </section>
@@ -428,10 +437,10 @@ function CandidateCTA() {
   const sectionRef = useRef(null);
   const { scrollYProgress } = useScroll({
     target: sectionRef,
-    offset: ["start end", "start 15%"]
+    offset: ["start end", "end end"]
   });
 
-  const clipPercent = useTransform(scrollYProgress, [0, 1], [100, 0]);
+  const clipPercent = useTransform(scrollYProgress, [0.25, 0.80], [100, 0]);
   const clipPathValue = useMotionTemplate`inset(${clipPercent}% 0 0 0)`;
 
   return (
@@ -440,54 +449,105 @@ function CandidateCTA() {
       ref={sectionRef}
       style={{
         position: 'relative',
-        background: 'var(--cream)',
-        minHeight: '100vh',
+        height: '100dvh',
+        minHeight: '100dvh',
         width: '100vw',
         marginLeft: 'calc(-50vw + 50%)',
         zIndex: 10,
-        display: 'flex',
-        flexDirection: 'column',
-        justifyContent: 'center',
+        margin: 0,
+        padding: 0,
         overflow: 'hidden',
       }}
     >
-      <div style={{ width: '100%', height: '100%', minHeight: '100vh', position: 'relative', display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
-        {/* Layer 1: Light Cream base */}
-        <div style={{ position: 'relative', zIndex: 1, padding: '4rem 2rem', width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-          <div className="cta-type-inner" style={{ textAlign: 'center', display: 'flex', flexDirection: 'column', alignItems: 'center', margin: '0 auto', maxWidth: '1200px' }}>
-            <h2 className="cta-type-headline" style={{ color: 'var(--black)', fontSize: 'clamp(3rem, 6.5vw, 5.5rem)', lineHeight: 1.1 }}>
-              Ready to Take Control<br />of Your Career Path?
-            </h2>
-            <p className="cta-eyebrow" style={{ color: 'var(--text-secondary)', marginTop: '1.75rem', fontSize: '1.35rem', maxWidth: '750px', lineHeight: 1.5, textTransform: 'none', letterSpacing: '0px' }}>
-              Build real proof of work, work on micro-internships, and land your dream job without the guesswork.
-            </p>
-            <button className="cta-type-btn" style={{ background: 'var(--purple)', color: '#fff', marginTop: '2.5rem', padding: '1.25rem 3.5rem', fontSize: '1.25rem', borderRadius: '9999px' }}>
-              Get Started →
-            </button>
-          </div>
+      {/* Base Layer: Light Cream base centered */}
+      <div
+        style={{
+          position: 'absolute',
+          inset: 0,
+          background: 'var(--cream)',
+          display: 'flex',
+          flexDirection: 'column',
+          alignItems: 'center',
+          justifyContent: 'center',
+          padding: '2rem 1.5rem',
+        }}
+      >
+        <div className="cta-type-inner" style={{ textAlign: 'center', display: 'flex', flexDirection: 'column', alignItems: 'center', margin: '0 auto', maxWidth: '1100px' }}>
+          <h2 className="cta-type-headline" style={{ color: 'var(--black)', fontSize: 'clamp(2.75rem, 5.5vw, 5rem)', lineHeight: 1.08, margin: 0 }}>
+            Ready to Take Control<br />of Your Career Path?
+          </h2>
+          <p className="cta-eyebrow" style={{ color: 'var(--text-secondary)', marginTop: '1.5rem', marginBottom: 0, fontSize: 'clamp(1.05rem, 1.5vw, 1.3rem)', maxWidth: '680px', lineHeight: 1.5, textTransform: 'none', letterSpacing: '0px' }}>
+            Build real proof of work, work on micro-internships, and land your dream job without the guesswork.
+          </p>
+          <a
+            href="https://theantbox.in/"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="cta-type-btn"
+            style={{
+              display: 'inline-flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              textDecoration: 'none',
+              background: 'var(--purple)',
+              color: '#fff',
+              marginTop: '2.25rem',
+              padding: '1.15rem 3.5rem',
+              fontSize: '1.2rem',
+              borderRadius: '9999px',
+              cursor: 'pointer',
+            }}
+          >
+            Get Started →
+          </a>
         </div>
-
-        {/* Layer 2: Full-screen Purple wipe smoothly covering the whole screen */}
-        <motion.div
-          style={{
-            position: 'absolute', top: 0, left: 0, width: '100%', height: '100%',
-            background: 'var(--purple)', zIndex: 2, padding: '4rem 2rem',
-            overflow: 'hidden', clipPath: clipPathValue, display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center'
-          }}
-        >
-          <div className="cta-type-inner" style={{ textAlign: 'center', display: 'flex', flexDirection: 'column', alignItems: 'center', margin: '0 auto', maxWidth: '1200px', width: '100%' }}>
-            <h2 className="cta-type-headline" style={{ color: '#fff', fontSize: 'clamp(3rem, 6.5vw, 5.5rem)', lineHeight: 1.1 }}>
-              Ready to Take Control<br />of Your Career Path?
-            </h2>
-            <p className="cta-eyebrow" style={{ color: '#f0f0f0', marginTop: '1.75rem', fontSize: '1.35rem', maxWidth: '750px', lineHeight: 1.5, textTransform: 'none', letterSpacing: '0px' }}>
-              Build real proof of work, work on micro-internships, and land your dream job without the guesswork.
-            </p>
-            <button className="cta-type-btn" style={{ background: 'var(--black)', color: '#fff', marginTop: '2.5rem', padding: '1.25rem 3.5rem', fontSize: '1.25rem', borderRadius: '9999px' }}>
-              Get Started →
-            </button>
-          </div>
-        </motion.div>
       </div>
+
+      {/* Top Purple Wipe Layer */}
+      <motion.div
+        style={{
+          position: 'absolute',
+          inset: 0,
+          background: 'var(--purple)',
+          zIndex: 2,
+          clipPath: clipPathValue,
+          display: 'flex',
+          flexDirection: 'column',
+          alignItems: 'center',
+          justifyContent: 'center',
+          padding: '2rem 1.5rem',
+        }}
+      >
+        <div className="cta-type-inner" style={{ textAlign: 'center', display: 'flex', flexDirection: 'column', alignItems: 'center', margin: '0 auto', maxWidth: '1100px' }}>
+          <h2 className="cta-type-headline" style={{ color: '#fff', fontSize: 'clamp(2.75rem, 5.5vw, 5rem)', lineHeight: 1.08, margin: 0 }}>
+            Ready to Take Control<br />of Your Career Path?
+          </h2>
+          <p className="cta-eyebrow" style={{ color: '#f0f0f0', marginTop: '1.5rem', marginBottom: 0, fontSize: 'clamp(1.05rem, 1.5vw, 1.3rem)', maxWidth: '680px', lineHeight: 1.5, textTransform: 'none', letterSpacing: '0px' }}>
+            Build real proof of work, work on micro-internships, and land your dream job without the guesswork.
+          </p>
+          <a
+            href="https://theantbox.in/"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="cta-type-btn"
+            style={{
+              display: 'inline-flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              textDecoration: 'none',
+              background: 'var(--black)',
+              color: '#fff',
+              marginTop: '2.25rem',
+              padding: '1.15rem 3.5rem',
+              fontSize: '1.2rem',
+              borderRadius: '9999px',
+              cursor: 'pointer',
+            }}
+          >
+            Get Started →
+          </a>
+        </div>
+      </motion.div>
     </section>
   );
 }
@@ -654,13 +714,52 @@ function CandidateFriction() {
 
 
 
-// Combined Scene: Hero ("Where talent IS Built not found") + "What Corporates Face"
-// 1. Initial state (scroll=0): ONLY "Where talent IS Built not found" is visible. WCF opacity is 0.
-// 2. Scroll: "Where talent / IS / not found" fly away.
-// 3. "BUILT" zooms in and dissolves; "WHAT CORPORATES FACE" appears directly behind "BUILT".
-// 4. "WHAT CORPORATES FACE" remains completely still until covered by dark curtain.
+const ROTATING_HERO_WORDS = ["TALENT", "PIPELINE", "PROOF"];
+
+// Combined Scene: Hero ("WHERE TALENT is BUILT not found") + "What Corporates Face"
+// 1. "WHERE ", "is", "BUILT", and "not found" are static.
+// 2. Only the rotating word (TALENT -> SKILLS -> PIPELINE -> ...) has the letter typing animation.
+// 3. Scroll: "WHERE [WORD] / is / not found" fly away smoothly.
+// 4. "BUILT" stays rock-solid in place and smoothly scales up to 32x into "What Corporates Face".
 function CorporateHeroAndProblems({ scrollProgress }) {
-  // 1. "Where talent", "IS", and "not found" fly completely off screen and vanish immediately (0 to 0.035)
+  // Rotating word typewriter state for "TALENT"
+  const [wordIndex, setWordIndex] = useState(0);
+  const [currentText, setCurrentText] = useState("TALENT");
+  const [isDeleting, setIsDeleting] = useState(false);
+
+  useEffect(() => {
+    const currentFullWord = ROTATING_HERO_WORDS[wordIndex];
+    let timeout;
+
+    if (!isDeleting) {
+      // Typing phase
+      if (currentText.length < currentFullWord.length) {
+        timeout = setTimeout(() => {
+          setCurrentText(currentFullWord.slice(0, currentText.length + 1));
+        }, 100);
+      } else {
+        // Full word typed — pause before backspacing
+        timeout = setTimeout(() => {
+          setIsDeleting(true);
+        }, 1800);
+      }
+    } else {
+      // Deleting phase
+      if (currentText.length > 0) {
+        timeout = setTimeout(() => {
+          setCurrentText(currentFullWord.slice(0, currentText.length - 1));
+        }, 55);
+      } else {
+        // Completely deleted — move to next word
+        setIsDeleting(false);
+        setWordIndex((prev) => (prev + 1) % ROTATING_HERO_WORDS.length);
+      }
+    }
+
+    return () => clearTimeout(timeout);
+  }, [currentText, isDeleting, wordIndex]);
+
+  // 1. "Where talent", "is", and "not found" fly completely off screen and vanish immediately (0 to 0.035)
   const leftX = useTransform(scrollProgress, [0, 0.035], ["0vw", "-120vw"]);
   const rightX = useTransform(scrollProgress, [0, 0.035], ["0vw", "120vw"]);
   const isX = useTransform(scrollProgress, [0, 0.035], ["0vw", "-80vw"]);
@@ -766,7 +865,7 @@ function CorporateHeroAndProblems({ scrollProgress }) {
         </div>
       </motion.div>
 
-      {/* Layer 2: Hero Section ("Where talent IS Built not found") on top */}
+      {/* Layer 2: Hero Section ("WHERE TALENT is BUILT not found") on top */}
       <motion.div
         className="flex flex-col items-center justify-center pointer-events-none"
         style={{
@@ -778,25 +877,31 @@ function CorporateHeroAndProblems({ scrollProgress }) {
         }}
       >
         <div className="flex flex-col items-center justify-center gap-2 md:gap-4 font-black tracking-[-0.03em] uppercase leading-[1.05] text-center w-full relative z-10" style={{ fontFamily: 'Poppins, sans-serif' }}>
+          {/* Row 1: WHERE [ROTATING WORD WITH TYPING ANIMATION] */}
           <motion.div
             style={{ x: leftX, opacity: topOpacity, display: peripheralDisplay }}
             className="text-on-surface text-[clamp(36px,8vw,120px)] whitespace-nowrap block"
           >
-            Where talent
+            WHERE <span>{currentText}</span>
           </motion.div>
 
+          {/* Row 2: IS BUILT */}
           <div className="flex items-center justify-center gap-4 text-[clamp(36px,8vw,120px)] w-full">
-            <motion.div style={{ x: isX, opacity: isOpacity, display: peripheralDisplay }} className="text-on-surface lowercase">
+            <motion.div
+              style={{ x: isX, opacity: isOpacity, pointerEvents: 'none' }}
+              className="text-on-surface uppercase"
+            >
               IS
             </motion.div>
             <motion.div
-              style={{ scale: builtScale, opacity: builtOpacity, transformOrigin: '47.5% 50%', zIndex: 50 }}
-              className="text-[var(--accent-purple)] pointer-events-none"
+              style={{ scale: builtScale, opacity: builtOpacity, transformOrigin: '50% 50%', zIndex: 50 }}
+              className="text-[var(--accent-purple)] pointer-events-none uppercase"
             >
-              Built
+              BUILT
             </motion.div>
           </div>
 
+          {/* Row 3: not found */}
           <motion.div style={{ x: rightX, opacity: topOpacity, display: peripheralDisplay }}>
             <span
               className="text-primary block"
@@ -1139,7 +1244,7 @@ function CandidateHowItWorks() {
   return (
     <section ref={sectionRef} style={{
       position: 'relative',
-      height: '135vh',
+      height: '240vh',
       width: '100vw',
       marginLeft: 'calc(-50vw + 50%)',
       background: 'var(--cream)',
