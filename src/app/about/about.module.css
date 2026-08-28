@@ -3,7 +3,7 @@
 .main {
   max-width: 1400px;
   margin: 0 auto;
-  padding: 1rem 3rem 2rem;
+  padding: 1rem 3rem 0;
   width: 100%;
 }
 
@@ -702,15 +702,16 @@
 
 .cultureStickyTrack {
   position: relative;
+  z-index: 10;
   width: 100vw;
   left: 50%;
   right: 50%;
   margin-left: -50vw;
   margin-right: -50vw;
-  height: 220vh;
-  background: transparent;
-  margin-top: 3rem;
-  margin-bottom: 2rem;
+  height: 350vh;
+  background: #0A0A0E;
+  margin-top: 0;
+  margin-bottom: 0;
 }
 
 .cultureStickyInner {
@@ -1359,6 +1360,130 @@
   min-height: calc(100vh - 80px);
   text-align: center;
   margin-bottom: 0;
+  overflow: hidden;
+  background-image: radial-gradient(rgba(187, 98, 222, 0.12) 1.2px, transparent 1.2px);
+  background-size: 32px 32px;
+  background-position: center center;
+}
+
+/* Ambient Radial Glow Blurs behind Hero */
+.operatorsGlowTopLeft {
+  position: absolute;
+  top: 15%;
+  left: 10%;
+  width: 450px;
+  height: 450px;
+  background: radial-gradient(circle, rgba(243, 232, 255, 0.8) 0%, rgba(253, 242, 248, 0.4) 50%, transparent 75%);
+  pointer-events: none;
+  filter: blur(60px);
+  z-index: 0;
+}
+
+.operatorsGlowBottomRight {
+  position: absolute;
+  bottom: 15%;
+  right: 10%;
+  width: 480px;
+  height: 480px;
+  background: radial-gradient(circle, rgba(233, 213, 255, 0.7) 0%, rgba(192, 132, 252, 0.25) 50%, transparent 75%);
+  pointer-events: none;
+  filter: blur(60px);
+  z-index: 0;
+}
+
+.heroCategoryTag {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.76rem;
+  font-weight: 700;
+  letter-spacing: 2.2px;
+  text-transform: uppercase;
+  color: #BB62DE;
+  background: rgba(187, 98, 222, 0.1);
+  border: 1px solid rgba(187, 98, 222, 0.3);
+  border-radius: 30px;
+  padding: 0.4rem 1.1rem;
+  margin-bottom: 1.5rem;
+  box-shadow: 0 4px 15px rgba(187, 98, 222, 0.12);
+  animation: lineStaggerFadeIn 0.85s cubic-bezier(0.16, 1, 0.3, 1) 0.05s both;
+}
+
+/* Floating Immersive Trust Badges */
+.floatingTrustPill {
+  position: absolute;
+  z-index: 3;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.82rem;
+  font-weight: 700;
+  color: #2D2D32;
+  background: rgba(255, 255, 255, 0.88);
+  backdrop-filter: blur(12px);
+  border: 1px solid rgba(187, 98, 222, 0.28);
+  border-radius: 30px;
+  padding: 0.55rem 1.15rem;
+  box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.08), 0 0 15px rgba(187, 98, 222, 0.1);
+  transition: transform 0.3s ease, border-color 0.3s ease;
+  cursor: pointer;
+}
+
+.floatingTrustPill:hover {
+  transform: translateY(-4px) scale(1.03);
+  border-color: rgba(187, 98, 222, 0.6);
+  box-shadow: 0 14px 30px -5px rgba(187, 98, 222, 0.2);
+}
+
+.floatingPillTopLeft {
+  top: 22%;
+  left: 5%;
+}
+
+.floatingPillTopRight {
+  top: 25%;
+  right: 5%;
+}
+
+.floatingPillBottomLeft {
+  bottom: 22%;
+  left: 7%;
+}
+
+.floatingPillBottomRight {
+  bottom: 25%;
+  right: 7%;
+}
+
+/* Scroll guidance button at bottom */
+.scrollGuidancePill {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.6rem;
+  margin-top: 2.2rem;
+  padding: 0.5rem 1.2rem;
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: #555555;
+  background: rgba(0, 0, 0, 0.03);
+  border: 1px solid rgba(0, 0, 0, 0.08);
+  border-radius: 30px;
+  transition: all 0.3s ease;
+  cursor: pointer;
+}
+
+.scrollGuidancePill:hover {
+  background: rgba(187, 98, 222, 0.1);
+  color: #BB62DE;
+  border-color: rgba(187, 98, 222, 0.3);
+}
+
+@media (max-width: 1100px) {
+  .floatingTrustPill {
+    display: none;
+  }
 }
 
 .operatorsHeaderBlock {
@@ -1373,7 +1498,7 @@
   justify-content: center;
   align-items: center;
   padding: 2rem 1.5rem;
-  z-index: 1;
+  z-index: 2;
 }
 
 @keyframes lineStaggerFadeIn {

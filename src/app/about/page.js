@@ -2,7 +2,7 @@
 import React, { useState, useEffect } from 'react';
 import Image from 'next/image';
 import Lenis from 'lenis';
-import { motion, useScroll, useTransform, useInView } from 'framer-motion';
+import { motion, useScroll, useTransform, useInView, useSpring } from 'framer-motion';
 import styles from './about.module.css';
 
 const manifestoParagraphs = [
@@ -112,14 +112,6 @@ function HorizontalSwipeValuesSection({ values }) {
     return () => unsubscribe();
   }, [scrollYProgress]);
 
-  // Smooth Natural Day to Night Background Transition (0.68 -> 0.94)
-  // Automatically & naturally changes BG color from Light Day (#FDFBF7) -> Dusk (#1A162B) -> Night (#0A0A0E)
-  const panelBg = useTransform(
-    scrollYProgress,
-    [0.68, 0.94],
-    ["#FDFBF7", "#0A0A0E"]
-  );
-
   return (
     <div ref={containerRef} className={styles.horizontalSwipeTrack} style={{ height: '360vh' }}>
       <div className={styles.horizontalStickyViewport}>
@@ -137,9 +129,9 @@ function HorizontalSwipeValuesSection({ values }) {
             </div>
           </motion.div>
 
-          {/* ── PANEL 2: Full-Screen Section with 5 Cards (Smooth Day-to-Night BG Transition) ── */}
-          <motion.div
-            style={{ backgroundColor: panelBg }}
+          {/* ── PANEL 2: Full-Screen Section with 5 Cards (Clean Light Background) ── */}
+          <div
+            style={{ backgroundColor: '#FDFBF7' }}
             className={styles.panelWhiteCards}
           >
             <div className={styles.valuesStickyContainer}>
@@ -194,7 +186,7 @@ function HorizontalSwipeValuesSection({ values }) {
                 })}
               </div>
             </div>
-          </motion.div>
+          </div>
         </motion.div>
       </div>
     </div>
@@ -350,8 +342,77 @@ function ScribbleUnderline({ children, color = "#BB62DE", active = false }) {
   );
 }
 
-function StatementCursor() {
-  return (
+function MaskedLineRevealStatement() {
+  const containerRef = React.useRef(null);
+  const isInView = useInView(containerRef, { once: true, amount: 0.3 });
+
+  const [part1, setPart1] = React.useState('');
+  const [part2, setPart2] = React.useState('');
+  const [part3, setPart3] = React.useState('');
+  const [part4, setPart4] = React.useState('');
+
+  const [activePart, setActivePart] = React.useState(0);
+  const [showUnderline, setShowUnderline] = React.useState(false);
+
+  const full1 = "AntBox is built on a simple idea: the degree was never a skill";
+  const full2 = "test — ";
+  const full3 = "it was a proxy.";
+  const full4 = "Nobody built the replacement. So we did.";
+
+  useEffect(() => {
+    if (!isInView) return;
+
+    let i1 = 0, i2 = 0, i3 = 0, i4 = 0;
+    const speed = 40;
+
+    setActivePart(1);
+
+    const t1 = setInterval(() => {
+      if (i1 < full1.length) {
+        setPart1(full1.slice(0, i1 + 1));
+        i1++;
+      } else {
+        clearInterval(t1);
+        setActivePart(2);
+        const t2 = setInterval(() => {
+          if (i2 < full2.length) {
+            setPart2(full2.slice(0, i2 + 1));
+            i2++;
+          } else {
+            clearInterval(t2);
+            setActivePart(3);
+            const t3 = setInterval(() => {
+              if (i3 < full3.length) {
+                setPart3(full3.slice(0, i3 + 1));
+                i3++;
+              } else {
+                clearInterval(t3);
+                setTimeout(() => {
+                  setActivePart(4);
+                  const t4 = setInterval(() => {
+                    if (i4 < full4.length) {
+                      setPart4(full4.slice(0, i4 + 1));
+                      i4++;
+                    } else {
+                      clearInterval(t4);
+                      setShowUnderline(true);
+                      setTimeout(() => setActivePart(0), 400);
+                    }
+                  }, speed);
+                }, 180);
+              }
+            }, speed);
+          }
+        }, speed);
+      }
+    }, speed);
+
+    return () => {
+      clearInterval(t1);
+    };
+  }, [isInView]);
+
+  const Cursor = () => (
     <motion.span
       animate={{ opacity: [1, 0] }}
       transition={{ duration: 0.4, repeat: Infinity, repeatType: 'reverse' }}
@@ -366,57 +427,12 @@ function StatementCursor() {
       }}
     />
   );
-}
-
-function MaskedLineRevealStatement() {
-  const containerRef = React.useRef(null);
-  const isInView = useInView(containerRef, { once: true, amount: 0.3 });
-
-  const [charCount, setCharCount] = React.useState(0);
-  const [showUnderline, setShowUnderline] = React.useState(false);
-
-  const full1 = "AntBox is built on a simple idea: the degree was never a skill";
-  const full2 = "test — ";
-  const full3 = "it was a proxy.";
-  const full4 = "Nobody built the replacement. So we did.";
-
-  const l1 = full1.length;
-  const l2 = full2.length;
-  const l3 = full3.length;
-  const l4 = full4.length;
-  const totalChars = l1 + l2 + l3 + l4;
-
-  useEffect(() => {
-    if (!isInView) return;
-
-    let current = 0;
-    const speed = 36;
-    const timer = setInterval(() => {
-      current++;
-      setCharCount(current);
-      if (current >= totalChars) {
-        clearInterval(timer);
-        setShowUnderline(true);
-      }
-    }, speed);
-
-    return () => clearInterval(timer);
-  }, [isInView, totalChars]);
-
-  const part1 = full1.slice(0, Math.min(charCount, l1));
-  const part2 = charCount > l1 ? full2.slice(0, Math.min(charCount - l1, l2)) : '';
-  const part3 = charCount > l1 + l2 ? full3.slice(0, Math.min(charCount - l1 - l2, l3)) : '';
-  const part4 = charCount > l1 + l2 + l3 ? full4.slice(0, Math.min(charCount - l1 - l2 - l3, l4)) : '';
-
-  const isTyping1 = charCount > 0 && charCount <= l1;
-  const isTyping23 = charCount > l1 && charCount <= l1 + l2 + l3;
-  const isTyping4 = charCount > l1 + l2 + l3 && charCount < totalChars;
 
   return (
     <div ref={containerRef} className={styles.valuesStatement} style={{ minHeight: '160px', textAlign: 'center' }}>
       <p style={{ margin: 0, textAlign: 'center' }}>
         {part1}
-        {isTyping1 && <StatementCursor />}
+        {activePart === 1 && <Cursor />}
       </p>
 
       <p style={{ margin: 0, marginTop: '0.2rem', textAlign: 'center' }}>
@@ -426,7 +442,7 @@ function MaskedLineRevealStatement() {
             {part3}
           </span>
         )}
-        {isTyping23 && <StatementCursor />}
+        {(activePart === 2 || activePart === 3) && <Cursor />}
       </p>
 
       <p style={{ margin: 0, marginTop: '0.2rem', textAlign: 'center' }}>
@@ -437,7 +453,7 @@ function MaskedLineRevealStatement() {
             </span>
           </ScribbleUnderline>
         )}
-        {isTyping4 && <StatementCursor />}
+        {activePart === 4 && <Cursor />}
       </p>
     </div>
   );
@@ -530,25 +546,61 @@ function RollingImageCardBox({ children }) {
 
 function ParallaxCultureCard() {
   const containerRef = React.useRef(null);
+  const videoRef = React.useRef(null);
+
   const { scrollYProgress } = useScroll({
     target: containerRef,
     offset: ["start end", "end end"]
   });
 
-  // Smooth scroll transformations for Full-Screen Expansion
-  const cardWidth = useTransform(scrollYProgress, [0.1, 0.65], ["85vw", "100vw"]);
-  const cardHeight = useTransform(scrollYProgress, [0.1, 0.65], ["76vh", "100vh"]);
-  const cardRadius = useTransform(scrollYProgress, [0.1, 0.65], ["36px", "0px"]);
-  const cardScale = useTransform(scrollYProgress, [0.1, 0.65], [0.92, 1.0]);
+  // Physics-based spring progress for ultra-smooth, slow transitions
+  const smoothProgress = useSpring(scrollYProgress, {
+    stiffness: 45,
+    damping: 20,
+    restDelta: 0.001
+  });
 
-  // Parallax Zoom transforms for background image / video
-  const imageScale = useTransform(scrollYProgress, [0, 0.65, 1], [1.35, 1.05, 1.0]);
-  const imageY = useTransform(scrollYProgress, [0, 1], ["-10%", "10%"]);
+  // Stage 1 (0.00 -> 0.28): Parallax Zoom Expansion into 100% Full Screen
+  const cardWidth = useTransform(smoothProgress, [0.00, 0.28], ["85vw", "100vw"]);
+  const cardHeight = useTransform(smoothProgress, [0.00, 0.28], ["76vh", "100vh"]);
+  const cardRadius = useTransform(smoothProgress, [0.00, 0.28], ["36px", "0px"]);
+  const cardScale = useTransform(smoothProgress, [0.00, 0.28], [0.92, 1.0]);
 
-  // Parallax Zoom transforms for heading typography
-  const textScale = useTransform(scrollYProgress, [0.1, 0.65], [0.88, 1.05]);
-  const textY = useTransform(scrollYProgress, [0.1, 0.65], [30, 0]);
-  const overlayOpacity = useTransform(scrollYProgress, [0.1, 0.65], [0.65, 0.4]);
+  // Stage 2A (0.28 -> 0.42): Layer 1 (Real Photo & "LIFE AT ANTBOX" Heading) minimizes slowly and fades out
+  const initialLayerOpacity = useTransform(smoothProgress, [0.28, 0.42], [1.0, 0.0]);
+  const initialLayerScale = useTransform(smoothProgress, [0.28, 0.42], [1.0, 0.82]);
+  const initialLayerY = useTransform(smoothProgress, [0.28, 0.42], [0, -30]);
+
+  // Stage 2B (0.36 -> 0.48): Layer 2 (3D Motion Video Animation Frame) smoothly fades in with depth scale
+  const videoOpacity = useTransform(smoothProgress, [0.36, 0.48], [0.0, 1.0]);
+  const videoScale = useTransform(smoothProgress, [0.36, 0.48, 1.0], [1.5, 1.35, 1.22]);
+  const videoY = useTransform(smoothProgress, [0.36, 1.0], ["-2%", "2%"]);
+
+  // Stage 3 (0.42 -> 1.00): Video movement activates ONLY when window reaches FULL SCREEN AND ONLY when scrolling!
+  useEffect(() => {
+    const video = videoRef.current;
+    if (!video) return;
+
+    // Pause auto playback so movement only occurs when scrolling
+    video.pause();
+
+    const unsubscribe = smoothProgress.on("change", (latest) => {
+      if (!video.duration || isNaN(video.duration)) return;
+
+      if (latest < 0.42) {
+        video.currentTime = 0;
+      } else {
+        // Smooth frame scrubbing across scroll
+        const videoProgress = Math.min(Math.max((latest - 0.42) / 0.58, 0), 1);
+        const targetTime = videoProgress * video.duration;
+        if (Math.abs(video.currentTime - targetTime) > 0.02) {
+          video.currentTime = targetTime;
+        }
+      }
+    });
+
+    return () => unsubscribe();
+  }, [smoothProgress]);
 
   return (
     <div ref={containerRef} className={styles.cultureStickyTrack}>
@@ -562,47 +614,74 @@ function ParallaxCultureCard() {
           }}
           className={styles.cultureHeroCard}
         >
-          {/* Parallax Zoom Background image / video wrapper */}
-          <div style={{ position: 'absolute', inset: 0, overflow: 'hidden', zIndex: 0 }}>
-            <motion.div style={{ y: imageY, scale: imageScale, width: '100%', height: '100%', position: 'relative' }}>
-              <Image
-                src="/culture-hero-real.jpg"
-                alt="Life at AntBox"
-                fill
-                unoptimized
-                className={styles.cultureHeroImage}
-              />
-            </motion.div>
-          </div>
+          {/* Layer 1: Real Culture Hero Image + LIFE AT ANTBOX text (Initial State - Minimizes on zoom) */}
+          <motion.div
+            style={{
+              position: 'absolute',
+              inset: 0,
+              overflow: 'hidden',
+              zIndex: 2,
+              opacity: initialLayerOpacity,
+              scale: initialLayerScale,
+              y: initialLayerY,
+              pointerEvents: 'none'
+            }}
+          >
+            <Image
+              src="/culture-hero-real.jpg"
+              alt="Life at AntBox"
+              fill
+              unoptimized
+              className={styles.cultureHeroImage}
+            />
+            <div className={styles.cultureHeroOverlay} style={{ opacity: 0.5 }} />
 
-          <motion.div style={{ opacity: overlayOpacity }} className={styles.cultureHeroOverlay}></motion.div>
+            {/* Prominent Stacked Heading for Initial Card */}
+            <div className={styles.cultureTextBlock}>
+              <h2 className={styles.cultureStackedHeading}>
+                <span>LIFE</span>
+                <span>AT</span>
+                <span className={styles.cultureAccentLine}>ANTBOX.</span>
+              </h2>
+            </div>
 
-          {/* Top badge */}
-          <span className={styles.cultureLabelBadge}>CULTURE & LIFE</span>
-
-          {/* Parallax Zoom Big stacked heading */}
-          <motion.div style={{ y: textY, scale: textScale }} className={styles.cultureTextBlock}>
-            <h2 className={styles.cultureStackedHeading}>
-              <span>LIFE</span>
-              <span>AT</span>
-              <span className={styles.cultureAccentLine}>ANTBOX.</span>
-            </h2>
+            {/* Subtitle & CTA for Initial Card */}
+            <div className={styles.cultureBottomRow}>
+              <div className={styles.cultureSubGroup}>
+                <p className={styles.cultureSubtitle}>
+                  But we don't burn out doing it.
+                </p>
+                <div className={styles.cultureCtaBtn}>
+                  Join the team
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                    <line x1="7" y1="17" x2="17" y2="7" /><polyline points="7 7 17 7 17 17" />
+                  </svg>
+                </div>
+              </div>
+            </div>
           </motion.div>
 
-          {/* Bottom row */}
-          <div className={styles.cultureBottomRow}>
-            <div className={styles.cultureSubGroup}>
-              <p className={styles.cultureSubtitle}>
-                But we do not burn out doing it.
-              </p>
-              <a href="#jobs" className={styles.cultureCtaBtn}>
-                Join the team
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-                  <line x1="7" y1="17" x2="17" y2="7" /><polyline points="7 7 17 7 17 17" />
-                </svg>
-              </a>
-            </div>
-          </div>
+          {/* Layer 2: Scroll-Driven Motion Background Video Animation (Fades in as card expands) */}
+          <motion.div
+            style={{
+              position: 'absolute',
+              inset: 0,
+              overflow: 'hidden',
+              zIndex: 1,
+              opacity: videoOpacity
+            }}
+          >
+            <motion.div style={{ y: videoY, scale: videoScale, width: '100%', height: '100%', position: 'relative' }}>
+              <video
+                ref={videoRef}
+                src="/lifeatantbox-animate.mp4"
+                muted
+                playsInline
+                className={styles.cultureHeroImage}
+                style={{ objectFit: 'cover', width: '100%', height: '100%' }}
+              />
+            </motion.div>
+          </motion.div>
         </motion.div>
       </div>
     </div>
@@ -792,13 +871,70 @@ export default function About() {
 
   return (
     <main className={styles.main}>
-      {/* ── Section 1: Operators Banner (Reference Style) ── */}
+      {/* ── Section 1: Operators Hero Section (Rich Immersive Aesthetics) ── */}
       <div className={styles.operatorsHeroSection}>
+        {/* Soft Ambient Glow Blurs */}
+        <div className={styles.operatorsGlowTopLeft} />
+        <div className={styles.operatorsGlowBottomRight} />
+
+        {/* Levitating Floating Trust Badges */}
+        <motion.div
+          animate={{ y: [0, -9, 0] }}
+          transition={{ duration: 5.5, repeat: Infinity, ease: "easeInOut" }}
+          className={`${styles.floatingTrustPill} ${styles.floatingPillTopLeft}`}
+        >
+          <span style={{ fontSize: '1rem' }}>⚡</span>
+          <span>50+ B2B SaaS Teams</span>
+        </motion.div>
+
+        <motion.div
+          animate={{ y: [0, 9, 0] }}
+          transition={{ duration: 6, repeat: Infinity, ease: "easeInOut", delay: 0.5 }}
+          className={`${styles.floatingTrustPill} ${styles.floatingPillTopRight}`}
+        >
+          <span style={{ fontSize: '1rem' }}>🎯</span>
+          <span>Verified Proof-of-Work</span>
+        </motion.div>
+
+        <motion.div
+          animate={{ y: [0, -8, 0] }}
+          transition={{ duration: 5.8, repeat: Infinity, ease: "easeInOut", delay: 1 }}
+          className={`${styles.floatingTrustPill} ${styles.floatingPillBottomLeft}`}
+        >
+          <span style={{ fontSize: '1rem' }}>🚀</span>
+          <span>Day 0 Contributor Ready</span>
+        </motion.div>
+
+        <motion.div
+          animate={{ y: [0, 8, 0] }}
+          transition={{ duration: 6.2, repeat: Infinity, ease: "easeInOut", delay: 1.5 }}
+          className={`${styles.floatingTrustPill} ${styles.floatingPillBottomRight}`}
+        >
+          <span style={{ fontSize: '1rem' }}>📈</span>
+          <span>98.4% Retention Signal</span>
+        </motion.div>
+
         <div className={styles.operatorsHeaderBlock}>
-          <h2 className={styles.operatorsTitle}>
+          {/* Hero Category Badge */}
+          <div className={styles.heroCategoryTag}>
+            <span>✨</span>
+            <span>OPERATOR-LED TALENT ENGINE</span>
+          </div>
+
+          <h1 className={styles.operatorsTitle}>
             We are operators who have <span className={styles.operatorsHighlight}>vetted, trained, and deployed</span> top talent for B2B companies.
-          </h2>
+          </h1>
           <TypingSubtitle text="We take final and pre-final year students, run them through real-world domain teardowns, and deploy them into fast-growing SaaS teams. We bring verified proof of work, owning candidate readiness so they contribute from Day 0." />
+
+          {/* Scroll Guidance Indicator */}
+          <motion.div
+            animate={{ y: [0, 5, 0] }}
+            transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
+            className={styles.scrollGuidancePill}
+          >
+            <span>SCROLL TO EXPLORE</span>
+            <span style={{ color: '#BB62DE', fontSize: '0.9rem', fontWeight: 800 }}>↓</span>
+          </motion.div>
         </div>
       </div>
 

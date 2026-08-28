@@ -79,9 +79,9 @@ function RollingNumber({ value, isAnimating }) {
   );
 }
 
-// 3D Typographic Roller Item in "WHAT WE BRING" (Pure text roller matching bringcards.mp4)
+// 3D Typographic Roller Item in "WHAT WE BRING" (Perfect focal-centered stage matching side tickers)
 function BringTypographyRollerItem({ card, index, totalCards, scrollYProgress }) {
-  // Signed distance from active center focal point
+  // Signed distance from active center focal point (-4 to +4)
   const signedRel = useTransform(scrollYProgress, (progress) => {
     const current = progress * (totalCards - 1);
     return index - current;
@@ -89,43 +89,60 @@ function BringTypographyRollerItem({ card, index, totalCards, scrollYProgress })
 
   const absRel = useTransform(signedRel, (s) => Math.abs(s));
 
-  // 3D Half-roller curvature (curves back into screen above and below center)
+  // Vertical position on the drum wheel: 0 when active (perfectly centered), moves up when negative, down when positive
+  const itemY = useTransform(signedRel, (s) => {
+    return `${s * 95}px`;
+  });
+
+  // 3D Half-roller curvature
   const rotateX = useTransform(signedRel, (s) => {
     const clamped = Math.max(-2.5, Math.min(2.5, s));
-    return `${-clamped * 18}deg`;
+    return `${-clamped * 20}deg`;
   });
 
   const translateZ = useTransform(absRel, (dist) => {
-    return `${Math.max(-70, 16 - dist * 38)}px`;
+    return `${Math.max(-100, 16 - dist * 40)}px`;
   });
 
-  const textScale = useTransform(absRel, [0, 0.45, 1.2], [1.04, 0.94, 0.88]);
-  // Active item 100% visible; inactive items are faint ghost text (rarely visible)
-  const textOpacity = useTransform(absRel, [0, 0.35, 0.8], [1.0, 0.16, 0.06]);
+  const textScale = useTransform(absRel, [0, 0.45, 1.2], [1.05, 0.94, 0.84]);
 
-  // Smoothly reveal full explanation text when item is active on scroll
-  const descOpacity = useTransform(absRel, [0, 0.38, 0.7], [1.0, 0.25, 0]);
-  const descY = useTransform(absRel, [0, 0.38], [0, 6]);
+  // Active item 100% visible; adjacent items softly visible, distant items completely hidden
+  const textOpacity = useTransform(absRel, (dist) => {
+    if (dist < 0.35) return 1.0;
+    if (dist < 1.1) return Math.max(0.12, 1.0 - (dist - 0.35) * 1.15);
+    return 0.08;
+  });
+
+  // Description text smoothly reveals only when item is active
+  const descOpacity = useTransform(absRel, [0, 0.32, 0.65], [1.0, 0.3, 0]);
+  const descY = useTransform(absRel, [0, 0.35], [0, 8]);
 
   const zIndex = useTransform(absRel, (dist) => Math.round(50 - dist * 10));
 
   return (
     <motion.div
       style={{
+        position: 'absolute',
+        top: '50%',
+        left: 0,
+        right: 0,
+        marginTop: '-50px', // Centers the item around the stage focal center
         opacity: textOpacity,
         scale: textScale,
+        y: itemY,
         rotateX: rotateX,
         z: translateZ,
         zIndex: zIndex,
         transformStyle: 'preserve-3d',
         transformOrigin: 'center center',
         width: '100%',
-        padding: '0.65rem 0',
+        padding: '0.4rem 0',
         display: 'flex',
         flexDirection: 'column',
         alignItems: 'center',
         textAlign: 'center',
         cursor: 'default',
+        pointerEvents: 'none',
       }}
     >
       {/* Main Title Typography */}
@@ -133,7 +150,7 @@ function BringTypographyRollerItem({ card, index, totalCards, scrollYProgress })
         <span
           style={{
             fontFamily: 'Poppins, sans-serif',
-            fontSize: 'clamp(0.9rem, 1.2vw, 1.2rem)',
+            fontSize: 'clamp(0.95rem, 1.3vw, 1.3rem)',
             fontWeight: 800,
             color: 'var(--accent-purple)',
             letterSpacing: '0.04em',
@@ -146,7 +163,7 @@ function BringTypographyRollerItem({ card, index, totalCards, scrollYProgress })
             margin: 0,
             color: '#ffffff',
             fontFamily: 'Poppins, sans-serif',
-            fontSize: 'clamp(1.5rem, 2.5vw, 2.2rem)',
+            fontSize: 'clamp(1.6rem, 2.7vw, 2.4rem)',
             fontWeight: 800,
             letterSpacing: '-0.02em',
             lineHeight: 1.15,
@@ -162,8 +179,8 @@ function BringTypographyRollerItem({ card, index, totalCards, scrollYProgress })
         style={{
           opacity: descOpacity,
           y: descY,
-          maxWidth: '620px',
-          marginTop: '0.45rem',
+          maxWidth: '640px',
+          marginTop: '0.55rem',
           padding: '0 1rem',
         }}
       >
@@ -171,7 +188,7 @@ function BringTypographyRollerItem({ card, index, totalCards, scrollYProgress })
           style={{
             margin: 0,
             color: '#e2beff',
-            fontSize: 'clamp(0.92rem, 1.15vw, 1.06rem)',
+            fontSize: 'clamp(0.95rem, 1.2vw, 1.12rem)',
             lineHeight: 1.5,
             fontWeight: 500,
             fontFamily: 'Century Gothic, sans-serif',
@@ -341,12 +358,6 @@ function WhatWeBringSection() {
 
   const totalCards = cardData.length;
 
-  // Dynamic vertical drum centering so active card is always vertically centered within viewport safe area
-  const drumY = useTransform(scrollYProgress, (progress) => {
-    const current = progress * (totalCards - 1);
-    return `${(2 - current) * 36}px`;
-  });
-
   return (
     <section
       ref={sectionRef}
@@ -365,12 +376,9 @@ function WhatWeBringSection() {
           display: 'flex',
           flexDirection: 'column',
           alignItems: 'center',
-          justifyContent: 'flex-start',
+          justifyContent: 'center',
           overflow: 'hidden',
-          paddingTop: 'clamp(100px, 14vh, 125px)',
-          paddingBottom: 'clamp(2rem, 4vh, 3.5rem)',
-          paddingLeft: '1.5rem',
-          paddingRight: '1.5rem',
+          padding: '2rem 1.5rem',
         }}
       >
         {/* Large Prominent Scroll Tickers on BOTH Sides */}
@@ -385,7 +393,7 @@ function WhatWeBringSection() {
             display: 'flex',
             flexDirection: 'column',
             alignItems: 'center',
-            justifyContent: 'flex-start',
+            justifyContent: 'center',
             position: 'relative',
           }}
         >
@@ -393,8 +401,7 @@ function WhatWeBringSection() {
             className="section-title heading-serif text-center"
             style={{
               color: '#ffffff',
-              marginTop: '0',
-              marginBottom: 'clamp(1.2rem, 2.5vh, 2.2rem)',
+              margin: '0 0 clamp(1rem, 2vh, 1.6rem)',
               fontSize: 'clamp(1.9rem, 3.4vw, 2.75rem)',
               textAlign: 'center',
               textTransform: 'uppercase',
@@ -405,16 +412,17 @@ function WhatWeBringSection() {
             WHAT WE <span style={{ color: 'var(--accent-purple)' }}>BRING</span>
           </h2>
 
-          {/* 3D Half-Roller Cards Stage (Cards dynamically centered on scroll) */}
-          <motion.div
+          {/* 3D Half-Roller Cards Stage (Cards centered at fixed focal height) */}
+          <div
             style={{
-              display: 'flex',
-              flexDirection: 'column',
-              gap: '0.65rem',
+              position: 'relative',
               width: '100%',
+              height: '280px',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
               perspective: '1200px',
               transformStyle: 'preserve-3d',
-              y: drumY,
             }}
           >
             {cardData.map((card, i) => (
@@ -426,7 +434,7 @@ function WhatWeBringSection() {
                 scrollYProgress={scrollYProgress}
               />
             ))}
-          </motion.div>
+          </div>
         </div>
       </div>
     </section>
