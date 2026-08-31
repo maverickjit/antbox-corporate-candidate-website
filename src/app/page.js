@@ -3,6 +3,8 @@ import React, { useRef, useEffect, useState } from 'react';
 import Image from 'next/image';
 import { motion, useScroll, useTransform, useMotionTemplate, AnimatePresence } from 'framer-motion';
 import AnimatedNumber from '@/components/ui/animated-number';
+import { ParallaxComponent } from '@/components/ui/parallax-scrolling';
+import { Timeline } from '@/components/ui/timeline';
 import { useTab } from '../context/TabContext';
 
 const cardData = [
@@ -106,16 +108,12 @@ function BringTypographyRollerItem({ card, index, totalCards, scrollYProgress })
 
   const textScale = useTransform(absRel, [0, 0.45, 1.2], [1.05, 0.94, 0.84]);
 
-  // Active item 100% visible; adjacent items softly visible, distant items completely hidden
-  const textOpacity = useTransform(absRel, (dist) => {
-    if (dist < 0.35) return 1.0;
-    if (dist < 1.1) return Math.max(0.12, 1.0 - (dist - 0.35) * 1.15);
-    return 0.08;
-  });
+  // Active item 100% visible; opacity of other texts decreases rapidly on scroll to 0
+  const textOpacity = useTransform(absRel, [0, 0.22, 0.55, 0.85], [1.0, 0.70, 0.08, 0]);
 
   // Description text smoothly reveals only when item is active
-  const descOpacity = useTransform(absRel, [0, 0.32, 0.65], [1.0, 0.3, 0]);
-  const descY = useTransform(absRel, [0, 0.35], [0, 8]);
+  const descOpacity = useTransform(absRel, [0, 0.28, 0.60], [1.0, 0.2, 0]);
+  const descY = useTransform(absRel, [0, 0.30], [0, 8]);
 
   const zIndex = useTransform(absRel, (dist) => Math.round(50 - dist * 10));
 
@@ -201,10 +199,18 @@ function BringTypographyRollerItem({ card, index, totalCards, scrollYProgress })
   );
 }
 
-// Vertical ruler tick track on both left & right edges (large and prominently visible on both sides)
+// Vertical ruler tick track on both left & right edges (perfectly aligned with text cards in lockstep)
 function BringSideScrollTicker({ scrollYProgress, side = 'right' }) {
-  const totalTicks = 34;
   const isLeft = side === 'left';
+  const totalCards = cardData.length;
+
+  // Generate ticks with 4 subdivisions per card interval, plus buffer before and after
+  const ticks = [];
+  for (let i = -2; i <= (totalCards - 1) * 4 + 2; i++) {
+    const relValue = i * 0.25;
+    const isMajor = i % 4 === 0;
+    ticks.push({ relValue, isMajor, id: i });
+  }
 
   return (
     <div
@@ -212,66 +218,74 @@ function BringSideScrollTicker({ scrollYProgress, side = 'right' }) {
         position: 'absolute',
         [isLeft ? 'left' : 'right']: 'clamp(1rem, 3.5vw, 4.5rem)',
         top: '50%',
-        transform: 'translateY(-50%)',
-        height: 'clamp(440px, 58vh, 600px)',
-        display: 'flex',
-        flexDirection: 'column',
-        alignItems: isLeft ? 'flex-start' : 'flex-end',
-        justifyContent: 'space-between',
+        height: '320px',
+        width: '45px',
         pointerEvents: 'none',
         zIndex: 20,
       }}
     >
-      {Array.from({ length: totalTicks }).map((_, i) => {
-        const tickPos = i / (totalTicks - 1);
-        return (
-          <TickerLine
-            key={i}
-            tickPos={tickPos}
-            scrollYProgress={scrollYProgress}
-            isMajor={i % 4 === 0}
-            isLeft={isLeft}
-          />
-        );
-      })}
+      {ticks.map((t) => (
+        <SideTickerTick
+          key={t.id}
+          relValue={t.relValue}
+          isMajor={t.isMajor}
+          isLeft={isLeft}
+          scrollYProgress={scrollYProgress}
+          totalCards={totalCards}
+        />
+      ))}
     </div>
   );
 }
 
-function TickerLine({ tickPos, scrollYProgress, isMajor, isLeft }) {
-  const opacity = useTransform(scrollYProgress, (p) => {
-    const dist = Math.abs(p - tickPos);
-    if (dist < 0.04) return 1.0;
-    if (dist < 0.12) return 0.70;
-    return isMajor ? 0.45 : 0.28;
+function SideTickerTick({ relValue, isMajor, isLeft, scrollYProgress, totalCards }) {
+  // Signed distance of this tick from the focal center line
+  const signedRel = useTransform(scrollYProgress, (progress) => {
+    const current = progress * (totalCards - 1);
+    return relValue - current;
   });
 
-  const width = useTransform(scrollYProgress, (p) => {
-    const dist = Math.abs(p - tickPos);
-    if (dist < 0.04) return '38px';
-    if (dist < 0.10) return isMajor ? '28px' : '20px';
+  const absRel = useTransform(signedRel, (s) => Math.abs(s));
+
+  // Exactly matches the 95px per card vertical step of BringTypographyRollerItem
+  const y = useTransform(signedRel, (s) => `${s * 95}px`);
+
+  const opacity = useTransform(absRel, (dist) => {
+    if (dist < 0.20) return 1.0;
+    if (dist < 0.60) return 0.65;
+    if (dist < 1.4) return 0.35;
+    if (dist < 2.2) return 0.15;
+    return 0;
+  });
+
+  const width = useTransform(absRel, (dist) => {
+    if (dist < 0.20) return '38px';
+    if (dist < 0.55) return isMajor ? '28px' : '20px';
     return isMajor ? '22px' : '14px';
   });
 
-  const color = useTransform(scrollYProgress, (p) => {
-    const dist = Math.abs(p - tickPos);
-    return dist < 0.04 ? 'var(--accent-purple)' : 'rgba(255, 255, 255, 0.85)';
+  const color = useTransform(absRel, (dist) => {
+    return dist < 0.20 ? 'var(--accent-purple)' : 'rgba(255, 255, 255, 0.75)';
   });
 
-  const shadow = useTransform(scrollYProgress, (p) => {
-    const dist = Math.abs(p - tickPos);
-    return dist < 0.04 ? '0 0 12px rgba(187, 98, 222, 0.9)' : 'none';
+  const shadow = useTransform(absRel, (dist) => {
+    return dist < 0.20 ? '0 0 12px rgba(187, 98, 222, 0.95)' : 'none';
   });
 
   return (
     <motion.div
       style={{
+        position: 'absolute',
+        top: '50%',
+        [isLeft ? 'left' : 'right']: 0,
+        y: y,
         height: isMajor ? '3px' : '2px',
         width: width,
         backgroundColor: color,
         boxShadow: shadow,
         opacity: opacity,
         borderRadius: '2px',
+        marginTop: '-1px',
       }}
     />
   );
@@ -363,7 +377,7 @@ function WhatWeBringSection() {
       ref={sectionRef}
       style={{
         position: 'relative',
-        height: '260vh',
+        height: '210vh',
         background: 'transparent',
       }}
     >
@@ -1047,334 +1061,65 @@ function CorporateView({ activeTab, setActiveTab }) {
   );
 }
 
-// Sub-component: each card handles its position on the continuous rotating semi-circle carousel wheel
-function HowItWorksCard({ step, index, totalCards, scrollYProgress }) {
-  // Relative position from active focal center (-3 to +3)
-  // When scroll reaches index / (totalCards - 1), relPos is 0 (focal center)
-  const relPos = useTransform(scrollYProgress, (progress) => {
-    const currentPos = progress * (totalCards - 1);
-    return index - currentPos;
-  });
-
-  // Generous 330px vertical spacing ensuring adjacent cards never collide or overlap
-  const cardY = useTransform(relPos, (rel) => {
-    return `${rel * 330}px`;
-  });
-
-  const cardX = useTransform(relPos, (rel) => {
-    return `${Math.pow(Math.abs(rel), 1.7) * 44}px`;
-  });
-
-  // Fixed horizontal orientation at all times (cards stay level, no tilting)
-  const cardScale = useTransform(relPos, (rel) => {
-    const dist = Math.abs(rel);
-    return Math.max(0.86, 1.0 - dist * 0.08);
-  });
-
-  // Active main card is 100% solid and crystal clear; all other cards remain softly blurred
-  const cardBlur = useTransform(relPos, (rel) => {
-    const dist = Math.abs(rel);
-    if (dist <= 0.35) return 0;
-    return Math.min(8, (dist - 0.35) * 6.5);
-  });
-  const cardFilter = useMotionTemplate`blur(${cardBlur}px)`;
-
-  // Opacity: 1 at focal center, blurred above/below cards remain visible in place
-  const cardOpacity = useTransform(relPos, (rel) => {
-    const dist = Math.abs(rel);
-    if (dist <= 0.4) return 1;
-    if (dist >= 2.2) return 0;
-    return Math.max(0.38, 1 - (dist - 0.4) * 0.35);
-  });
-
-  const zIndex = useTransform(relPos, (rel) => {
-    return Math.round(50 - Math.abs(rel) * 12);
-  });
-
-  // Point scale on axis line
-  const pointScale = useTransform(relPos, (rel) => {
-    const dist = Math.abs(rel);
-    return dist <= 0.35 ? 1.35 : 0.9;
-  });
-
-  return (
-    <motion.div
-      style={{
-        position: 'absolute',
-        width: 'min(430px, 86%)',
-        right: 'clamp(2rem, 4.5vw, 4rem)',
-        borderRadius: '24px',
-        overflow: 'visible',
-        x: cardX,
-        y: cardY,
-        rotate: 0,
-        opacity: cardOpacity,
-        filter: cardFilter,
-        scale: cardScale,
-        zIndex: zIndex,
-        transformOrigin: 'left center',
-      }}
-    >
-      {/* Point attached to card riding directly on the curved axis line */}
-      <motion.div
-        style={{
-          position: 'absolute',
-          left: '-10px',
-          top: '50%',
-          transform: 'translateY(-50%)',
-          width: '18px',
-          height: '18px',
-          borderRadius: '50%',
-          background: 'var(--accent-purple)',
-          border: '3px solid #F7F5EE',
-          boxShadow: '0 0 14px rgba(187, 98, 222, 0.95)',
-          scale: pointScale,
-          zIndex: 10,
-        }}
-      />
-
-      {/* Card body */}
-      <div
-        style={{
-          borderRadius: '24px',
-          overflow: 'hidden',
-          boxShadow: '0 25px 60px rgba(0,0,0,0.5)',
-          border: '1px solid rgba(187, 98, 222, 0.35)',
-          background: '#240a2f',
-        }}
-      >
-        {/* Gap statement area — solid brand purple, completely opaque */}
-        <div style={{
-          minHeight: '170px',
-          background: '#240a2f',
-          display: 'flex',
-          flexDirection: 'column',
-          alignItems: 'flex-start',
-          justifyContent: 'center',
-          padding: '1.85rem 1.85rem',
-          position: 'relative',
-        }}>
-          {/* The GAP text — big and bold */}
-          <p style={{
-            fontFamily: 'Poppins, sans-serif',
-            fontWeight: 700,
-            fontSize: 'clamp(1.05rem, 1.6vw, 1.25rem)',
-            color: '#ffffff',
-            lineHeight: 1.42,
-            margin: 0,
-            maxWidth: '390px',
-          }}>{step.gap}</p>
-        </div>
-
-        {/* Footer bar — THE GAP badge */}
-        <div style={{
-          background: '#180620',
-          padding: '0.75rem 1.85rem',
-          borderTop: '2px solid var(--accent-purple)',
-          display: 'flex',
-          alignItems: 'center',
-        }}>
-          <span style={{
-            display: 'inline-block',
-            background: 'var(--accent-purple)',
-            color: '#ffffff',
-            padding: '0.3rem 1rem',
-            borderRadius: '50px',
-            fontSize: '0.68rem',
-            fontWeight: 900,
-            letterSpacing: '1.5px',
-            textTransform: 'uppercase',
-            flexShrink: 0,
-          }}>THE GAP</span>
-        </div>
-      </div>
-    </motion.div>
-  );
-}
+const candidateTimelineData = [
+  {
+    solutionTitle: "Discover Your Career Pathway Early",
+    solutionDescription: "Participate in AntBox campus roadshows and hands-on workshops. Identify your core strengths and learn market-relevant tools long before placement season opens.",
+    accentColor: "var(--accent-purple)",
+    tags: ["🎯 Campus Roadshows", "📊 Skill Diagnostics", "✨ Zero Guesswork"],
+    problem: {
+      tag: "The Problem",
+      statement: "Getting rejected by automated resume scanners without getting a chance to show real skills.",
+      explanation: "Traditional campus drives rely on keywords and generic GPA filters, discarding high-potential talent before any technical assessment.",
+      stepTag: "Screening Bottleneck"
+    }
+  },
+  {
+    solutionTitle: "Build Proof of Work, Not Just Resumes",
+    solutionDescription: "Work on real-world micro-internships with actual corporate briefs. Show hiring managers proof of what you can build, rather than just listing skills on paper.",
+    accentColor: "#e093ff",
+    tags: ["💼 Micro-Internships", "📁 Verified Portfolios", "⚡ Live Corporate Briefs"],
+    problem: {
+      tag: "The Problem",
+      statement: "Zero real-world project exposure before your first full-time role.",
+      explanation: "Academic curriculums teach theory, but companies hire for practical execution. Candidates struggle to demonstrate proof of actual ability.",
+      stepTag: "Execution Gap"
+    }
+  },
+  {
+    solutionTitle: "Skip the Resume Queue",
+    solutionDescription: "Top companies evaluate your live performance on micro-projects instead of filtering you out with generic criteria.",
+    accentColor: "var(--accent-purple)",
+    tags: ["🚀 100+ Skill Metrics", "🤝 Direct Recruiter Access", "🔥 3x Faster Shortlists"],
+    problem: {
+      tag: "The Problem",
+      statement: "Waiting months during placement season with endless interview rounds and uncertainty.",
+      explanation: "Hundreds of applicants compete for single openings in opaque recruitment pipelines, with zero transparency or feedback.",
+      stepTag: "The Waiting Queue"
+    }
+  },
+  {
+    solutionTitle: "Fast-Track Offers & Zero Retraining",
+    solutionDescription: "Land job offers faster with complete confidence. Step into your role on Day 1 ready to deliver, without the fear of revoked offers or post-hiring lag.",
+    accentColor: "#d580ff",
+    tags: ["🎯 Day-1 Productivity", "🏆 Zero Post-Hiring Lag", "💼 Verified Placement Offers"],
+    problem: {
+      tag: "The Problem",
+      statement: "Unsure how to bridge the gap between classroom theory and industry expectations.",
+      explanation: "New hires spend 4-6 months in corporate training buffers before doing billable work, risking performance reviews and delayed onboarding.",
+      stepTag: "Onboarding Lag"
+    }
+  }
+];
 
 function CandidateHowItWorks() {
-  const sectionRef = useRef(null);
-  const { scrollYProgress } = useScroll({
-    target: sectionRef,
-    offset: ["start start", "end end"]
-  });
-
-  const steps = [
-    {
-      label: '01',
-      gap: 'Getting rejected by automated resume scanners without getting a chance to show real skills.',
-      solution: 'Discover Your Career Pathway Early',
-      body: 'Participate in AntBox campus roadshows and hands-on workshops. Identify your core strengths and learn market-relevant tools long before placement season opens.',
-      color: '#2b0c37',
-      accent: '#BB62DE'
-
-    },
-    {
-      label: '02',
-      gap: 'Zero real-world project exposure before your first full-time role.',
-      solution: 'Build Proof of Work, Not Just Resumes',
-      body: 'Work on real-world micro-internships with actual corporate briefs. Show hiring managers proof of what you can build, rather than just listing skills on paper.',
-      color: '#1a0826',
-      accent: '#e093ff'
-
-    },
-    {
-      label: '03',
-      gap: 'Waiting months during placement season with endless interview rounds and uncertainty.',
-      solution: 'Skip the Resume Queue',
-      body: 'Top companies evaluate your live performance on micro-projects instead of filtering you out with generic criteria.',
-      color: '#0f0518',
-      accent: '#BB62DE'
-
-    },
-    {
-      label: '04',
-      gap: 'Unsure how to bridge the gap between classroom theory and industry expectations.',
-      solution: 'Fast-Track Offers & Zero Retraining',
-      body: 'Land job offers faster with complete confidence. Step into your role on Day 1 ready to deliver, without the fear of revoked offers or post-hiring lag.',
-      color: '#200840',
-      accent: '#d580ff'
-    },
-  ];
-
-  const totalCards = steps.length;
-  const [activeStep, setActiveStep] = useState(0);
-
-  // For each card, determine which step it maps to (0-1 range per card)
-  useEffect(() => {
-    return scrollYProgress.onChange(latest => {
-      const stepSize = 1 / totalCards;
-      const idx = Math.min(Math.floor(latest / stepSize), totalCards - 1);
-      setActiveStep(idx);
-    });
-  }, [scrollYProgress, totalCards]);
-
   return (
-    <section ref={sectionRef} style={{
-      position: 'relative',
-      height: '240vh',
-      width: '100vw',
-      marginLeft: 'calc(-50vw + 50%)',
-      background: 'var(--cream)',
-      zIndex: 10,
-    }}>
-      <div style={{
-        position: 'sticky',
-        top: 0,
-        height: '100vh',
-        display: 'flex',
-        overflow: 'hidden',
-      }}>
-        {/* LEFT — Title pushed down from navbar, expanded left section */}
-        <div style={{
-          flex: '0 0 56%',
-          position: 'relative',
-          display: 'flex',
-          flexDirection: 'column',
-          justifyContent: 'center',
-          padding: 'clamp(2rem, 5vw, 6rem)',
-          zIndex: 2,
-        }}>
-          {/* Top Title: HOW IT WORKS — balanced modern scale */}
-          <div style={{ position: 'absolute', top: 'clamp(4.2rem, 7.5vh, 5.8rem)', left: 'clamp(2rem, 5vw, 6rem)' }}>
-            <h2 style={{
-              fontFamily: 'Poppins, sans-serif',
-              fontSize: 'clamp(2.4rem, 4.2vw, 3.6rem)',
-              fontWeight: 900,
-              letterSpacing: '-0.04em',
-              lineHeight: 1.0,
-              color: 'var(--black)',
-              margin: 0,
-              textTransform: 'uppercase',
-            }}>
-              HOW <span style={{ color: 'var(--accent-purple)' }}>IT WORKS</span>
-            </h2>
-          </div>
-
-          {/* Active Solution Container — perfectly proportioned */}
-          <div style={{ width: '100%', maxWidth: '580px', marginTop: '2.5rem' }}>
-            <AnimatePresence mode="wait">
-              <motion.div
-                key={activeStep}
-                initial={{ opacity: 0, y: 16 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -16 }}
-                transition={{ duration: 0.35, ease: [0.22, 1, 0.36, 1] }}
-                style={{ width: '100%' }}
-              >
-                {/* Heading with side vertical accent bar */}
-                <div style={{ display: 'flex', alignItems: 'center', gap: '1.15rem', marginBottom: '1.25rem' }}>
-                  <div
-                    style={{
-                      width: '5px',
-                      height: 'clamp(2.2rem, 3.2vw, 2.8rem)',
-                      borderRadius: '999px',
-                      background: steps[activeStep].accent || 'var(--accent-purple)',
-                      flexShrink: 0,
-                    }}
-                  />
-                  <h3 style={{
-                    fontFamily: 'Poppins, sans-serif',
-                    fontSize: 'clamp(1.5rem, 2.5vw, 2.1rem)',
-                    fontWeight: 800,
-                    color: 'var(--black)',
-                    lineHeight: 1.2,
-                    margin: 0,
-                    letterSpacing: '-0.02em',
-                  }}>{steps[activeStep].solution}</h3>
-                </div>
-
-                {/* Description body underneath */}
-                <p style={{
-                  fontFamily: 'Century Gothic, sans-serif',
-                  fontSize: 'clamp(1.02rem, 1.35vw, 1.18rem)',
-                  color: '#383838',
-                  lineHeight: 1.6,
-                  paddingLeft: '1.45rem',
-                  margin: 0,
-                  fontWeight: 400,
-                }}>{steps[activeStep].body}</p>
-              </motion.div>
-            </AnimatePresence>
-          </div>
-        </div>
-
-        {/* RIGHT — circular arc guide line and animated cards matching WOVE structure */}
-        <div style={{
-          flex: '0 0 42%',
-          position: 'relative',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'flex-end',
-          overflow: 'visible',
-        }}>
-          {/* Precise Semi-Circle Track (R = 500px) matching card point trajectory */}
-          <div
-            style={{
-              position: 'absolute',
-              right: 'calc(clamp(2rem, 4.5vw, 4rem) - 500px)',
-              top: '50%',
-              transform: 'translateY(-50%)',
-              width: '1000px',
-              height: '1000px',
-              borderRadius: '50%',
-              border: '2px dashed rgba(187, 98, 222, 0.35)',
-              pointerEvents: 'none',
-              zIndex: 0,
-            }}
-          />
-
-          {steps.map((step, i) => (
-            <HowItWorksCard
-              key={i}
-              step={step}
-              index={i}
-              totalCards={totalCards}
-              scrollYProgress={scrollYProgress}
-            />
-          ))}
-        </div>
-      </div>
+    <section className="w-full relative z-10" style={{ background: 'var(--cream)', borderTop: '1px solid rgba(0,0,0,0.06)' }}>
+      <Timeline
+        data={candidateTimelineData}
+        title="HOW IT WORKS"
+        subtitle="Discover how Antbox bridges the gap between campus learning and day-one corporate readiness."
+      />
     </section>
   );
 }
@@ -1609,129 +1354,136 @@ function CandidateView() {
   const heroRef = useRef(null);
   const { scrollYProgress } = useScroll({
     target: heroRef,
-    offset: ["start start", "end end"]
+    offset: ["start start", "end start"]
   });
 
-  // Parallax transforms: Photo starts zoomed in and zooms out to wide view on scroll; text glides with depth
-  const photoScale = useTransform(scrollYProgress, [0, 1], [1.45, 1.0]);
-  const photoY = useTransform(scrollYProgress, [0, 1], ["-6%", "6%"]);
-  const textY = useTransform(scrollYProgress, [0, 1], ["0%", "-35%"]);
+  // Multi-layer parallax transforms (inspired by Osmo layered depth):
+  // Layer 1: Background audience & auditorium (Deepest plane, smooth pan & scale)
+  const bgY = useTransform(scrollYProgress, [0, 1], ["0%", "26%"]);
+  const bgScale = useTransform(scrollYProgress, [0, 1], [1.02, 1.14]);
+
+  // Layer 2: Hero Headline & Subtitle (Middle plane, glides upwards & fades with depth)
+  const textY = useTransform(scrollYProgress, [0, 1], ["0%", "-38%"]);
+  const textScale = useTransform(scrollYProgress, [0, 1], [1, 0.92]);
+  const textOpacity = useTransform(scrollYProgress, [0, 0.72], [1, 0]);
 
   return (
-    <div className="page-wrapper candidate-view">
-      {/* Pinned Scroll Track for Visible Parallax Zoom */}
-      <div ref={heroRef} style={{ position: 'relative', height: '180vh' }}>
-        <div
-          className="candidate-hero-bg"
+    <div className="page-wrapper candidate-view" style={{ position: 'relative' }}>
+      {/* 100vh Full-screen Multi-layer Parallax Hero Section */}
+      <div
+        ref={heroRef}
+        className="candidate-hero-bg"
+        style={{
+          position: 'relative',
+          height: '100vh',
+          minHeight: '100vh',
+          width: '100vw',
+          marginLeft: 'calc(-50vw + 50%)',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          overflow: 'hidden',
+          zIndex: 1,
+        }}
+      >
+        {/* Parallax Layer 1: Background Audience & Stage with smooth lens blur */}
+        <motion.div
           style={{
-            position: 'sticky',
-            top: 0,
-            height: '100vh',
-            width: '100vw',
-            marginLeft: 'calc(-50vw + 50%)',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            overflow: 'hidden',
+            position: 'absolute',
+            inset: 0,
+            y: bgY,
+            scale: bgScale,
+            transformOrigin: '20% 25%',
+            zIndex: 1,
           }}
         >
-          {/* 1. Full-screen Rohit's Photo zooming in clearly as you scroll */}
+          <img
+            src="/rohits.jpeg"
+            alt="Antbox Candidate Experience"
+            style={{
+              width: '100%',
+              height: '100%',
+              objectFit: 'cover',
+              objectPosition: '14% 18%',
+              display: 'block',
+              filter: 'blur(6px) brightness(0.85)',
+              transform: 'scale(1.05)',
+            }}
+          />
+        </motion.div>
+
+        {/* Ambient Tone Overlay: Balanced contrast for text and foreground subject */}
+        <div
+          style={{
+            position: 'absolute',
+            inset: 0,
+            zIndex: 2,
+            background: 'linear-gradient(to right, rgba(10, 10, 14, 0.35) 0%, rgba(10, 10, 14, 0.15) 30%, rgba(10, 10, 14, 0.35) 70%, rgba(10, 10, 14, 0.70) 100%)',
+            pointerEvents: 'none',
+          }}
+        />
+
+        {/* Parallax Layer 2: Floating Hero Typography (Middle Depth Plane) */}
+        <div
+          className="w-full max-w-[1440px] mx-auto px-6 sm:px-8 py-12 relative flex items-center justify-end"
+          style={{ width: '100%', height: '100%', zIndex: 5, paddingRight: 'clamp(1.5rem, 5vw, 5rem)' }}
+        >
           <motion.div
             style={{
-              position: 'absolute',
-              inset: 0,
-              y: photoY,
-              scale: photoScale,
-              transformOrigin: '20% 25%',
-              zIndex: 1,
+              maxWidth: '560px',
+              width: '100%',
+              y: textY,
+              scale: textScale,
+              opacity: textOpacity,
             }}
+            className="flex flex-col justify-center text-left"
           >
-            <img
-              src="/rohits.jpeg"
-              alt="Antbox Candidate Experience"
+            <h1
+              className="hero-title heading-serif"
               style={{
-                width: '100%',
-                height: '100%',
-                objectFit: 'cover',
-                objectPosition: '14% 18%',
-                display: 'block',
+                color: '#ffffff',
+                fontSize: 'clamp(2.75rem, 5.2vw, 5.2rem)',
+                textTransform: 'uppercase',
+                lineHeight: 1.02,
+                letterSpacing: '-0.04em',
+                textShadow: '0 2px 24px rgba(0, 0, 0, 0.85), 0 4px 48px rgba(0, 0, 0, 0.7)',
               }}
-            />
-          </motion.div>
-
-          {/* 2. Gradient overlay: Clear/vivid on Rohit's side (left), high dark opacity on audience side (right) */}
-          <div
-            style={{
-              position: 'absolute',
-              inset: 0,
-              zIndex: 2,
-              background: 'linear-gradient(to right, rgba(10, 10, 14, 0.15) 0%, rgba(10, 10, 14, 0.4) 38%, rgba(10, 10, 14, 0.90) 62%, rgba(10, 10, 14, 0.98) 100%)',
-              pointerEvents: 'none',
-            }}
-          />
-
-          {/* Bottom subtle edge fade into next section */}
-          <div
-            style={{
-              position: 'absolute',
-              bottom: 0,
-              left: 0,
-              right: 0,
-              height: '140px',
-              zIndex: 2,
-              background: 'linear-gradient(to top, var(--black) 0%, transparent 100%)',
-              pointerEvents: 'none',
-            }}
-          />
-
-          {/* 3. Hero Message: Solid, razor-sharp, with multi-plane parallax depth on scroll */}
-          <div
-            className="w-full max-w-[1440px] mx-auto px-6 sm:px-8 py-12 relative flex items-center justify-end"
-            style={{ width: '100%', height: '100%', zIndex: 5, paddingRight: 'clamp(1.5rem, 5vw, 5rem)' }}
-          >
-            <motion.div
-              style={{
-                maxWidth: '540px',
-                width: '100%',
-                y: textY,
-                opacity: 1,
-              }}
-              className="flex flex-col justify-center text-left"
             >
-              <h1
-                className="hero-title heading-serif"
-                style={{
-                  color: '#ffffff',
-                  fontSize: 'clamp(2.75rem, 5.2vw, 5.2rem)',
-                  textTransform: 'uppercase',
-                  lineHeight: 1.02,
-                  letterSpacing: '-0.04em',
-                }}
-              >
-                <span style={{ display: 'block' }}>CAMPUS TO</span>
-                <span style={{ display: 'block', color: 'var(--accent-purple)' }}>CORPORATE</span>
-                <span style={{ display: 'block' }}>WITHOUT THE</span>
-                <span style={{ display: 'block', color: 'var(--accent-purple)' }}>GUESSWORK</span>
-              </h1>
-              <p
-                className="hero-subtitle"
-                style={{
-                  color: 'rgba(255, 255, 255, 0.9)',
-                  fontSize: 'clamp(1.1rem, 2vw, 1.35rem)',
-                  marginTop: '1.75rem',
-                  fontWeight: 500,
-                  lineHeight: 1.5,
-                  maxWidth: '540px',
-                }}
-              >
-                Stop applying blindly. Start building real proof of work.
-              </p>
-            </motion.div>
-          </div>
+              <span style={{ display: 'block' }}>CAMPUS TO</span>
+              <span style={{ display: 'block', color: 'var(--accent-purple)', textShadow: '0 0 30px rgba(187, 98, 222, 0.6), 0 2px 20px rgba(0,0,0,0.8)' }}>CORPORATE</span>
+              <span style={{ display: 'block' }}>WITHOUT THE</span>
+              <span style={{ display: 'block', color: 'var(--accent-purple)', textShadow: '0 0 30px rgba(187, 98, 222, 0.6), 0 2px 20px rgba(0,0,0,0.8)' }}>GUESSWORK</span>
+            </h1>
+            <p
+              className="hero-subtitle"
+              style={{
+                color: '#ffffff',
+                fontSize: 'clamp(1.1rem, 2vw, 1.35rem)',
+                marginTop: '1.75rem',
+                fontWeight: 500,
+                lineHeight: 1.5,
+                maxWidth: '540px',
+                textShadow: '0 2px 16px rgba(0, 0, 0, 0.95), 0 1px 4px rgba(0, 0, 0, 0.8)',
+              }}
+            >
+              Stop applying blindly. Start building real proof of work.
+            </p>
+          </motion.div>
         </div>
       </div>
 
-      <div className="candidate-content-flow" style={{ position: 'relative', zIndex: 2 }}>
+      {/* Content flow section: Starts cleanly below the hero */}
+      <div
+        className="candidate-content-flow scroll-overlay-container"
+        style={{
+          position: 'relative',
+          zIndex: 10,
+          background: 'var(--black)',
+          marginTop: 0,
+          boxShadow: 'none',
+          borderRadius: 0,
+        }}
+      >
         <CandidateFriction />
 
         {/* Social Proof Marquee with pause on hover & company brief popups */}
@@ -1746,6 +1498,11 @@ function CandidateView() {
 
 export default function Home() {
   const { activeTab } = useTab();
+
+  useEffect(() => {
+    // Always start at top of the webpage when switching between Corporates and Candidates
+    window.scrollTo({ top: 0, left: 0, behavior: 'instant' });
+  }, [activeTab]);
 
   return (
     <AnimatePresence mode="wait">

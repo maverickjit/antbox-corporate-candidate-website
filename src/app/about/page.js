@@ -2,7 +2,7 @@
 import React, { useState, useEffect } from 'react';
 import Image from 'next/image';
 import Lenis from 'lenis';
-import { motion, useScroll, useTransform, useInView, useSpring } from 'framer-motion';
+import { motion, useScroll, useTransform, useInView, useSpring, useMotionValue } from 'framer-motion';
 import styles from './about.module.css';
 
 const manifestoParagraphs = [
@@ -79,114 +79,112 @@ function TypingSubtitle({ text }) {
   );
 }
 
-function HorizontalSwipeValuesSection({ values }) {
+function BlackQuoteStatementSection() {
+  return (
+    <div
+      className={styles.panelBlackQuote}
+      style={{
+        width: '100vw',
+        left: '50%',
+        marginLeft: '-50vw',
+        minHeight: '100vh',
+        height: '100vh',
+        borderRadius: 0,
+        padding: '2rem',
+        background: '#0A0A0E',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        position: 'relative',
+        zIndex: 2
+      }}
+    >
+      <div className={styles.heroQuoteContainer} style={{ width: '100%', maxWidth: '1100px', margin: '0 auto', textAlign: 'center' }}>
+        <MaskedLineRevealStatement />
+      </div>
+    </div>
+  );
+}
+
+function CompanyValuesCardsSection({ values }) {
   const containerRef = React.useRef(null);
-  const [revealedCount, setRevealedCount] = React.useState(1);
 
   const { scrollYProgress } = useScroll({
     target: containerRef,
     offset: ["start start", "end end"]
   });
 
-  // Phase 1 (0.00 -> 0.15): Roll up entrance animation for Panel 1 black sheet
-  const sheetY = useTransform(scrollYProgress, [0.0, 0.15], [100, 0]);
-  const sheetRadius = useTransform(scrollYProgress, [0.0, 0.15], ["44px 44px 0 0", "0px 0px 0px 0px"]);
+  // Horizontal slide finishes at 0.68, then cards stay completely stationary from 0.68 to 1.0 while next section overlays
+  const trackX = useTransform(scrollYProgress, [0.0, 0.68, 1.0], ["0px", "-3160px", "-3160px"]);
 
-  // Phase 2 (0.18 -> 0.40): Horizontal Swipe from Panel 1 (Black) to Panel 2 (White)
-  const panelX = useTransform(scrollYProgress, [0.18, 0.40], ["0vw", "-100vw"]);
-
-  // Phase 3 (0.40 -> 0.95): Card reveal sequence inside Panel 2
-  useEffect(() => {
-    const unsubscribe = scrollYProgress.on("change", (latest) => {
-      if (latest < 0.40) {
-        setRevealedCount(1);
-      } else if (latest <= 0.95) {
-        const cardProgress = (latest - 0.40) / 0.55;
-        const step = Math.floor(cardProgress * 5) + 1;
-        const count = Math.min(Math.max(step, 1), 5);
-        setRevealedCount(count);
-      } else {
-        setRevealedCount(5);
-      }
-    });
-    return () => unsubscribe();
-  }, [scrollYProgress]);
+  const cardSuits = ['♠', '♥', '♦', '♣', '★'];
+  const cardTags = [
+    'RADICAL TRANSPARENCY • OPEN CREDIT • NO CLOSED DOORS',
+    'FIRST PRINCIPLES • CLARITY FIRST • SIMPLIFY EVERYTHING',
+    'URGENCY • MOVE FAST • DELIVER AHEAD OF TIME',
+    'VERIFIED EVIDENCE • SHOW DON\'T TELL • SHIP CONSTANTLY',
+    'TOTAL ACCOUNTABILITY • FULL OWNERSHIP • NO HANDOFFS'
+  ];
 
   return (
-    <div ref={containerRef} className={styles.horizontalSwipeTrack} style={{ height: '360vh' }}>
-      <div className={styles.horizontalStickyViewport}>
-        <motion.div
-          style={{ x: panelX }}
-          className={styles.horizontalPanelContainer}
-        >
-          {/* ── PANEL 1: Whole Screen Black Statement Section ── */}
-          <motion.div
-            style={{ y: sheetY, borderRadius: sheetRadius }}
-            className={styles.panelBlackQuote}
-          >
-            <div className={styles.heroQuoteContainer}>
-              <MaskedLineRevealStatement />
-            </div>
-          </motion.div>
+    <div ref={containerRef} className={styles.valuesArcSection}>
+      <div className={styles.valuesArcSticky}>
+        {/* Section Header */}
+        <div className={styles.valuesArcHeader}>
+          <h2 className={styles.valuesArcTitle}>
+            OUR CORE VALUES
+          </h2>
+        </div>
 
-          {/* ── PANEL 2: Full-Screen Section with 5 Cards (Clean Light Background) ── */}
-          <div
-            style={{ backgroundColor: '#FDFBF7' }}
-            className={styles.panelWhiteCards}
-          >
-            <div className={styles.valuesStickyContainer}>
-              {/* Company Values Badge */}
-              <div className={styles.valuesMeta} style={{ marginBottom: '1rem' }}>
-                <span className={styles.labelBadge}>Company Values</span>
-              </div>
-
-              {/* Card Step Indicator */}
-              <div className={styles.cardStepIndicator}>
-                <div className={styles.stepDots}>
-                  {[1, 2, 3, 4, 5].map((step) => (
-                    <button
-                      key={step}
-                      className={`${styles.stepDot} ${step <= revealedCount ? styles.stepDotActive : ''}`}
-                      onClick={() => setRevealedCount(step)}
-                      aria-label={`Jump to value ${step}`}
-                    />
-                  ))}
-                </div>
-              </div>
-
-              <div className={styles.inspoCardsContainer}>
-                {values.map((value, index) => {
-                  const isRevealed = index < revealedCount;
-                  return (
-                    <div
-                      key={index}
-                      className={`${styles.inspoCard} ${isRevealed ? styles.inspoCardRevealed : styles.inspoCardHidden}`}
-                      style={{
-                        backgroundColor: value.bg,
-                        transitionDelay: `${(index % 5) * 0.05}s`
-                      }}
-                    >
-                      <div className={styles.inspoImageContainer}>
-                        {value.image ? (
-                          <Image
-                            src={value.image}
-                            alt={value.title}
-                            fill
-                            unoptimized
-                            className={styles.inspoImage}
-                          />
-                        ) : null}
-                      </div>
-                      <div>
-                        <h3 className={styles.inspoCardTitle}>{value.title}</h3>
-                        <p className={styles.inspoCardDesc}>{value.desc}</p>
-                      </div>
+        {/* Horizontal Curved Track with 5 Cards (Text Left, Image Right) */}
+        <motion.div style={{ x: trackX }} className={styles.valuesArcTrack}>
+          {values.map((value, index) => {
+            return (
+              <motion.div
+                key={index}
+                className={styles.arcPlayCard}
+                style={{
+                  borderTop: `6px solid ${value.bg}`
+                }}
+              >
+                {/* Left Column: Text Content */}
+                <div className={styles.arcCardLeft}>
+                  <div>
+                    <div className={styles.arcCardStepRow}>
+                      <span className={styles.arcCardSuitIcon}>
+                        {cardSuits[index]}
+                      </span>
                     </div>
-                  );
-                })}
-              </div>
-            </div>
-          </div>
+
+                    <h3 className={styles.arcCardTitle}>
+                      {value.title}
+                    </h3>
+                    <p className={styles.arcCardDesc}>
+                      {value.desc}
+                    </p>
+                  </div>
+
+                  <div className={styles.arcCardFooter}>
+                    <span>✦</span>
+                    <span>{cardTags[index]}</span>
+                  </div>
+                </div>
+
+                {/* Right Column: Image Artwork */}
+                <div className={styles.arcCardRight} style={{ backgroundColor: value.bg }}>
+                  {value.image ? (
+                    <Image
+                      src={value.image}
+                      alt={value.title}
+                      fill
+                      unoptimized
+                      className={styles.arcCardImg}
+                    />
+                  ) : null}
+                </div>
+              </motion.div>
+            );
+          })}
         </motion.div>
       </div>
     </div>
@@ -195,10 +193,24 @@ function HorizontalSwipeValuesSection({ values }) {
 
 function FoundersManifestoSection() {
   const sectionRef = React.useRef(null);
-  const isInView = useInView(sectionRef, { once: true, amount: 0.15 });
+  const { scrollYProgress } = useScroll({
+    target: sectionRef,
+    offset: ["start end", "start start"]
+  });
+
+  // Smooth deck card entrance: overlays directly over the stationary cards section
+  const deckRadius = useTransform(scrollYProgress, [0, 1], ["48px 48px 0 0", "36px 36px 0 0"]);
+  const deckShadow = useTransform(
+    scrollYProgress,
+    [0, 1],
+    [
+      "0 -25px 60px rgba(0, 0, 0, 0.7), 0 -1px 0 rgba(255, 255, 255, 0.1)",
+      "0 -50px 120px rgba(0, 0, 0, 0.98), 0 -1px 0 rgba(255, 255, 255, 0.18)"
+    ]
+  );
 
   return (
-    <div
+    <motion.div
       ref={sectionRef}
       style={{
         position: 'relative',
@@ -207,17 +219,17 @@ function FoundersManifestoSection() {
         right: '50%',
         marginLeft: '-50vw',
         marginRight: '-50vw',
-        zIndex: 10,
+        marginTop: '-100vh', // Overlays directly over the pinned cards section
+        zIndex: 25,
         overflow: 'hidden',
-        background: '#0A0A0E'
+        background: '#0A0A0E',
+        borderRadius: deckRadius,
+        boxShadow: deckShadow
       }}
     >
-      <motion.div
-        initial={{ opacity: 0, y: 40 }}
-        animate={{ opacity: isInView ? 1 : 0, y: isInView ? 0 : 40 }}
-        transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
+      <div
         className={styles.darkOverlapSheet}
-        style={{ margin: 0, padding: '5.5rem 0 6rem', borderRadius: 0, background: '#0A0A0E' }}
+        style={{ margin: 0, padding: '6rem 0 6.5rem', borderRadius: 0, background: '#0A0A0E' }}
       >
         <div className={styles.darkOverlapContent} style={{ width: '100%', maxWidth: '1050px', margin: '0 auto', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
 
@@ -292,8 +304,8 @@ function FoundersManifestoSection() {
           </div>
 
         </div>
-      </motion.div>
-    </div>
+      </div>
+    </motion.div>
   );
 }
 
@@ -546,61 +558,26 @@ function RollingImageCardBox({ children }) {
 
 function ParallaxCultureCard() {
   const containerRef = React.useRef(null);
-  const videoRef = React.useRef(null);
 
   const { scrollYProgress } = useScroll({
     target: containerRef,
     offset: ["start end", "end end"]
   });
 
-  // Physics-based spring progress for ultra-smooth, slow transitions
-  const smoothProgress = useSpring(scrollYProgress, {
-    stiffness: 45,
-    damping: 20,
-    restDelta: 0.001
-  });
+  // Smooth scroll transformations for Full-Screen Expansion (0.10 -> 0.65)
+  const cardWidth = useTransform(scrollYProgress, [0.10, 0.65], ["85vw", "100vw"]);
+  const cardHeight = useTransform(scrollYProgress, [0.10, 0.65], ["76vh", "100vh"]);
+  const cardRadius = useTransform(scrollYProgress, [0.10, 0.65], ["36px", "0px"]);
+  const cardScale = useTransform(scrollYProgress, [0.10, 0.65], [0.92, 1.0]);
 
-  // Stage 1 (0.00 -> 0.28): Parallax Zoom Expansion into 100% Full Screen
-  const cardWidth = useTransform(smoothProgress, [0.00, 0.28], ["85vw", "100vw"]);
-  const cardHeight = useTransform(smoothProgress, [0.00, 0.28], ["76vh", "100vh"]);
-  const cardRadius = useTransform(smoothProgress, [0.00, 0.28], ["36px", "0px"]);
-  const cardScale = useTransform(smoothProgress, [0.00, 0.28], [0.92, 1.0]);
+  // Parallax Zoom transforms for background real culture image
+  const imageScale = useTransform(scrollYProgress, [0.00, 0.65, 1.0], [1.35, 1.05, 1.0]);
+  const imageY = useTransform(scrollYProgress, [0.00, 1.0], ["-8%", "8%"]);
 
-  // Stage 2A (0.28 -> 0.42): Layer 1 (Real Photo & "LIFE AT ANTBOX" Heading) minimizes slowly and fades out
-  const initialLayerOpacity = useTransform(smoothProgress, [0.28, 0.42], [1.0, 0.0]);
-  const initialLayerScale = useTransform(smoothProgress, [0.28, 0.42], [1.0, 0.82]);
-  const initialLayerY = useTransform(smoothProgress, [0.28, 0.42], [0, -30]);
-
-  // Stage 2B (0.36 -> 0.48): Layer 2 (3D Motion Video Animation Frame) smoothly fades in with depth scale
-  const videoOpacity = useTransform(smoothProgress, [0.36, 0.48], [0.0, 1.0]);
-  const videoScale = useTransform(smoothProgress, [0.36, 0.48, 1.0], [1.5, 1.35, 1.22]);
-  const videoY = useTransform(smoothProgress, [0.36, 1.0], ["-2%", "2%"]);
-
-  // Stage 3 (0.42 -> 1.00): Video movement activates ONLY when window reaches FULL SCREEN AND ONLY when scrolling!
-  useEffect(() => {
-    const video = videoRef.current;
-    if (!video) return;
-
-    // Pause auto playback so movement only occurs when scrolling
-    video.pause();
-
-    const unsubscribe = smoothProgress.on("change", (latest) => {
-      if (!video.duration || isNaN(video.duration)) return;
-
-      if (latest < 0.42) {
-        video.currentTime = 0;
-      } else {
-        // Smooth frame scrubbing across scroll
-        const videoProgress = Math.min(Math.max((latest - 0.42) / 0.58, 0), 1);
-        const targetTime = videoProgress * video.duration;
-        if (Math.abs(video.currentTime - targetTime) > 0.02) {
-          video.currentTime = targetTime;
-        }
-      }
-    });
-
-    return () => unsubscribe();
-  }, [smoothProgress]);
+  // Parallax Zoom transforms for heading typography
+  const textScale = useTransform(scrollYProgress, [0.10, 0.65], [0.88, 1.05]);
+  const textY = useTransform(scrollYProgress, [0.10, 0.65], [30, 0]);
+  const overlayOpacity = useTransform(scrollYProgress, [0.10, 0.65], [0.65, 0.4]);
 
   return (
     <div ref={containerRef} className={styles.cultureStickyTrack}>
@@ -614,86 +591,429 @@ function ParallaxCultureCard() {
           }}
           className={styles.cultureHeroCard}
         >
-          {/* Layer 1: Real Culture Hero Image + LIFE AT ANTBOX text (Initial State - Minimizes on zoom) */}
-          <motion.div
-            style={{
-              position: 'absolute',
-              inset: 0,
-              overflow: 'hidden',
-              zIndex: 2,
-              opacity: initialLayerOpacity,
-              scale: initialLayerScale,
-              y: initialLayerY,
-              pointerEvents: 'none'
-            }}
-          >
-            <Image
-              src="/culture-hero-real.jpg"
-              alt="Life at AntBox"
-              fill
-              unoptimized
-              className={styles.cultureHeroImage}
-            />
-            <div className={styles.cultureHeroOverlay} style={{ opacity: 0.5 }} />
-
-            {/* Prominent Stacked Heading for Initial Card */}
-            <div className={styles.cultureTextBlock}>
-              <h2 className={styles.cultureStackedHeading}>
-                <span>LIFE</span>
-                <span>AT</span>
-                <span className={styles.cultureAccentLine}>ANTBOX.</span>
-              </h2>
-            </div>
-
-            {/* Subtitle & CTA for Initial Card */}
-            <div className={styles.cultureBottomRow}>
-              <div className={styles.cultureSubGroup}>
-                <p className={styles.cultureSubtitle}>
-                  But we don't burn out doing it.
-                </p>
-                <div className={styles.cultureCtaBtn}>
-                  Join the team
-                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-                    <line x1="7" y1="17" x2="17" y2="7" /><polyline points="7 7 17 7 17 17" />
-                  </svg>
-                </div>
-              </div>
-            </div>
-          </motion.div>
-
-          {/* Layer 2: Scroll-Driven Motion Background Video Animation (Fades in as card expands) */}
-          <motion.div
-            style={{
-              position: 'absolute',
-              inset: 0,
-              overflow: 'hidden',
-              zIndex: 1,
-              opacity: videoOpacity
-            }}
-          >
-            <motion.div style={{ y: videoY, scale: videoScale, width: '100%', height: '100%', position: 'relative' }}>
-              <video
-                ref={videoRef}
-                src="/lifeatantbox-animate.mp4"
-                muted
-                playsInline
+          {/* Parallax Zoom Background Image */}
+          <div style={{ position: 'absolute', inset: 0, overflow: 'hidden', zIndex: 0 }}>
+            <motion.div style={{ y: imageY, scale: imageScale, width: '100%', height: '100%', position: 'relative' }}>
+              <Image
+                src="/culture-hero-real.jpg"
+                alt="Life at AntBox"
+                fill
+                unoptimized
                 className={styles.cultureHeroImage}
-                style={{ objectFit: 'cover', width: '100%', height: '100%' }}
               />
             </motion.div>
+          </div>
+
+          <motion.div style={{ opacity: overlayOpacity }} className={styles.cultureHeroOverlay}></motion.div>
+
+          {/* Parallax Zoom Big stacked heading */}
+          <motion.div style={{ y: textY, scale: textScale }} className={styles.cultureTextBlock}>
+            <h2 className={styles.cultureStackedHeading}>
+              <span>LIFE</span>
+              <span>AT</span>
+              <span className={styles.cultureAccentLine}>ANTBOX.</span>
+            </h2>
           </motion.div>
+
+          {/* Bottom row */}
+          <div className={styles.cultureBottomRow}>
+            <div className={styles.cultureSubGroup}>
+              <p className={styles.cultureSubtitle}>
+                But we don't burn out doing it.
+              </p>
+              <a href="#jobs" className={styles.cultureCtaBtn}>
+                Join the team
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                  <line x1="7" y1="17" x2="17" y2="7" /><polyline points="7 7 17 7 17 17" />
+                </svg>
+              </a>
+            </div>
+          </div>
         </motion.div>
       </div>
     </div>
   );
 }
 
+const customerReviewsData = [
+  // Column 1
+  [
+    {
+      name: "Alexandra Giraldo",
+      role: "Global SDR Manager at Cabify",
+      avatar: "/avatars/avatar1.jpg",
+      tag: "TOP FUNNEL EFFICIENCY",
+      text: "I lead a global team of SDRs that was using 7 different tools to complete full top funnel cycle. Now with AntBox operators, candidates hit the ground running with zero ramp-up time. Everything shipped on Day 1."
+    },
+    {
+      name: "Aline Louzada",
+      role: "Growth at Clara",
+      avatar: "/avatars/avatar2.jpg",
+      tag: "99.4% SKILL ACCURACY",
+      text: "AntBox is remarkably intuitive and fast. They provide verified proof-of-work candidates rather than generic resumes. We replaced a 3-week screening process with a 48-hour direct deployment."
+    },
+    {
+      name: "Amar Balic",
+      role: "Revenue Operations Lead at Twinwin",
+      avatar: "/avatars/avatar7.jpg",
+      tag: "REV-OPS RIGOR",
+      text: "The quality of operators coming out of AntBox is unmatched. The practical training in Glass Kitchen workflows means they already understand production rigor from day zero."
+    },
+    {
+      name: "Elena Rostova",
+      role: "VP of Product at Moneta",
+      avatar: "/avatars/avatar1.jpg",
+      tag: "DESIGN & DEV SYNC",
+      text: "We needed senior-caliber execution under tight deadlines. AntBox's operators delivered our core design system rollout 3 weeks ahead of schedule."
+    }
+  ],
+  // Column 2
+  [
+    {
+      name: "José Marques",
+      role: "CMO & Business Developer at Dokutech",
+      avatar: "/avatars/avatar5.jpg",
+      tag: "OUTBOUND STRATEGY",
+      text: "Before using AntBox, I was heavily reliant on hit-or-miss recruiter pipelines. AntBox is an incredible upgrade — the workflow is 5x faster and candidates are vetted by actual engineering tests."
+    },
+    {
+      name: "Karén Mkhitaryan",
+      role: "CMO at Game Strategies",
+      avatar: "/avatars/avatar4.jpg",
+      tag: "SCALED OPERATIONS",
+      text: "The whole model is built around proof of work instead of credential fluff. Every candidate we brought on had built real systems before they ever interviewed with us."
+    },
+    {
+      name: "David Vance",
+      role: "CTO at HyperScale Systems",
+      avatar: "/avatars/avatar8.jpg",
+      tag: "CORE INFRASTRUCTURE",
+      text: "AntBox solved our senior frontend and backend bandwidth bottleneck. We onboarded 3 operators in 4 days, and their code velocity matched our top engineers immediately."
+    },
+    {
+      name: "Sofia Chen",
+      role: "Engineering Director at Apex Cloud",
+      avatar: "/avatars/avatar4.jpg",
+      tag: "CLOUD ARCHITECTURE",
+      text: "The transparency and accountability AntBox brings is refreshing. No middlemen, no vanity metrics — just high-performing builders who take ownership."
+    }
+  ],
+  // Column 3
+  [
+    {
+      name: "Lucas Summers",
+      role: "Digital Sales Account Manager at Hewlett Packard Enterprise",
+      avatar: "/avatars/avatar3.jpg",
+      tag: "ENTERPRISE OUTCOMES",
+      text: "I went from a 5% open rate to an average of nearly 45% with our AntBox-trained cohort. The domain depth they instill makes a massive difference in complex sales cycles."
+    },
+    {
+      name: "Luke Sheehy",
+      role: "GTM at Tidio",
+      avatar: "/avatars/avatar6.jpg",
+      tag: "48-HOUR DEPLOYMENT",
+      text: "During the free trial alone, we generated 5-6 enterprise pipeline meetings. Every candidate arrived fully trained on our exact tech stack and CRM workflows."
+    },
+    {
+      name: "Marcus Thorne",
+      role: "VP of Engineering at FinEdge",
+      avatar: "/avatars/avatar9.jpg",
+      tag: "FINTECH RELIABILITY",
+      text: "AntBox operators treated our mission-critical codebase with total care. They embody 'Own The Whole Box' — finding edge cases and patching them before release."
+    },
+    {
+      name: "Priya Nambiar",
+      role: "Talent Partner at VentureScale",
+      avatar: "/avatars/avatar3.jpg",
+      tag: "SERIES A TO C TEAMS",
+      text: "We recommend AntBox to all our portfolio founders. It's the most reliable way to hire pre-vetted, high-grit operators without burning engineering bandwidth on interviews."
+    }
+  ]
+];
 
+function CustomerReviewsSection() {
+  const columnClasses = [styles.reviewsColUp, styles.reviewsColDown, styles.reviewsColUpFast];
+
+  return (
+    <section className={styles.customerReviewsSection}>
+      {/* Section Header */}
+      <div className={styles.reviewsHeader}>
+        <div className={styles.reviewsBadge}>
+          <span>✦</span>
+          <span>WALL OF PROOF</span>
+        </div>
+        <h2 className={styles.reviewsTitle}>
+          Hear it directly from our customers & partners
+        </h2>
+        <p className={styles.reviewsSubtitle}>
+          Real feedback from high-growth engineering leaders, founders, and operators scaling with AntBox.
+        </p>
+      </div>
+
+      {/* Marquee Masonry Grid with Gradient Fade Masks */}
+      <div className={styles.reviewsContainer}>
+        <div className={styles.reviewsFadeTop} />
+        <div className={styles.reviewsFadeBottom} />
+
+        <div className={styles.reviewsGrid}>
+          {customerReviewsData.map((col, colIndex) => {
+            // Duplicate array for seamless infinite vertical marquee looping
+            const loopItems = [...col, ...col];
+            return (
+              <div
+                key={colIndex}
+                className={`${styles.reviewsColTrack} ${columnClasses[colIndex]}`}
+              >
+                {loopItems.map((item, idx) => (
+                  <div key={idx} className={styles.reviewCard}>
+                    <div className={styles.reviewAuthorRow}>
+                      <Image
+                        src={item.avatar}
+                        alt={item.name}
+                        width={44}
+                        height={44}
+                        unoptimized
+                        className={styles.reviewAvatar}
+                      />
+                      <div className={styles.reviewAuthorMeta}>
+                        <span className={styles.reviewAuthorName}>{item.name}</span>
+                        <span className={styles.reviewAuthorRole}>{item.role}</span>
+                        <div className={styles.reviewStars}>
+                          {'★'.repeat(5)}
+                        </div>
+                      </div>
+                    </div>
+
+                    <p className={styles.reviewText}>
+                      "{item.text}"
+                    </p>
+
+                    <div className={styles.reviewTag}>
+                      {item.tag}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            );
+          })}
+        </div>
+      </div>
+    </section>
+  );
+}
+
+function AboutFooterSection() {
+  const [email, setEmail] = useState('');
+  const [isSubscribed, setIsSubscribed] = useState(false);
+
+  const handleSubscribe = (e) => {
+    e.preventDefault();
+    if (email && email.includes('@')) {
+      setIsSubscribed(true);
+    }
+  };
+
+  return (
+    <footer className={styles.subtleFooterSection}>
+      <div className={styles.footerContainer}>
+        {/* Subtle Badge */}
+        <div className={styles.footerBadge}>
+          <span>✦</span>
+          <span>BUILD WITH US</span>
+        </div>
+
+        {/* Heading & Subtitle */}
+        <h2 className={styles.footerTitle}>
+          Join our team or stay in the loop
+        </h2>
+        <p className={styles.footerSubtitle}>
+          Whether you want to join our operator engine or get weekly dispatches on scaling high-performing teams, we'd love to connect.
+        </p>
+
+        {/* Dual Actions Grid: Join Team (Left) + Email Updates (Right) */}
+        <div className={styles.footerActionsGrid}>
+          {/* Card A: Join Our Team */}
+          <div className={styles.footerCard}>
+            <div>
+              <h3 className={styles.footerCardHeading}>Join Our Team</h3>
+              <p className={styles.footerCardText}>
+                We are always looking for high-grit product designers, engineers, and growth operators ready to own real work.
+              </p>
+            </div>
+            <a href="/candidates" className={styles.joinTeamBtn}>
+              Explore Open Roles
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                <line x1="7" y1="17" x2="17" y2="7" /><polyline points="7 7 17 7 17 17" />
+              </svg>
+            </a>
+          </div>
+
+          {/* Card B: Email Updates */}
+          <div className={styles.footerCard}>
+            <div>
+              <h3 className={styles.footerCardHeading}>Get Weekly Updates</h3>
+              <p className={styles.footerCardText}>
+                No fluff. Just operator playbooks, domain teardowns, and insights from scaling teams across tech.
+              </p>
+            </div>
+
+            {isSubscribed ? (
+              <div className={styles.successMessage}>
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M20 6L9 17l-5-5" />
+                </svg>
+                <span>You're in the loop! Check your inbox soon.</span>
+              </div>
+            ) : (
+              <form onSubmit={handleSubscribe} className={styles.newsletterForm}>
+                <input
+                  type="email"
+                  placeholder="Enter your work email..."
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  required
+                  className={styles.newsletterInput}
+                />
+                <button type="submit" className={styles.subscribeBtn}>
+                  Get Updates
+                </button>
+              </form>
+            )}
+          </div>
+        </div>
+
+        {/* Subtle Bottom Row */}
+        <div className={styles.footerBottomRow}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '0.6rem' }}>
+            <Image src="/antboxlogo.png" alt="AntBox Logo" width={22} height={22} unoptimized />
+            <span style={{ fontWeight: 800, color: '#FFFFFF', letterSpacing: '-0.02em', fontSize: '0.95rem' }}>antbox</span>
+          </div>
+
+          <div className={styles.footerLinks}>
+            <a href="/corporates">Corporates</a>
+            <a href="/candidates">Candidates</a>
+            <a href="/about">About</a>
+            <a href="/resources">Resources</a>
+          </div>
+
+          <div>
+            <span>© 2026 AntBox Inc. All rights reserved.</span>
+          </div>
+        </div>
+      </div>
+    </footer>
+  );
+}
+
+function HeroCursorFollower({ containerRef }) {
+  const mouseX = useMotionValue(600);
+  const mouseY = useMotionValue(350);
+  const [isHovered, setIsHovered] = useState(false);
+
+  // Smooth responsive spring physics for cursor light
+  const springConfig = { damping: 28, stiffness: 200, mass: 0.4 };
+  const smoothX = useSpring(mouseX, springConfig);
+  const smoothY = useSpring(mouseY, springConfig);
+
+  // Ethereal trailing aura with slightly softer lag
+  const trailX = useSpring(mouseX, { damping: 38, stiffness: 110, mass: 0.85 });
+  const trailY = useSpring(mouseY, { damping: 38, stiffness: 110, mass: 0.85 });
+
+  useEffect(() => {
+    const container = containerRef.current;
+    if (!container) return;
+
+    const handleMouseMove = (e) => {
+      const rect = container.getBoundingClientRect();
+      mouseX.set(e.clientX - rect.left);
+      mouseY.set(e.clientY - rect.top);
+      setIsHovered(true);
+    };
+
+    const handleMouseLeave = () => {
+      setIsHovered(false);
+    };
+
+    container.addEventListener('mousemove', handleMouseMove);
+    container.addEventListener('mouseleave', handleMouseLeave);
+    container.addEventListener('mouseenter', () => setIsHovered(true));
+
+    return () => {
+      container.removeEventListener('mousemove', handleMouseMove);
+      container.removeEventListener('mouseleave', handleMouseLeave);
+    };
+  }, [containerRef, mouseX, mouseY]);
+
+  return (
+    <div style={{ position: 'absolute', inset: 0, overflow: 'hidden', pointerEvents: 'none', zIndex: 1 }}>
+      {/* Outer Ethereal Aurora Glow */}
+      <motion.div
+        style={{
+          position: 'absolute',
+          left: 0,
+          top: 0,
+          x: trailX,
+          y: trailY,
+          translateX: '-50%',
+          translateY: '-50%',
+          width: '640px',
+          height: '640px',
+          borderRadius: '50%',
+          background: 'radial-gradient(circle, rgba(187, 98, 222, 0.22) 0%, rgba(236, 72, 153, 0.12) 35%, rgba(192, 132, 252, 0.04) 65%, transparent 75%)',
+          filter: 'blur(55px)',
+          opacity: isHovered ? 1 : 0,
+          transition: 'opacity 0.6s ease'
+        }}
+      />
+
+      {/* Inner Responsive Ambient Spotlight Beam */}
+      <motion.div
+        style={{
+          position: 'absolute',
+          left: 0,
+          top: 0,
+          x: smoothX,
+          y: smoothY,
+          translateX: '-50%',
+          translateY: '-50%',
+          width: '260px',
+          height: '260px',
+          borderRadius: '50%',
+          background: 'radial-gradient(circle, rgba(216, 180, 254, 0.42) 0%, rgba(187, 98, 222, 0.16) 45%, transparent 70%)',
+          filter: 'blur(28px)',
+          opacity: isHovered ? 1 : 0,
+          transition: 'opacity 0.3s ease'
+        }}
+      />
+
+      {/* Subtle Luminous Focal Dot */}
+      <motion.div
+        style={{
+          position: 'absolute',
+          left: 0,
+          top: 0,
+          x: smoothX,
+          y: smoothY,
+          translateX: '-50%',
+          translateY: '-50%',
+          width: '36px',
+          height: '36px',
+          borderRadius: '50%',
+          background: 'radial-gradient(circle, rgba(255, 255, 255, 0.85) 0%, rgba(192, 132, 252, 0.5) 50%, transparent 100%)',
+          filter: 'blur(5px)',
+          opacity: isHovered ? 0.75 : 0,
+          transition: 'opacity 0.2s ease'
+        }}
+      />
+    </div>
+  );
+}
 
 export default function About() {
   const [activeFilter, setActiveFilter] = useState('View all');
   const [revealedCount, setRevealedCount] = useState(1);
   const valuesSectionRef = React.useRef(null);
+  const heroContainerRef = React.useRef(null);
 
   useEffect(() => {
     const observerCallback = (entries) => {
@@ -872,47 +1192,13 @@ export default function About() {
   return (
     <main className={styles.main}>
       {/* ── Section 1: Operators Hero Section (Rich Immersive Aesthetics) ── */}
-      <div className={styles.operatorsHeroSection}>
+      <div ref={heroContainerRef} className={styles.operatorsHeroSection}>
+        {/* Cursor-following interactive ambient spotlight element */}
+        <HeroCursorFollower containerRef={heroContainerRef} />
+
         {/* Soft Ambient Glow Blurs */}
         <div className={styles.operatorsGlowTopLeft} />
         <div className={styles.operatorsGlowBottomRight} />
-
-        {/* Levitating Floating Trust Badges */}
-        <motion.div
-          animate={{ y: [0, -9, 0] }}
-          transition={{ duration: 5.5, repeat: Infinity, ease: "easeInOut" }}
-          className={`${styles.floatingTrustPill} ${styles.floatingPillTopLeft}`}
-        >
-          <span style={{ fontSize: '1rem' }}>⚡</span>
-          <span>50+ B2B SaaS Teams</span>
-        </motion.div>
-
-        <motion.div
-          animate={{ y: [0, 9, 0] }}
-          transition={{ duration: 6, repeat: Infinity, ease: "easeInOut", delay: 0.5 }}
-          className={`${styles.floatingTrustPill} ${styles.floatingPillTopRight}`}
-        >
-          <span style={{ fontSize: '1rem' }}>🎯</span>
-          <span>Verified Proof-of-Work</span>
-        </motion.div>
-
-        <motion.div
-          animate={{ y: [0, -8, 0] }}
-          transition={{ duration: 5.8, repeat: Infinity, ease: "easeInOut", delay: 1 }}
-          className={`${styles.floatingTrustPill} ${styles.floatingPillBottomLeft}`}
-        >
-          <span style={{ fontSize: '1rem' }}>🚀</span>
-          <span>Day 0 Contributor Ready</span>
-        </motion.div>
-
-        <motion.div
-          animate={{ y: [0, 8, 0] }}
-          transition={{ duration: 6.2, repeat: Infinity, ease: "easeInOut", delay: 1.5 }}
-          className={`${styles.floatingTrustPill} ${styles.floatingPillBottomRight}`}
-        >
-          <span style={{ fontSize: '1rem' }}>📈</span>
-          <span>98.4% Retention Signal</span>
-        </motion.div>
 
         <div className={styles.operatorsHeaderBlock}>
           {/* Hero Category Badge */}
@@ -938,14 +1224,23 @@ export default function About() {
         </div>
       </div>
 
-      {/* ── Section 2: Pinned Horizontal Swipe Track (Black Quote -> White 5 Cards) ── */}
-      <HorizontalSwipeValuesSection values={values} />
+      {/* ── Section 2A: Whole Screen Black Statement Section ── */}
+      <BlackQuoteStatementSection />
+
+      {/* ── Section 2B: Company Core Values (3D Cards Stack with New 1.mp4 Video Animation) ── */}
+      <CompanyValuesCardsSection values={values} />
 
       {/* ── Section 3: Founders Manifesto (Normal Vertical Scroll Section) ── */}
       <FoundersManifestoSection />
 
       {/* ── Section 4: Culture Section (3D Parallax Scroll Transition) ── */}
       <ParallaxCultureCard />
+
+      {/* ── Section 5: Customer Reviews Marquee Masonry Wall (customerreview.mp4 style) ── */}
+      <CustomerReviewsSection />
+
+      {/* ── Section 6: Simple & Subtle Join Team & Email Updates Footer CTA ── */}
+      <AboutFooterSection />
     </main>
   );
 }

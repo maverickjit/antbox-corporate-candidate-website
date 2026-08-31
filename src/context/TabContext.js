@@ -43,6 +43,8 @@ export function TabProvider({ children }) {
           url.searchParams.set('tab', tab);
           window.history.replaceState(null, '', url.toString());
         }
+        // Always reset scroll position to the top of the webpage when toggling tabs
+        window.scrollTo({ top: 0, left: 0, behavior: 'instant' });
       }
     } catch (e) {
       // Ignore storage errors in restricted contexts

@@ -3,7 +3,7 @@
 .main {
   max-width: 1400px;
   margin: 0 auto;
-  padding: 1rem 3rem 0;
+  padding: 0;
   width: 100%;
 }
 
@@ -467,117 +467,206 @@
   text-transform: uppercase;
 }
 
-/* Cardsinspo Horizontal Overlapping Stacked Track */
-.inspoCardsContainer {
-  display: flex;
+/* ── Company Values Playing Cards (cardsanimation.mp4 style) ── */
+.valuesArcSection {
   position: relative;
-  width: 100%;
-  max-width: 1280px;
-  margin: 0.25rem auto 0;
-  padding: 0.5rem 1rem 1rem;
-  justify-content: center;
-  align-items: stretch;
+  width: 100vw;
+  left: 50%;
+  right: 50%;
+  margin-left: -50vw;
+  margin-right: -50vw;
+  height: 380vh;
+  background-color: #FAF8F5;
+  background-image: radial-gradient(rgba(0, 0, 0, 0.06) 1.2px, transparent 1.2px);
+  background-size: 28px 28px;
+  overflow: visible;
+  z-index: 5;
 }
 
-.inspoCard {
-  width: 275px;
-  min-width: 275px;
-  border-radius: 24px;
-  border: 3.5px solid #000000;
-  padding: 1.15rem 1.15rem 1.25rem;
+.valuesArcSticky {
+  position: sticky;
+  top: 0;
+  height: 100vh;
+  width: 100vw;
   display: flex;
   flex-direction: column;
-  justify-content: flex-start;
-  gap: 0.85rem;
-  box-shadow: 7px 8px 0px #000000;
-  transition: transform 0.45s cubic-bezier(0.34, 1.56, 0.64, 1), opacity 0.4s ease, box-shadow 0.3s ease, margin-left 0.4s ease;
-  position: relative;
+  justify-content: center;
+  align-items: flex-start;
   overflow: hidden;
-  color: #000000;
-  margin-left: -50px;
-  /* Overlap effect: cards layer over each other! */
-  z-index: 1;
+  padding: 1.5rem 0;
 }
 
-/* First card needs no negative margin */
-.inspoCard:first-child {
-  margin-left: 0;
-}
-
-/* Cardsinspo 3D Reveal & Entrance Animation */
-.inspoCardHidden {
-  opacity: 0 !important;
-  transform: translateY(50px) rotate(-12deg) scale(0.85) !important;
+.valuesArcHeader {
+  width: 100vw;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  margin-bottom: 1.8rem;
+  z-index: 10;
   pointer-events: none;
 }
 
-.inspoCardRevealed {
-  opacity: 1 !important;
-  transform: translateY(0) rotate(0deg) scale(1) !important;
+.valuesArcTitle {
+  font-size: 2.4rem;
+  font-weight: 850;
+  color: #111111;
+  letter-spacing: -0.02em;
+  margin: 0;
+  text-transform: uppercase;
 }
 
-/* Hovering brings card forward above the stack */
-.inspoCard:hover {
-  transform: translateY(-16px) rotate(-2deg) scale(1.05) !important;
-  box-shadow: 12px 18px 0px #000000 !important;
-  z-index: 20 !important;
+.valuesArcTrack {
+  display: flex;
+  gap: 2.5rem;
+  padding-left: calc(50vw - 375px);
+  padding-right: calc(50vw - 375px);
+  align-items: center;
+  will-change: transform;
 }
 
-/* Illustration Container */
-.inspoImageContainer {
+.arcPlayCard {
+  width: 750px;
+  min-width: 750px;
+  max-width: 750px;
+  height: 420px;
+  background: #FFFFFF;
+  border-radius: 28px;
+  border: 2.5px solid #000000;
+  box-shadow: 8px 10px 0px #000000;
+  display: grid;
+  grid-template-columns: 1.15fr 0.85fr;
+  padding: 2rem;
+  gap: 1.8rem;
+  position: relative;
+  overflow: hidden;
+  flex-shrink: 0;
+  transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.3s ease;
+}
+
+.arcPlayCard:hover {
+  transform: translateY(-8px) scale(1.015) !important;
+  box-shadow: 12px 16px 0px #000000 !important;
+}
+
+.arcCardLeft {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  z-index: 2;
+  text-align: left;
+}
+
+.arcCardStepRow {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  margin-bottom: 0.85rem;
+}
+
+.arcCardSuitIcon {
+  font-size: 1.25rem;
+  font-weight: 900;
+  color: #000000;
+}
+
+.arcCardTitle {
+  font-size: 1.6rem;
+  font-weight: 850;
+  color: #000000;
+  line-height: 1.2;
+  letter-spacing: -0.015em;
+  text-transform: uppercase;
+  margin-bottom: 0.75rem;
+}
+
+.arcCardDesc {
+  font-size: 0.95rem;
+  font-weight: 500;
+  color: #222222;
+  line-height: 1.6;
+  margin-bottom: 1rem;
+}
+
+.arcCardFooter {
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  color: #555555;
+  border-top: 1.5px dashed rgba(0, 0, 0, 0.15);
+  padding-top: 0.75rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.arcCardRight {
   position: relative;
   width: 100%;
-  aspect-ratio: 1/1;
-  border-radius: 16px;
+  height: 100%;
+  min-height: 240px;
+  border-radius: 20px;
+  border: 2px solid #000000;
+  box-shadow: 3.5px 3.5px 0px #000000;
   overflow: hidden;
-  border: 2.5px solid #000000;
-  box-shadow: 2.5px 2.5px 0px #000000;
-  background: #ffffff;
+  background: #F4F4F6;
+  z-index: 2;
 }
 
-.inspoImage {
+.arcCardImg {
   object-fit: cover;
+  transition: transform 0.6s ease;
 }
 
-.inspoCardTitle {
-  font-family: 'Inter', sans-serif;
-  font-size: 1.05rem;
-  font-weight: 800;
-  color: #000000;
-  line-height: 1.3;
-  letter-spacing: -0.01em;
-  text-transform: uppercase;
-  margin-top: 0.15rem;
-  margin-bottom: 0.4rem;
+.arcPlayCard:hover .arcCardImg {
+  transform: scale(1.05);
 }
 
-.inspoCardDesc {
-  font-size: 0.82rem;
-  font-weight: 500;
-  color: #1a1a1a;
-  line-height: 1.5;
-}
-
-@media (max-width: 1280px) {
-  .inspoCardsContainer {
-    overflow-x: auto;
-    justify-content: flex-start;
-    padding-left: 1.5rem;
-    padding-right: 1.5rem;
-    scrollbar-width: none;
+@media (max-width: 1024px) {
+  .valuesArcTrack {
+    padding-left: calc(50vw - 310px);
+    padding-right: calc(50vw - 310px);
   }
 
-  .inspoCardsContainer::-webkit-scrollbar {
-    display: none;
+  .arcPlayCard {
+    width: 620px;
+    min-width: 620px;
+    max-width: 620px;
+    height: 380px;
+    grid-template-columns: 1fr 1fr;
+    padding: 1.5rem;
+    gap: 1.2rem;
+  }
+
+  .arcCardTitle {
+    font-size: 1.35rem;
+  }
+
+  .arcCardDesc {
+    font-size: 0.88rem;
   }
 }
 
 @media (max-width: 768px) {
-  .inspoCard {
-    width: 250px;
-    min-width: 250px;
-    margin-left: -40px;
-    padding: 1.25rem 1rem 1.4rem;
+  .valuesArcTrack {
+    padding-left: calc(50vw - 170px);
+    padding-right: calc(50vw - 170px);
+    gap: 1.5rem;
+  }
+
+  .arcPlayCard {
+    width: 340px;
+    min-width: 340px;
+    max-width: 340px;
+    height: auto;
+    grid-template-columns: 1fr;
+    padding: 1.25rem;
+    gap: 1rem;
+  }
+
+  .arcCardRight {
+    height: 200px;
   }
 }
 
@@ -708,7 +797,7 @@
   right: 50%;
   margin-left: -50vw;
   margin-right: -50vw;
-  height: 350vh;
+  height: 240vh;
   background: #0A0A0E;
   margin-top: 0;
   margin-bottom: 0;
@@ -1357,10 +1446,12 @@
   align-items: center;
   justify-content: center;
   width: 100%;
-  min-height: calc(100vh - 80px);
+  min-height: 100vh;
+  padding: 6rem 2rem 4rem;
   text-align: center;
   margin-bottom: 0;
   overflow: hidden;
+  background-color: #FAF8F5;
   background-image: radial-gradient(rgba(187, 98, 222, 0.12) 1.2px, transparent 1.2px);
   background-size: 32px 32px;
   background-position: center center;
@@ -1609,5 +1700,489 @@
     border-radius: 16px;
     aspect-ratio: 4 / 3;
     height: auto;
+  }
+}
+
+/* ── Customer Reviews Masonry Marquee Wall (customerreview.mp4 style) ── */
+.customerReviewsSection {
+  position: relative;
+  width: 100vw;
+  left: 50%;
+  right: 50%;
+  margin-left: -50vw;
+  margin-right: -50vw;
+  background: #0A0A0E;
+  color: #FFFFFF;
+  padding: 6.5rem 1.5rem 7.5rem;
+  overflow: hidden;
+  z-index: 15;
+}
+
+.reviewsHeader {
+  text-align: center;
+  max-width: 840px;
+  margin: 0 auto 3.5rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.reviewsBadge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.78rem;
+  font-weight: 800;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: #D8B4FE;
+  background: rgba(216, 180, 254, 0.12);
+  border: 1px solid rgba(216, 180, 254, 0.28);
+  padding: 0.4rem 1rem;
+  border-radius: 9999px;
+  margin-bottom: 1.25rem;
+}
+
+.reviewsTitle {
+  font-size: 2.75rem;
+  font-weight: 850;
+  line-height: 1.18;
+  letter-spacing: -0.025em;
+  color: #FFFFFF;
+  margin-bottom: 1rem;
+  background: linear-gradient(135deg, #FFFFFF 0%, #F5F3FF 50%, #C084FC 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.reviewsSubtitle {
+  font-size: 1.08rem;
+  color: rgba(255, 255, 255, 0.65);
+  line-height: 1.6;
+  max-width: 640px;
+  margin: 0;
+}
+
+.reviewsContainer {
+  position: relative;
+  max-width: 1280px;
+  height: 680px;
+  margin: 0 auto;
+  overflow: hidden;
+}
+
+/* Gradient Fade Masks at top & bottom */
+.reviewsFadeTop {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 140px;
+  background: linear-gradient(to bottom, #0A0A0E 20%, rgba(10, 10, 14, 0.8) 50%, transparent 100%);
+  pointer-events: none;
+  z-index: 10;
+}
+
+.reviewsFadeBottom {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 140px;
+  background: linear-gradient(to top, #0A0A0E 20%, rgba(10, 10, 14, 0.8) 50%, transparent 100%);
+  pointer-events: none;
+  z-index: 10;
+}
+
+.reviewsGrid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1.75rem;
+  height: 100%;
+}
+
+.reviewsColTrack {
+  display: flex;
+  flex-direction: column;
+  gap: 1.75rem;
+}
+
+.reviewsColUp {
+  animation: marqueeUp 42s linear infinite;
+}
+
+.reviewsColDown {
+  animation: marqueeDown 48s linear infinite;
+}
+
+.reviewsColUpFast {
+  animation: marqueeUp 36s linear infinite;
+}
+
+.reviewsGrid:hover .reviewsColUp,
+.reviewsGrid:hover .reviewsColDown,
+.reviewsGrid:hover .reviewsColUpFast {
+  animation-play-state: paused;
+}
+
+@keyframes marqueeUp {
+  0% {
+    transform: translateY(0);
+  }
+
+  100% {
+    transform: translateY(-50%);
+  }
+}
+
+@keyframes marqueeDown {
+  0% {
+    transform: translateY(-50%);
+  }
+
+  100% {
+    transform: translateY(0);
+  }
+}
+
+/* Review Card UI */
+.reviewCard {
+  background: rgba(255, 255, 255, 0.038);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 20px;
+  padding: 1.6rem 1.6rem 1.4rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1), border-color 0.3s ease, background-color 0.3s ease, box-shadow 0.3s ease;
+  will-change: transform;
+}
+
+.reviewCard:hover {
+  transform: translateY(-4px) scale(1.015);
+  background: rgba(255, 255, 255, 0.065);
+  border-color: rgba(192, 132, 252, 0.35);
+  box-shadow: 0 16px 35px rgba(0, 0, 0, 0.6), 0 0 20px rgba(192, 132, 252, 0.12);
+}
+
+.reviewAuthorRow {
+  display: flex;
+  align-items: center;
+  gap: 0.85rem;
+}
+
+.reviewAvatar {
+  width: 44px;
+  height: 44px;
+  border-radius: 12px;
+  object-fit: cover;
+  border: 1.5px solid rgba(255, 255, 255, 0.15);
+  flex-shrink: 0;
+}
+
+.reviewAuthorMeta {
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+}
+
+.reviewAuthorName {
+  font-size: 0.98rem;
+  font-weight: 700;
+  color: #FFFFFF;
+  line-height: 1.2;
+}
+
+.reviewAuthorRole {
+  font-size: 0.78rem;
+  font-weight: 500;
+  color: rgba(255, 255, 255, 0.55);
+  line-height: 1.2;
+}
+
+.reviewStars {
+  display: flex;
+  gap: 0.2rem;
+  color: #F59E0B;
+  font-size: 0.85rem;
+  margin-top: 0.15rem;
+}
+
+.reviewText {
+  font-size: 0.92rem;
+  line-height: 1.62;
+  color: rgba(255, 255, 255, 0.85);
+  margin: 0;
+}
+
+.reviewTag {
+  align-self: flex-start;
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  color: #C084FC;
+  background: rgba(192, 132, 252, 0.1);
+  border: 1px solid rgba(192, 132, 252, 0.2);
+  padding: 0.25rem 0.65rem;
+  border-radius: 6px;
+}
+
+@media (max-width: 1024px) {
+  .reviewsGrid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .reviewsGrid>div:nth-child(3) {
+    display: none;
+  }
+
+  .reviewsTitle {
+    font-size: 2.2rem;
+  }
+}
+
+@media (max-width: 640px) {
+  .reviewsGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .reviewsGrid>div:nth-child(2) {
+    display: none;
+  }
+
+  .reviewsContainer {
+    height: 580px;
+  }
+
+  .reviewsTitle {
+    font-size: 1.85rem;
+  }
+}
+
+/* ── Simple & Subtle Footer CTA Section ── */
+.subtleFooterSection {
+  position: relative;
+  width: 100vw;
+  left: 50%;
+  right: 50%;
+  margin-left: -50vw;
+  margin-right: -50vw;
+  background: #08080C;
+  color: #FFFFFF;
+  padding: 5.5rem 1.5rem 3.5rem;
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+  z-index: 20;
+  overflow: hidden;
+}
+
+.footerContainer {
+  max-width: 1100px;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+}
+
+.footerBadge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.75rem;
+  font-weight: 800;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: #D8B4FE;
+  background: rgba(216, 180, 254, 0.1);
+  border: 1px solid rgba(216, 180, 254, 0.25);
+  padding: 0.35rem 0.9rem;
+  border-radius: 9999px;
+  margin-bottom: 1.25rem;
+}
+
+.footerTitle {
+  font-size: 2.4rem;
+  font-weight: 850;
+  letter-spacing: -0.02em;
+  color: #FFFFFF;
+  margin-bottom: 0.75rem;
+}
+
+.footerSubtitle {
+  font-size: 1.02rem;
+  color: rgba(255, 255, 255, 0.6);
+  max-width: 580px;
+  margin: 0 auto 3rem;
+  line-height: 1.6;
+}
+
+.footerActionsGrid {
+  display: grid;
+  grid-template-columns: 1fr 1.2fr;
+  gap: 1.75rem;
+  width: 100%;
+  max-width: 960px;
+  margin-bottom: 4.5rem;
+  text-align: left;
+}
+
+.footerCard {
+  background: rgba(255, 255, 255, 0.035);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 20px;
+  padding: 2rem;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  transition: border-color 0.3s ease, transform 0.3s ease, background 0.3s ease;
+}
+
+.footerCard:hover {
+  border-color: rgba(192, 132, 252, 0.35);
+  background: rgba(255, 255, 255, 0.05);
+  transform: translateY(-3px);
+}
+
+.footerCardHeading {
+  font-size: 1.25rem;
+  font-weight: 750;
+  color: #FFFFFF;
+  margin-bottom: 0.5rem;
+}
+
+.footerCardText {
+  font-size: 0.88rem;
+  color: rgba(255, 255, 255, 0.65);
+  line-height: 1.55;
+  margin-bottom: 1.5rem;
+}
+
+.joinTeamBtn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.6rem;
+  background: linear-gradient(135deg, #A855F7 0%, #7C3AED 100%);
+  color: #FFFFFF;
+  font-size: 0.9rem;
+  font-weight: 700;
+  padding: 0.8rem 1.4rem;
+  border-radius: 12px;
+  text-decoration: none;
+  transition: transform 0.2s ease, box-shadow 0.2s ease, opacity 0.2s ease;
+  border: none;
+  cursor: pointer;
+  width: fit-content;
+}
+
+.joinTeamBtn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 20px rgba(168, 85, 247, 0.35);
+  opacity: 0.95;
+}
+
+.newsletterForm {
+  display: flex;
+  gap: 0.65rem;
+  width: 100%;
+}
+
+.newsletterInput {
+  flex: 1;
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 12px;
+  padding: 0.8rem 1.1rem;
+  font-size: 0.88rem;
+  color: #FFFFFF;
+  outline: none;
+  transition: border-color 0.2s ease, background 0.2s ease;
+}
+
+.newsletterInput:focus {
+  border-color: #C084FC;
+  background: rgba(255, 255, 255, 0.09);
+}
+
+.newsletterInput::placeholder {
+  color: rgba(255, 255, 255, 0.4);
+}
+
+.subscribeBtn {
+  background: #FFFFFF;
+  color: #0A0A0E;
+  font-size: 0.88rem;
+  font-weight: 700;
+  padding: 0.8rem 1.4rem;
+  border-radius: 12px;
+  border: none;
+  cursor: pointer;
+  transition: transform 0.2s ease, background 0.2s ease;
+  white-space: nowrap;
+}
+
+.subscribeBtn:hover {
+  background: #E4E4E7;
+  transform: translateY(-2px);
+}
+
+.successMessage {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.88rem;
+  font-weight: 600;
+  color: #4ADE80;
+  background: rgba(74, 222, 128, 0.1);
+  border: 1px solid rgba(74, 222, 128, 0.25);
+  padding: 0.75rem 1rem;
+  border-radius: 12px;
+}
+
+.footerBottomRow {
+  width: 100%;
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+  padding-top: 2rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 0.82rem;
+  color: rgba(255, 255, 255, 0.45);
+}
+
+.footerLinks {
+  display: flex;
+  gap: 1.5rem;
+}
+
+.footerLinks a {
+  color: rgba(255, 255, 255, 0.55);
+  text-decoration: none;
+  transition: color 0.2s ease;
+}
+
+.footerLinks a:hover {
+  color: #FFFFFF;
+}
+
+@media (max-width: 768px) {
+  .footerActionsGrid {
+    grid-template-columns: 1fr;
+    gap: 1.25rem;
+  }
+
+  .newsletterForm {
+    flex-direction: column;
+  }
+
+  .footerBottomRow {
+    flex-direction: column;
+    gap: 1rem;
+    text-align: center;
   }
 }
