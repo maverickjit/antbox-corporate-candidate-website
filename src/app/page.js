@@ -821,8 +821,12 @@ function CorporateHeroAndProblems({ scrollProgress }) {
     });
   }, [scrollProgress]);
 
+  // Background image parallax & fade
+  const bgScale = useTransform(scrollProgress, [0, 0.28], [1, 1.15]);
+  const bgOpacity = useTransform(scrollProgress, [0, 0.16, 0.26], [1, 0.8, 0]);
+
   return (
-    <div style={{ position: 'relative', width: '100%', height: '100%', overflow: 'hidden', background: 'var(--cream)' }}>
+    <div style={{ position: 'relative', width: '100%', height: '100%', overflow: 'hidden', background: '#F7F5EE' }}>
       {/* Layer 1: "What Corporates Face" — starts diminished & blurred through gap of Built, expands to normal solid page */}
       <motion.div
         style={{
@@ -837,6 +841,7 @@ function CorporateHeroAndProblems({ scrollProgress }) {
           justifyContent: 'center',
           alignItems: 'center',
           padding: '2rem 1.5rem 1rem',
+          background: '#F7F5EE',
         }}
       >
         <div className="w-full max-w-[1400px] mx-auto px-6 md:px-12">
@@ -861,7 +866,7 @@ function CorporateHeroAndProblems({ scrollProgress }) {
             </div>
             <div className="problem-card">
               <h3 className="problem-stat">
-                <RollingNumber value="$4,700+" isAnimating={statsVisible} />
+                <RollingNumber value="$5,475+" isAnimating={statsVisible} />
               </h3>
               <p className="problem-text">burned per wrong hire.</p>
               <a href="#" className="arrow-link">
@@ -902,22 +907,29 @@ function CorporateHeroAndProblems({ scrollProgress }) {
           {/* Row 1: WHERE [ROTATING WORD WITH TYPING ANIMATION] */}
           <motion.div
             style={{ x: leftX, opacity: topOpacity, display: peripheralDisplay }}
-            className="text-on-surface text-[clamp(36px,8vw,120px)] whitespace-nowrap block"
+            className="text-[clamp(36px,8vw,120px)] whitespace-nowrap block"
           >
-            WHERE <span>{currentText}</span>
+            <span style={{ color: 'var(--black)' }}>WHERE </span>
+            <span style={{ color: 'var(--black)' }}>{currentText}</span>
           </motion.div>
 
           {/* Row 2: IS BUILT */}
           <div className="flex items-center justify-center gap-4 text-[clamp(36px,8vw,120px)] w-full">
             <motion.div
-              style={{ x: isX, opacity: isOpacity, pointerEvents: 'none' }}
-              className="text-on-surface uppercase"
+              style={{ x: isX, opacity: isOpacity, display: peripheralDisplay, pointerEvents: 'none', color: 'var(--black)' }}
+              className="uppercase"
             >
               IS
             </motion.div>
             <motion.div
-              style={{ scale: builtScale, opacity: builtOpacity, transformOrigin: '50% 50%', zIndex: 50 }}
-              className="text-[var(--accent-purple)] pointer-events-none uppercase"
+              style={{
+                scale: builtScale,
+                opacity: builtOpacity,
+                transformOrigin: '50% 50%',
+                zIndex: 50,
+                color: 'var(--accent-purple)',
+              }}
+              className="pointer-events-none uppercase"
             >
               BUILT
             </motion.div>
@@ -926,7 +938,7 @@ function CorporateHeroAndProblems({ scrollProgress }) {
           {/* Row 3: not found */}
           <motion.div style={{ x: rightX, opacity: topOpacity, display: peripheralDisplay }}>
             <span
-              className="text-primary block"
+              className="block"
               style={{
                 fontFamily: 'var(--font-times)',
                 fontStyle: 'italic',
@@ -935,6 +947,7 @@ function CorporateHeroAndProblems({ scrollProgress }) {
                 textTransform: 'none',
                 letterSpacing: 'normal',
                 fontWeight: 'normal',
+                color: 'var(--accent-purple)',
               }}
             >
               not found
@@ -970,23 +983,49 @@ function CorporateCTA() {
         boxShadow: 'none',
       }}
     >
-      {/* Base layer — light yellow/cream */}
+      {/* Base layer — light cream with bottom half race track lineart */}
       <div style={{
         position: 'absolute', inset: 0, background: 'var(--cream)',
         display: 'flex', alignItems: 'center', justifyContent: 'center',
+        overflow: 'hidden',
       }}>
-        <div className="cta-type-inner">
-          <p className="cta-eyebrow" style={{ color: 'var(--dark-grey)' }}>The next era of hiring</p>
+        {/* Race track pattern on base layer */}
+        <div style={{
+          position: 'absolute', inset: 0, zIndex: 1, pointerEvents: 'none',
+          opacity: 0.5,
+        }}>
+          <img
+            src="/f1race-cta-cream.png"
+            alt="Antbox F1 Race Track Pattern"
+            style={{
+              width: '100%',
+              height: '100%',
+              objectFit: 'cover',
+              objectPosition: 'center center',
+              display: 'block',
+            }}
+          />
+          {/* Soft vignette to guarantee 100% crispness of CTA texts */}
+          <div
+            style={{
+              position: 'absolute',
+              inset: 0,
+              background: 'radial-gradient(ellipse at center, rgba(247, 245, 238, 0.88) 0%, rgba(247, 245, 238, 0.5) 60%, rgba(247, 245, 238, 0.15) 100%)',
+            }}
+          />
+        </div>
+
+        <div className="cta-type-inner" style={{ position: 'relative', zIndex: 10 }}>
           <h2 className="cta-type-headline">
-            <span className="cta-line cta-line-italic" style={{ color: 'var(--black)' }}>The future is</span>
-            <span className="cta-line cta-line-bold" style={{ color: 'var(--black)' }}>Pre-Built</span>
-            <span className="cta-line cta-line-italic" style={{ color: 'var(--black)' }}>Talent</span>
+            <span className="cta-line cta-line-italic" style={{ color: '#F7F5ee' }}>The future is</span>
+            <span className="cta-line cta-line-bold" style={{ color: '#F7F5ee' }}>Pre-Built</span>
+            <span className="cta-line cta-line-italic" style={{ color: '#F7F5ee' }}>Talent</span>
           </h2>
           <button className="cta-type-btn" style={{ background: 'var(--purple)', color: '#fff' }}>Enter Factory →</button>
         </div>
       </div>
 
-      {/* Top purple layer — clips in from top on scroll down, clips out on scroll up */}
+      {/* Top purple layer — clips in from top on scroll down, filling track in vibrant brand colors */}
       <motion.div
         style={{
           position: 'absolute', inset: 0,
@@ -994,16 +1033,42 @@ function CorporateCTA() {
           clipPath: clipPathValue,
           display: 'flex', alignItems: 'center', justifyContent: 'center',
           zIndex: 2,
+          overflow: 'hidden',
         }}
       >
-        <div className="cta-type-inner">
-          <p className="cta-eyebrow" style={{ color: 'rgba(43,12,55,0.7)' }}>The next era of hiring</p>
+        {/* Full vibrant brand purple and black track on the purple cover layer */}
+        <div style={{
+          position: 'absolute', inset: 0, zIndex: 1, pointerEvents: 'none',
+        }}>
+          <img
+            src="/f1race-cta-purple.png"
+            alt="Antbox F1 Race Track Vivid"
+            style={{
+              width: '100%',
+              height: '100%',
+              objectFit: 'cover',
+              objectPosition: 'center center',
+              display: 'block',
+              opacity: 0.85,
+            }}
+          />
+          {/* Ambient overlay keeping brand purple aesthetic & pristine text legibility */}
+          <div
+            style={{
+              position: 'absolute',
+              inset: 0,
+              background: 'radial-gradient(ellipse at center, rgba(187, 98, 222, 0.65) 0%, rgba(43, 12, 55, 0.6) 70%, rgba(18, 6, 28, 0.75) 100%)',
+            }}
+          />
+        </div>
+
+        <div className="cta-type-inner" style={{ position: 'relative', zIndex: 10 }}>
           <h2 className="cta-type-headline">
-            <span className="cta-line cta-line-italic" style={{ color: 'var(--cream)' }}>The future is</span>
-            <span className="cta-line cta-line-bold" style={{ color: 'var(--cream)' }}>Pre-Built</span>
-            <span className="cta-line cta-line-italic" style={{ color: 'var(--cream)' }}>Talent</span>
+            <span className="cta-line cta-line-italic" style={{ color: '#F7F5ee' }}>The future is</span>
+            <span className="cta-line cta-line-bold" style={{ color: '#F7F5ee' }}>Pre-Built</span>
+            <span className="cta-line cta-line-italic" style={{ color: '#F7F5ee' }}>Talent</span>
           </h2>
-          <button className="cta-type-btn" style={{ background: 'var(--black)', color: '#fff' }}>Get Pipeline →</button>
+          <button className="cta-type-btn" style={{ background: 'var(--purple)', color: '#fff' }}>Enter Factory →</button>
         </div>
       </motion.div>
     </section>
@@ -1031,7 +1096,7 @@ function CorporateView({ activeTab, setActiveTab }) {
             marginLeft: 'calc(-50vw + 50%)',
             zIndex: 1,
             overflow: 'hidden',
-            background: 'var(--cream)',
+            background: '#0a0610',
           }}
         >
           <CorporateHeroAndProblems scrollProgress={heroProgress} />
@@ -1061,65 +1126,556 @@ function CorporateView({ activeTab, setActiveTab }) {
   );
 }
 
-const candidateTimelineData = [
-  {
-    solutionTitle: "Discover Your Career Pathway Early",
-    solutionDescription: "Participate in AntBox campus roadshows and hands-on workshops. Identify your core strengths and learn market-relevant tools long before placement season opens.",
-    accentColor: "var(--accent-purple)",
-    tags: ["🎯 Campus Roadshows", "📊 Skill Diagnostics", "✨ Zero Guesswork"],
-    problem: {
-      tag: "The Problem",
-      statement: "Getting rejected by automated resume scanners without getting a chance to show real skills.",
-      explanation: "Traditional campus drives rely on keywords and generic GPA filters, discarding high-potential talent before any technical assessment.",
-      stepTag: "Screening Bottleneck"
-    }
-  },
-  {
-    solutionTitle: "Build Proof of Work, Not Just Resumes",
-    solutionDescription: "Work on real-world micro-internships with actual corporate briefs. Show hiring managers proof of what you can build, rather than just listing skills on paper.",
-    accentColor: "#e093ff",
-    tags: ["💼 Micro-Internships", "📁 Verified Portfolios", "⚡ Live Corporate Briefs"],
-    problem: {
-      tag: "The Problem",
-      statement: "Zero real-world project exposure before your first full-time role.",
-      explanation: "Academic curriculums teach theory, but companies hire for practical execution. Candidates struggle to demonstrate proof of actual ability.",
-      stepTag: "Execution Gap"
-    }
-  },
-  {
-    solutionTitle: "Skip the Resume Queue",
-    solutionDescription: "Top companies evaluate your live performance on micro-projects instead of filtering you out with generic criteria.",
-    accentColor: "var(--accent-purple)",
-    tags: ["🚀 100+ Skill Metrics", "🤝 Direct Recruiter Access", "🔥 3x Faster Shortlists"],
-    problem: {
-      tag: "The Problem",
-      statement: "Waiting months during placement season with endless interview rounds and uncertainty.",
-      explanation: "Hundreds of applicants compete for single openings in opaque recruitment pipelines, with zero transparency or feedback.",
-      stepTag: "The Waiting Queue"
-    }
-  },
-  {
-    solutionTitle: "Fast-Track Offers & Zero Retraining",
-    solutionDescription: "Land job offers faster with complete confidence. Step into your role on Day 1 ready to deliver, without the fear of revoked offers or post-hiring lag.",
-    accentColor: "#d580ff",
-    tags: ["🎯 Day-1 Productivity", "🏆 Zero Post-Hiring Lag", "💼 Verified Placement Offers"],
-    problem: {
-      tag: "The Problem",
-      statement: "Unsure how to bridge the gap between classroom theory and industry expectations.",
-      explanation: "New hires spend 4-6 months in corporate training buffers before doing billable work, risking performance reviews and delayed onboarding.",
-      stepTag: "Onboarding Lag"
-    }
-  }
-];
+function HowItWorksCard({ step, index, totalCards, scrollYProgress }) {
+  // Relative position from active focal center (-3 to +3)
+  // When scroll reaches index / (totalCards - 1), relPos is 0 (focal center)
+  const relPos = useTransform(scrollYProgress, (progress) => {
+    const currentPos = progress * (totalCards - 1);
+    return index - currentPos;
+  });
+
+  // True circular semi-circle arc math with Radius R = 500px
+  const cardY = useTransform(relPos, (rel) => {
+    const clampedRel = Math.max(-2.8, Math.min(2.8, rel));
+    return `${Math.sin(clampedRel * 0.44) * 500}px`;
+  });
+
+  const cardX = useTransform(relPos, (rel) => {
+    const clampedRel = Math.max(-2.8, Math.min(2.8, rel));
+    const offset = 500 * (1 - Math.cos(clampedRel * 0.44));
+    return `${offset}px`;
+  });
+
+  // Tangent rotation along the semi-circle wheel curve around its attachment point
+  const cardRotate = useTransform(relPos, (rel) => {
+    const clampedRel = Math.max(-2.8, Math.min(2.8, rel));
+    return clampedRel * 24;
+  });
+
+  // Scale: 1.02 at focal center, smooth taper outward
+  const cardScale = useTransform(relPos, (rel) => {
+    const dist = Math.abs(rel);
+    return Math.max(0.76, 1.02 - dist * 0.12);
+  });
+
+  // Active card is crystal clear, all other cards remain softly blurred
+  const cardBlur = useTransform(relPos, (rel) => {
+    const dist = Math.abs(rel);
+    if (dist <= 0.35) return 0;
+    return Math.min(8, (dist - 0.35) * 5.5);
+  });
+  const cardFilter = useMotionTemplate`blur(${cardBlur}px)`;
+
+  // Opacity: 1 at focal center, above & below cards remain clearly visible on the semi-circle
+  const cardOpacity = useTransform(relPos, (rel) => {
+    const dist = Math.abs(rel);
+    if (dist <= 0.4) return 1;
+    if (dist >= 2.4) return 0;
+    return Math.max(0.3, 1 - (dist - 0.4) * 0.35);
+  });
+
+  const zIndex = useTransform(relPos, (rel) => {
+    return Math.round(50 - Math.abs(rel) * 10);
+  });
+
+  // Point scale on axis line
+  const pointScale = useTransform(relPos, (rel) => {
+    const dist = Math.abs(rel);
+    return dist <= 0.35 ? 1.35 : 0.9;
+  });
+
+  return (
+    <motion.div
+      style={{
+        position: 'absolute',
+        width: 'min(450px, 88%)',
+        right: 'clamp(2rem, 4.5vw, 4rem)',
+        borderRadius: '26px',
+        overflow: 'visible',
+        x: cardX,
+        y: cardY,
+        rotate: cardRotate,
+        opacity: cardOpacity,
+        filter: cardFilter,
+        scale: cardScale,
+        zIndex: zIndex,
+        transformOrigin: 'left center',
+      }}
+    >
+      {/* Point attached to card riding directly on the curved axis line */}
+      <motion.div
+        style={{
+          position: 'absolute',
+          left: '-10px',
+          top: '50%',
+          transform: 'translateY(-50%)',
+          width: '18px',
+          height: '18px',
+          borderRadius: '50%',
+          background: 'var(--accent-purple)',
+          border: '3px solid #F7F5EE',
+          boxShadow: '0 0 14px rgba(187, 98, 222, 0.95)',
+          scale: pointScale,
+          zIndex: 10,
+        }}
+      />
+
+      {/* Card body */}
+      <div
+        style={{
+          borderRadius: '26px',
+          overflow: 'hidden',
+          boxShadow: '0 30px 70px rgba(0,0,0,0.5)',
+          border: '1px solid rgba(187, 98, 222, 0.35)',
+          background: '#240a2f',
+        }}
+      >
+        {/* Big gap statement area — solid brand purple, completely opaque */}
+        <div style={{
+          minHeight: '230px',
+          background: '#240a2f',
+          display: 'flex',
+          flexDirection: 'column',
+          alignItems: 'flex-start',
+          justifyContent: 'center',
+          padding: '2.25rem 2.25rem',
+          position: 'relative',
+        }}>
+          {/* Step indicator tag on card */}
+          <div style={{ display: 'flex', alignItems: 'center', gap: '0.65rem', marginBottom: '0.9rem' }}>
+            <span style={{
+              fontFamily: 'Poppins, sans-serif',
+              fontSize: '1rem',
+              fontWeight: 800,
+              color: 'var(--accent-purple)',
+              letterSpacing: '1px',
+            }}>{step.label}</span>
+            <span style={{ width: '22px', height: '1.5px', background: 'rgba(187, 98, 222, 0.5)' }}></span>
+          </div>
+
+          {/* The GAP text — big and bold */}
+          <p style={{
+            fontFamily: 'Poppins, sans-serif',
+            fontWeight: 700,
+            fontSize: 'clamp(1.15rem, 1.9vw, 1.4rem)',
+            color: '#ffffff',
+            lineHeight: 1.45,
+            margin: 0,
+            maxWidth: '420px',
+          }}>{step.gap}</p>
+        </div>
+
+        {/* Footer bar — THE GAP badge */}
+        <div style={{
+          background: '#180620',
+          padding: '1rem 2.25rem',
+          borderTop: '2px solid var(--accent-purple)',
+          display: 'flex',
+          alignItems: 'center',
+        }}>
+          <span style={{
+            display: 'inline-block',
+            background: 'var(--accent-purple)',
+            color: '#ffffff',
+            padding: '0.35rem 1.15rem',
+            borderRadius: '50px',
+            fontSize: '0.72rem',
+            fontWeight: 900,
+            letterSpacing: '1.5px',
+            textTransform: 'uppercase',
+            flexShrink: 0,
+          }}>THE GAP</span>
+        </div>
+      </div>
+    </motion.div>
+  );
+}
 
 function CandidateHowItWorks() {
+  const sectionRef = useRef(null);
+  const { scrollYProgress } = useScroll({
+    target: sectionRef,
+    offset: ["start start", "end end"]
+  });
+
+  const steps = [
+    {
+      label: '01',
+      gap: 'Getting rejected by automated resume scanners without getting a chance to show real skills.',
+      solution: 'Discover Your Career Pathway Early',
+      body: 'Participate in AntBox campus roadshows and hands-on workshops. Identify your core strengths and learn market-relevant tools long before placement season opens.',
+      color: '#2b0c37',
+      accent: '#BB62DE'
+    },
+    {
+      label: '02',
+      gap: 'Zero real-world project exposure before your first full-time role.',
+      solution: 'Build Proof of Work, Not Just Resumes',
+      body: 'Work on real-world micro-internships with actual corporate briefs. Show hiring managers proof of what you can build, rather than just listing skills on paper.',
+      color: '#1a0826',
+      accent: '#e093ff'
+    },
+    {
+      label: '03',
+      gap: 'Waiting months during placement season with endless interview rounds and uncertainty.',
+      solution: 'Skip the Resume Queue',
+      body: 'Top companies evaluate your live performance on micro-projects instead of filtering you out with generic criteria.',
+      color: '#0f0518',
+      accent: '#BB62DE'
+    },
+    {
+      label: '04',
+      gap: 'Unsure how to bridge the gap between classroom theory and industry expectations.',
+      solution: 'Fast-Track Offers & Zero Retraining',
+      body: 'Land job offers faster with complete confidence. Step into your role on Day 1 ready to deliver, without the fear of revoked offers or post-hiring lag.',
+      color: '#200840',
+      accent: '#d580ff'
+    },
+  ];
+
+  // For each card, determine which step it maps to (0-1 range per card)
+  const totalCards = steps.length;
+
+  // Active step driven by scroll
+  const [activeStep, setActiveStep] = useState(0);
+  useEffect(() => {
+    return scrollYProgress.on('change', (latest) => {
+      const idx = Math.min(Math.round(latest * (totalCards - 1)), totalCards - 1);
+      setActiveStep(idx);
+    });
+  }, [scrollYProgress, totalCards]);
+
   return (
-    <section className="w-full relative z-10" style={{ background: 'var(--cream)', borderTop: '1px solid rgba(0,0,0,0.06)' }}>
-      <Timeline
-        data={candidateTimelineData}
-        title="HOW IT WORKS"
-        subtitle="Discover how Antbox bridges the gap between campus learning and day-one corporate readiness."
-      />
+    <section
+      ref={sectionRef}
+      style={{
+        position: 'relative',
+        height: '155vh',
+        background: '#F7F5EE',
+      }}
+    >
+      {/* Sticky wrapper — fills viewport */}
+      <div style={{
+        position: 'sticky',
+        top: 0,
+        height: '100vh',
+        display: 'flex',
+        overflow: 'hidden',
+      }}>
+        {/* LEFT — Title pushed down from navbar, expanded left section */}
+        <div style={{
+          flex: '0 0 58%',
+          position: 'relative',
+          display: 'flex',
+          flexDirection: 'column',
+          justifyContent: 'center',
+          padding: 'clamp(2.5rem, 6vw, 7.5rem)',
+          zIndex: 2,
+        }}>
+          {/* Top Title: HOW IT WORKS — enlarged and clear of navbar */}
+          <div style={{ position: 'absolute', top: 'clamp(5rem, 10vh, 7.5rem)', left: 'clamp(2.5rem, 6vw, 7.5rem)' }}>
+            <h2 style={{
+              fontFamily: 'Poppins, sans-serif',
+              fontSize: 'clamp(3.8rem, 6.8vw, 6.2rem)',
+              fontWeight: 900,
+              letterSpacing: '-0.05em',
+              lineHeight: 0.9,
+              color: 'var(--black)',
+              margin: 0,
+              textTransform: 'uppercase',
+            }}>
+              HOW <span style={{ color: 'var(--accent-purple)' }}>IT WORKS</span>
+            </h2>
+          </div>
+
+          {/* Active Solution Container — enlarged and filling the space */}
+          <div style={{ width: '100%', maxWidth: '750px', marginTop: '6rem' }}>
+            <AnimatePresence mode="wait">
+              <motion.div
+                key={activeStep}
+                initial={{ opacity: 0, y: 16 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -16 }}
+                transition={{ duration: 0.35, ease: [0.22, 1, 0.36, 1] }}
+                style={{ width: '100%' }}
+              >
+                {/* Heading with side vertical accent bar */}
+                <div style={{ display: 'flex', alignItems: 'center', gap: '1.35rem', marginBottom: '1.5rem' }}>
+                  <div
+                    style={{
+                      width: '6px',
+                      height: 'clamp(2.6rem, 4vw, 3.6rem)',
+                      borderRadius: '999px',
+                      background: steps[activeStep].accent || 'var(--accent-purple)',
+                      flexShrink: 0,
+                    }}
+                  />
+                  <h3 style={{
+                    fontFamily: 'Poppins, sans-serif',
+                    fontSize: 'clamp(2.1rem, 3.6vw, 3.2rem)',
+                    fontWeight: 800,
+                    color: 'var(--black)',
+                    lineHeight: 1.15,
+                    margin: 0,
+                    letterSpacing: '-0.02em',
+                  }}>{steps[activeStep].solution}</h3>
+                </div>
+
+                {/* Description body underneath */}
+                <p style={{
+                  fontFamily: 'Century Gothic, sans-serif',
+                  fontSize: 'clamp(1.2rem, 1.8vw, 1.55rem)',
+                  color: '#383838',
+                  lineHeight: 1.62,
+                  paddingLeft: '1.75rem',
+                  margin: 0,
+                  fontWeight: 400,
+                }}>{steps[activeStep].body}</p>
+              </motion.div>
+            </AnimatePresence>
+          </div>
+        </div>
+
+        {/* RIGHT — animated cards matching semi-circle structure */}
+        <div style={{
+          flex: '0 0 42%',
+          position: 'relative',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'flex-end',
+          overflow: 'visible',
+        }}>
+          {steps.map((step, i) => (
+            <HowItWorksCard
+              key={i}
+              step={step}
+              index={i}
+              totalCards={totalCards}
+              scrollYProgress={scrollYProgress}
+            />
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+}
+
+function CandidateStorySection() {
+  return (
+    <section
+      className="w-full relative z-10"
+      style={{
+        background: '#F7F5EE',
+        padding: 'clamp(5rem, 8vw, 7.5rem) clamp(1.5rem, 5vw, 6.5rem)',
+        borderTop: '1px solid rgba(0,0,0,0.06)',
+      }}
+    >
+      <div className="max-w-[1600px] w-full mx-auto grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-16 items-center">
+        {/* Left: Interactive Profile / Proof Card */}
+        <motion.div
+          initial={{ opacity: 0, x: -30 }}
+          whileInView={{ opacity: 1, x: 0 }}
+          viewport={{ once: true, amount: 0.2 }}
+          transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
+          className="lg:col-span-6 flex items-center justify-start relative w-full"
+        >
+          {/* Main Profile Card */}
+          <div
+            className="relative w-full max-w-[540px] bg-white rounded-3xl p-7 sm:p-9 shadow-[0_20px_50px_rgba(0,0,0,0.05)] border border-neutral-100"
+          >
+            {/* Top Right Floating Badge */}
+            <div
+              className="absolute -top-3.5 right-4 sm:-right-3 bg-white px-4 py-1.5 rounded-full shadow-[0_6px_20px_rgba(0,0,0,0.08)] border border-neutral-100 flex items-center gap-2"
+            >
+              <span className="w-2 h-2 rounded-full bg-[var(--accent-purple)] inline-block" />
+              <span className="text-xs font-bold text-neutral-800 tracking-tight" style={{ fontFamily: 'Poppins, sans-serif' }}>
+                PPO Received
+              </span>
+            </div>
+
+            {/* Profile Header */}
+            <div className="flex items-center gap-4 mb-7">
+              <div className="w-12 h-12 rounded-2xl bg-[#f6effb] text-[var(--accent-purple)] flex items-center justify-center shrink-0">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M22 10v6M2 10l10-5 10 5-10 5z" />
+                  <path d="M6 12v5c3 3 9 3 12 0v-5" />
+                </svg>
+              </div>
+              <div>
+                <h4 className="font-extrabold text-lg sm:text-xl text-[var(--black)] leading-tight" style={{ fontFamily: 'Poppins, sans-serif' }}>
+                  Priya Sharma
+                </h4>
+                <p className="text-xs sm:text-sm text-neutral-500 font-medium mt-0.5" style={{ fontFamily: 'Century Gothic, sans-serif' }}>
+                  Final Year · Computer Science
+                </p>
+              </div>
+            </div>
+
+            {/* Skills & Metrics Progress Bars */}
+            <div className="space-y-5 mb-7">
+              {/* Sprint Completion */}
+              <div>
+                <div className="flex justify-between items-center mb-2">
+                  <span className="text-[11px] sm:text-xs font-extrabold tracking-wider text-neutral-500 uppercase" style={{ fontFamily: 'Poppins, sans-serif' }}>
+                    SPRINT COMPLETION
+                  </span>
+                </div>
+                <div className="w-full h-2 rounded-full bg-[#ece7dc] overflow-hidden">
+                  <motion.div
+                    initial={{ width: 0 }}
+                    whileInView={{ width: '82%' }}
+                    viewport={{ once: true }}
+                    transition={{ duration: 0.9, delay: 0.2, ease: [0.16, 1, 0.3, 1] }}
+                    className="h-full rounded-full bg-[var(--accent-purple)]"
+                  />
+                </div>
+              </div>
+
+              {/* Communication Skills */}
+              <div>
+                <div className="flex justify-between items-center mb-2">
+                  <span className="text-[11px] sm:text-xs font-extrabold tracking-wider text-neutral-500 uppercase" style={{ fontFamily: 'Poppins, sans-serif' }}>
+                    COMMUNICATION SKILLS
+                  </span>
+                </div>
+                <div className="w-full h-2 rounded-full bg-[#ece7dc] overflow-hidden">
+                  <motion.div
+                    initial={{ width: 0 }}
+                    whileInView={{ width: '66%' }}
+                    viewport={{ once: true }}
+                    transition={{ duration: 0.9, delay: 0.35, ease: [0.16, 1, 0.3, 1] }}
+                    className="h-full rounded-full bg-[var(--accent-purple)]"
+                  />
+                </div>
+              </div>
+
+              {/* Problem Solving */}
+              <div>
+                <div className="flex justify-between items-center mb-2">
+                  <span className="text-[11px] sm:text-xs font-extrabold tracking-wider text-neutral-500 uppercase" style={{ fontFamily: 'Poppins, sans-serif' }}>
+                    PROBLEM SOLVING
+                  </span>
+                </div>
+                <div className="w-full h-2 rounded-full bg-[#ece7dc] overflow-hidden">
+                  <motion.div
+                    initial={{ width: 0 }}
+                    whileInView={{ width: '52%' }}
+                    viewport={{ once: true }}
+                    transition={{ duration: 0.9, delay: 0.5, ease: [0.16, 1, 0.3, 1] }}
+                    className="h-full rounded-full bg-[var(--accent-purple)]"
+                  />
+                </div>
+              </div>
+            </div>
+
+            {/* Tags Row */}
+            <div className="flex flex-wrap items-center gap-2.5 pt-1">
+              <span className="px-3.5 py-1.5 rounded-full text-xs font-semibold bg-[#f6effb] text-[var(--accent-purple)]" style={{ fontFamily: 'Poppins, sans-serif' }}>
+                Product Design Sprint
+              </span>
+              <span className="px-3.5 py-1.5 rounded-full text-xs font-medium bg-[#ece7dc] text-neutral-700" style={{ fontFamily: 'Century Gothic, sans-serif' }}>
+                Fintech · 2 weeks
+              </span>
+            </div>
+
+            {/* Bottom Left Floating Badge */}
+            <div
+              className="absolute -bottom-3.5 left-6 bg-white px-4 py-1.5 rounded-full shadow-[0_6px_20px_rgba(0,0,0,0.08)] border border-neutral-100 flex items-center gap-2"
+            >
+              <span className="w-2 h-2 rounded-full bg-[var(--accent-purple)] inline-block" />
+              <span className="text-xs font-bold text-neutral-800 tracking-tight" style={{ fontFamily: 'Poppins, sans-serif' }}>
+                Readiness: 88%
+              </span>
+            </div>
+          </div>
+        </motion.div>
+
+        {/* Right: Typography & Sequentially Appearing Feature Cards */}
+        <div className="lg:col-span-6 flex flex-col justify-center lg:items-end w-full">
+          <div className="w-full max-w-[560px]">
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true, amount: 0.2 }}
+              transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
+            >
+              <h2
+                className="text-4xl sm:text-5xl lg:text-[3.5rem] font-black text-[var(--black)] leading-[1.06] mb-3"
+                style={{ fontFamily: 'Poppins, sans-serif' }}
+              >
+                Own your <br />
+                <span
+                  style={{
+                    fontFamily: '"Times New Roman", Times, serif',
+                    fontStyle: 'italic',
+                    color: 'var(--accent-purple)',
+                    fontWeight: 700,
+                  }}
+                >
+                  career story.
+                </span>
+              </h2>
+              <p
+                className="text-neutral-600 text-base sm:text-lg mb-6 leading-relaxed font-normal"
+                style={{ fontFamily: 'Century Gothic, sans-serif' }}
+              >
+                Stop waiting for opportunities. Sprints put you in the room with the companies you want to work for, before graduation.
+              </p>
+            </motion.div>
+
+            {/* Vertical list of cards appearing one by one on scroll and staying permanently */}
+            <div className="space-y-3.5 w-full">
+              {/* Card 1 */}
+              <motion.div
+                initial={{ opacity: 0, y: 28 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true, amount: 0.2 }}
+                transition={{ duration: 0.55, delay: 0.15, ease: [0.16, 1, 0.3, 1] }}
+                className="bg-white rounded-2xl p-5 sm:p-6 shadow-[0_8px_24px_rgba(0,0,0,0.04)] border border-neutral-100 transition-all hover:shadow-[0_12px_32px_rgba(0,0,0,0.07)] hover:-translate-y-0.5 duration-200"
+              >
+                <h3 className="font-bold text-base sm:text-lg text-[var(--black)] leading-snug" style={{ fontFamily: 'Poppins, sans-serif' }}>
+                  Real briefs, real companies
+                </h3>
+                <p className="text-xs sm:text-sm text-neutral-500 mt-1 leading-relaxed font-normal" style={{ fontFamily: 'Century Gothic, sans-serif' }}>
+                  Work on actual projects, not case studies and build a portfolio that speaks for itself.
+                </p>
+              </motion.div>
+
+              {/* Card 2 */}
+              <motion.div
+                initial={{ opacity: 0, y: 28 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true, amount: 0.2 }}
+                transition={{ duration: 0.55, delay: 0.32, ease: [0.16, 1, 0.3, 1] }}
+                className="bg-white rounded-2xl p-5 sm:p-6 shadow-[0_8px_24px_rgba(0,0,0,0.04)] border border-neutral-100 transition-all hover:shadow-[0_12px_32px_rgba(0,0,0,0.07)] hover:-translate-y-0.5 duration-200"
+              >
+                <h3 className="font-bold text-base sm:text-lg text-[var(--black)] leading-snug" style={{ fontFamily: 'Poppins, sans-serif' }}>
+                  Fast-track to Pre-Placement Offers
+                </h3>
+                <p className="text-xs sm:text-sm text-neutral-500 mt-1 leading-relaxed font-normal" style={{ fontFamily: 'Century Gothic, sans-serif' }}>
+                  Top sprint performers get direct PPOs from participating companies. No resume round.
+                </p>
+              </motion.div>
+
+              {/* Card 3 */}
+              <motion.div
+                initial={{ opacity: 0, y: 28 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true, amount: 0.2 }}
+                transition={{ duration: 0.55, delay: 0.48, ease: [0.16, 1, 0.3, 1] }}
+                className="bg-white rounded-2xl p-5 sm:p-6 shadow-[0_8px_24px_rgba(0,0,0,0.04)] border border-neutral-100 transition-all hover:shadow-[0_12px_32px_rgba(0,0,0,0.07)] hover:-translate-y-0.5 duration-200"
+              >
+                <h3 className="font-bold text-base sm:text-lg text-[var(--black)] leading-snug" style={{ fontFamily: 'Poppins, sans-serif' }}>
+                  AI-validated readiness score
+                </h3>
+                <p className="text-xs sm:text-sm text-neutral-500 mt-1 leading-relaxed font-normal" style={{ fontFamily: 'Century Gothic, sans-serif' }}>
+                  Your profile includes an AntBox Readiness Score, trusted by 340+ enterprises.
+                </p>
+              </motion.div>
+            </div>
+          </div>
+        </div>
+      </div>
     </section>
   );
 }
@@ -1398,16 +1954,15 @@ function CandidateView() {
           }}
         >
           <img
-            src="/rohits.jpeg"
+            src="/rohit-hero-clean.png"
             alt="Antbox Candidate Experience"
             style={{
               width: '100%',
               height: '100%',
               objectFit: 'cover',
-              objectPosition: '14% 18%',
+              objectPosition: 'center center',
               display: 'block',
-              filter: 'blur(6px) brightness(0.85)',
-              transform: 'scale(1.05)',
+              filter: 'brightness(1.02) contrast(1.02)',
             }}
           />
         </motion.div>
@@ -1490,6 +2045,7 @@ function CandidateView() {
         <CompanyMarqueeSection />
 
         <CandidateHowItWorks />
+        <CandidateStorySection />
         <CandidateCTA />
       </div>
     </div>

@@ -43,7 +43,8 @@ export default function Navbar() {
   if (!mounted) return null;
 
   const isCorporate = activeTab === 'corporates';
-  // If navbar background is currently dark (black pill or transparent over candidate dark hero)
+  // When scrolled: corporate pill is dark, candidate pill is light.
+  // When not scrolled: corporate hero is beige (#F7F5EE -> light nav), candidate hero is dark (dark nav).
   const isDarkNav = isHome ? (isScrolled ? isCorporate : !isCorporate) : false;
 
   // Background style
@@ -173,7 +174,7 @@ export default function Navbar() {
                   padding: isScrolled ? '6px 16px' : '7px 20px',
                   borderRadius: '9999px',
                   fontSize: isScrolled ? '0.84rem' : '0.9rem',
-                  color: activeTab === 'corporates' ? '#ffffff' : (isDarkNav ? 'rgba(255, 255, 255, 0.65)' : 'rgba(0, 0, 0, 0.65)'),
+                  color: activeTab === 'corporates' ? '#ffffff' : (isDarkNav ? 'rgba(255, 255, 255, 0.75)' : '#181818'),
                   border: 'none',
                   background: 'transparent',
                   cursor: 'pointer',
@@ -191,7 +192,7 @@ export default function Navbar() {
                   padding: isScrolled ? '6px 16px' : '7px 20px',
                   borderRadius: '9999px',
                   fontSize: isScrolled ? '0.84rem' : '0.9rem',
-                  color: activeTab === 'candidates' ? '#ffffff' : (isDarkNav ? 'rgba(255, 255, 255, 0.65)' : 'rgba(0, 0, 0, 0.65)'),
+                  color: activeTab === 'candidates' ? '#ffffff' : (isDarkNav ? 'rgba(255, 255, 255, 0.75)' : '#181818'),
                   border: 'none',
                   background: 'transparent',
                   cursor: 'pointer',

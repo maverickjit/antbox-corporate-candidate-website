@@ -106,6 +106,122 @@ function BlackQuoteStatementSection() {
   );
 }
 
+function StackedValueCard({ value, index, scrollYProgress, cardSuits, cardTags }) {
+  // Dynamic transforms per card: 900px offscreen start + binary opacity gating to prevent overlap
+  let y, scale, rotate, opacity;
+
+  if (index === 0) {
+    y = useTransform(
+      scrollYProgress,
+      [0.10, 0.22, 0.28, 0.40, 0.46, 0.58, 0.64, 0.74],
+      [0, -8, -8, -16, -16, -24, -24, -32]
+    );
+    scale = useTransform(
+      scrollYProgress,
+      [0.10, 0.22, 0.28, 0.40, 0.46, 0.58, 0.64, 0.74],
+      [1.0, 0.98, 0.98, 0.96, 0.96, 0.94, 0.94, 0.92]
+    );
+    rotate = 0;
+    opacity = 1;
+  } else if (index === 1) {
+    y = useTransform(
+      scrollYProgress,
+      [0.10, 0.22, 0.28, 0.40, 0.46, 0.58, 0.64, 0.74],
+      [900, 0, 0, -8, -8, -16, -16, -24]
+    );
+    scale = useTransform(
+      scrollYProgress,
+      [0.10, 0.22, 0.28, 0.40, 0.46, 0.58, 0.64, 0.74],
+      [1.0, 1.0, 1.0, 0.98, 0.98, 0.96, 0.96, 0.94]
+    );
+    rotate = useTransform(scrollYProgress, [0.10, 0.22], [2, 0]);
+    opacity = useTransform(scrollYProgress, (v) => (v < 0.08 ? 0 : 1));
+  } else if (index === 2) {
+    y = useTransform(
+      scrollYProgress,
+      [0.28, 0.40, 0.46, 0.58, 0.64, 0.74],
+      [900, 0, 0, -8, -8, -16]
+    );
+    scale = useTransform(
+      scrollYProgress,
+      [0.28, 0.40, 0.46, 0.58, 0.64, 0.74],
+      [1.0, 1.0, 1.0, 0.98, 0.98, 0.96]
+    );
+    rotate = useTransform(scrollYProgress, [0.28, 0.40], [-2, 0]);
+    opacity = useTransform(scrollYProgress, (v) => (v < 0.26 ? 0 : 1));
+  } else if (index === 3) {
+    y = useTransform(
+      scrollYProgress,
+      [0.46, 0.58, 0.64, 0.74],
+      [900, 0, 0, -8]
+    );
+    scale = useTransform(
+      scrollYProgress,
+      [0.46, 0.58, 0.64, 0.74],
+      [1.0, 1.0, 1.0, 0.98]
+    );
+    rotate = useTransform(scrollYProgress, [0.46, 0.58], [1.5, 0]);
+    opacity = useTransform(scrollYProgress, (v) => (v < 0.44 ? 0 : 1));
+  } else {
+    // Card 4 (final card: finishes at 0.74, staying fully visible until next section enters at 0.83)
+    y = useTransform(scrollYProgress, [0.64, 0.74], [900, 0]);
+    scale = 1.0;
+    rotate = useTransform(scrollYProgress, [0.64, 0.74], [-1, 0]);
+    opacity = useTransform(scrollYProgress, (v) => (v < 0.62 ? 0 : 1));
+  }
+
+  return (
+    <motion.div
+      className={styles.arcPlayCard}
+      style={{
+        y,
+        scale,
+        rotate,
+        opacity,
+        zIndex: index + 1,
+        backgroundColor: '#FFFFFF',
+        borderTop: `6px solid ${value.bg}`,
+      }}
+    >
+      {/* Left Column: Text Content */}
+      <div className={styles.arcCardLeft}>
+        <div>
+          <div className={styles.arcCardStepRow}>
+            <span className={styles.arcCardSuitIcon}>
+              {cardSuits[index]}
+            </span>
+          </div>
+
+          <h3 className={styles.arcCardTitle}>
+            {value.title}
+          </h3>
+          <p className={styles.arcCardDesc}>
+            {value.desc}
+          </p>
+        </div>
+
+        <div className={styles.arcCardFooter}>
+          <span>✦</span>
+          <span>{cardTags[index]}</span>
+        </div>
+      </div>
+
+      {/* Right Column: Image Artwork */}
+      <div className={styles.arcCardRight} style={{ backgroundColor: value.bg }}>
+        {value.image ? (
+          <Image
+            src={value.image}
+            alt={value.title}
+            fill
+            unoptimized
+            className={styles.arcCardImg}
+          />
+        ) : null}
+      </div>
+    </motion.div>
+  );
+}
+
 function CompanyValuesCardsSection({ values }) {
   const containerRef = React.useRef(null);
 
@@ -113,9 +229,6 @@ function CompanyValuesCardsSection({ values }) {
     target: containerRef,
     offset: ["start start", "end end"]
   });
-
-  // Horizontal slide finishes at 0.68, then cards stay completely stationary from 0.68 to 1.0 while next section overlays
-  const trackX = useTransform(scrollYProgress, [0.0, 0.68, 1.0], ["0px", "-3160px", "-3160px"]);
 
   const cardSuits = ['♠', '♥', '♦', '♣', '★'];
   const cardTags = [
@@ -136,56 +249,19 @@ function CompanyValuesCardsSection({ values }) {
           </h2>
         </div>
 
-        {/* Horizontal Curved Track with 5 Cards (Text Left, Image Right) */}
-        <motion.div style={{ x: trackX }} className={styles.valuesArcTrack}>
-          {values.map((value, index) => {
-            return (
-              <motion.div
-                key={index}
-                className={styles.arcPlayCard}
-                style={{
-                  borderTop: `6px solid ${value.bg}`
-                }}
-              >
-                {/* Left Column: Text Content */}
-                <div className={styles.arcCardLeft}>
-                  <div>
-                    <div className={styles.arcCardStepRow}>
-                      <span className={styles.arcCardSuitIcon}>
-                        {cardSuits[index]}
-                      </span>
-                    </div>
-
-                    <h3 className={styles.arcCardTitle}>
-                      {value.title}
-                    </h3>
-                    <p className={styles.arcCardDesc}>
-                      {value.desc}
-                    </p>
-                  </div>
-
-                  <div className={styles.arcCardFooter}>
-                    <span>✦</span>
-                    <span>{cardTags[index]}</span>
-                  </div>
-                </div>
-
-                {/* Right Column: Image Artwork */}
-                <div className={styles.arcCardRight} style={{ backgroundColor: value.bg }}>
-                  {value.image ? (
-                    <Image
-                      src={value.image}
-                      alt={value.title}
-                      fill
-                      unoptimized
-                      className={styles.arcCardImg}
-                    />
-                  ) : null}
-                </div>
-              </motion.div>
-            );
-          })}
-        </motion.div>
+        {/* Vertical Stacking Cards Deck Container */}
+        <div className={styles.valuesStackDeck}>
+          {values.map((value, index) => (
+            <StackedValueCard
+              key={index}
+              value={value}
+              index={index}
+              scrollYProgress={scrollYProgress}
+              cardSuits={cardSuits}
+              cardTags={cardTags}
+            />
+          ))}
+        </div>
       </div>
     </div>
   );
@@ -367,7 +443,7 @@ function MaskedLineRevealStatement() {
   const [showUnderline, setShowUnderline] = React.useState(false);
 
   const full1 = "AntBox is built on a simple idea: the degree was never a skill";
-  const full2 = "test — ";
+  const full2 = "test ";
   const full3 = "it was a proxy.";
   const full4 = "Nobody built the replacement. So we did.";
 
@@ -564,20 +640,20 @@ function ParallaxCultureCard() {
     offset: ["start end", "end end"]
   });
 
-  // Smooth scroll transformations for Full-Screen Expansion (0.10 -> 0.65)
-  const cardWidth = useTransform(scrollYProgress, [0.10, 0.65], ["85vw", "100vw"]);
-  const cardHeight = useTransform(scrollYProgress, [0.10, 0.65], ["76vh", "100vh"]);
-  const cardRadius = useTransform(scrollYProgress, [0.10, 0.65], ["36px", "0px"]);
-  const cardScale = useTransform(scrollYProgress, [0.10, 0.65], [0.92, 1.0]);
+  // Smooth scroll transformations for Full-Screen Expansion (0.05 -> 0.45)
+  const cardWidth = useTransform(scrollYProgress, [0.05, 0.45], ["85vw", "100vw"]);
+  const cardHeight = useTransform(scrollYProgress, [0.05, 0.45], ["76vh", "100vh"]);
+  const cardRadius = useTransform(scrollYProgress, [0.05, 0.45], ["32px", "0px"]);
+  const cardScale = useTransform(scrollYProgress, [0.05, 0.45], [0.94, 1.0]);
 
   // Parallax Zoom transforms for background real culture image
-  const imageScale = useTransform(scrollYProgress, [0.00, 0.65, 1.0], [1.35, 1.05, 1.0]);
-  const imageY = useTransform(scrollYProgress, [0.00, 1.0], ["-8%", "8%"]);
+  const imageScale = useTransform(scrollYProgress, [0.00, 0.45, 1.0], [1.3, 1.05, 1.0]);
+  const imageY = useTransform(scrollYProgress, [0.00, 1.0], ["-6%", "6%"]);
 
-  // Parallax Zoom transforms for heading typography
-  const textScale = useTransform(scrollYProgress, [0.10, 0.65], [0.88, 1.05]);
-  const textY = useTransform(scrollYProgress, [0.10, 0.65], [30, 0]);
-  const overlayOpacity = useTransform(scrollYProgress, [0.10, 0.65], [0.65, 0.4]);
+  // Heading typography transforms
+  const textScale = useTransform(scrollYProgress, [0.05, 0.45], [0.92, 1.0]);
+  const textY = useTransform(scrollYProgress, [0.05, 0.45], [20, 0]);
+  const overlayOpacity = useTransform(scrollYProgress, [0.05, 0.45], [0.65, 0.45]);
 
   return (
     <div ref={containerRef} className={styles.cultureStickyTrack}>
@@ -606,29 +682,28 @@ function ParallaxCultureCard() {
 
           <motion.div style={{ opacity: overlayOpacity }} className={styles.cultureHeroOverlay}></motion.div>
 
-          {/* Parallax Zoom Big stacked heading */}
+          {/* Parallax Zoom Centered Heading & CTA Block */}
           <motion.div style={{ y: textY, scale: textScale }} className={styles.cultureTextBlock}>
+            <div className={styles.cultureBadge}>
+              <span>✦</span>
+              <span>LIFE AT ANTBOX</span>
+            </div>
             <h2 className={styles.cultureStackedHeading}>
-              <span>LIFE</span>
-              <span>AT</span>
+              <span>LIFE AT</span>
               <span className={styles.cultureAccentLine}>ANTBOX.</span>
             </h2>
-          </motion.div>
-
-          {/* Bottom row */}
-          <div className={styles.cultureBottomRow}>
-            <div className={styles.cultureSubGroup}>
-              <p className={styles.cultureSubtitle}>
-                But we don't burn out doing it.
-              </p>
-              <a href="#jobs" className={styles.cultureCtaBtn}>
+            <p className={styles.cultureSubtitle}>
+              High standard. High velocity. But we don't burn out doing it.
+            </p>
+            <div className={styles.cultureCtaWrapper}>
+              <a href="/candidates" className={styles.cultureCtaBtn}>
                 Join the team
                 <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
                   <line x1="7" y1="17" x2="17" y2="7" /><polyline points="7 7 17 7 17 17" />
                 </svg>
               </a>
             </div>
-          </div>
+          </motion.div>
         </motion.div>
       </div>
     </div>
@@ -639,114 +714,148 @@ const customerReviewsData = [
   // Column 1
   [
     {
+      name: "Rohan Verma",
+      role: "Software Engineering Intern deployed at FinEdge",
+      avatar: "/avatars/avatar8.jpg",
+      tag: "STUDENT TO ENGINEER",
+      text: "AntBox was a game changer for my career. Instead of rote DSA questions, I built production-grade microservices and handled live traffic teardowns. Deployed into FinEdge on Day 0 with zero friction."
+    },
+    {
       name: "Alexandra Giraldo",
-      role: "Global SDR Manager at Cabify",
+      role: "Global SDR Manager at Cabify (Hiring Partner)",
       avatar: "/avatars/avatar1.jpg",
-      tag: "TOP FUNNEL EFFICIENCY",
-      text: "I lead a global team of SDRs that was using 7 different tools to complete full top funnel cycle. Now with AntBox operators, candidates hit the ground running with zero ramp-up time. Everything shipped on Day 1."
+      tag: "HIRING PARTNER",
+      text: "The interns from AntBox arrived knowing our exact tech stack, CRM workflows, and cadence tools. They required zero ramp-up time and delivered outbound pipeline from their very first week."
     },
     {
-      name: "Aline Louzada",
-      role: "Growth at Clara",
+      name: "Ananya Sen",
+      role: "Product Design Fellow deployed at Clara",
       avatar: "/avatars/avatar2.jpg",
-      tag: "99.4% SKILL ACCURACY",
-      text: "AntBox is remarkably intuitive and fast. They provide verified proof-of-work candidates rather than generic resumes. We replaced a 3-week screening process with a 48-hour direct deployment."
+      tag: "DESIGN INTERN",
+      text: "The Glass Kitchen environment at AntBox taught me how real design systems are shipped. When I started my internship at Clara, I was already contributing to production component libraries on Day 1."
     },
     {
-      name: "Amar Balic",
-      role: "Revenue Operations Lead at Twinwin",
-      avatar: "/avatars/avatar7.jpg",
-      tag: "REV-OPS RIGOR",
-      text: "The quality of operators coming out of AntBox is unmatched. The practical training in Glass Kitchen workflows means they already understand production rigor from day zero."
-    },
-    {
-      name: "Elena Rostova",
-      role: "VP of Product at Moneta",
-      avatar: "/avatars/avatar1.jpg",
-      tag: "DESIGN & DEV SYNC",
-      text: "We needed senior-caliber execution under tight deadlines. AntBox's operators delivered our core design system rollout 3 weeks ahead of schedule."
+      name: "David Vance",
+      role: "CTO at HyperScale Systems (Hiring Partner)",
+      avatar: "/avatars/avatar5.jpg",
+      tag: "HIRING PARTNER",
+      text: "AntBox solved our junior engineering bandwidth bottleneck. We brought in 3 backend interns, and their code velocity and discipline matched mid-level engineers within their first two weeks."
     }
   ],
   // Column 2
   [
     {
+      name: "Aditya Patel",
+      role: "Full-Stack Intern deployed at Dokutech",
+      avatar: "/avatars/avatar7.jpg",
+      tag: "STUDENT TO OPERATOR",
+      text: "Most college courses don't prepare you for real-world codebases. AntBox gave me the grit to debug legacy systems, write comprehensive tests, and ship clean pull requests with complete confidence."
+    },
+    {
       name: "José Marques",
-      role: "CMO & Business Developer at Dokutech",
-      avatar: "/avatars/avatar5.jpg",
-      tag: "OUTBOUND STRATEGY",
-      text: "Before using AntBox, I was heavily reliant on hit-or-miss recruiter pipelines. AntBox is an incredible upgrade — the workflow is 5x faster and candidates are vetted by actual engineering tests."
-    },
-    {
-      name: "Karén Mkhitaryan",
-      role: "CMO at Game Strategies",
+      role: "CMO & Business Lead at Dokutech (Hiring Partner)",
       avatar: "/avatars/avatar4.jpg",
-      tag: "SCALED OPERATIONS",
-      text: "The whole model is built around proof of work instead of credential fluff. Every candidate we brought on had built real systems before they ever interviewed with us."
+      tag: "HIRING PARTNER",
+      text: "AntBox is an incredible talent partner for scaling startups. Every student intern we hosted had verified proof-of-work and a relentless hunger to execute. Truly Day-0 ready."
     },
     {
-      name: "David Vance",
-      role: "CTO at HyperScale Systems",
-      avatar: "/avatars/avatar8.jpg",
-      tag: "CORE INFRASTRUCTURE",
-      text: "AntBox solved our senior frontend and backend bandwidth bottleneck. We onboarded 3 operators in 4 days, and their code velocity matched our top engineers immediately."
+      name: "Pooja Sundaram",
+      role: "AI/ML Intern deployed at Moneta",
+      avatar: "/avatars/avatar3.jpg",
+      tag: "STUDENT SUCCESS",
+      text: "Building real domain projects under senior operator mentorship gave me practical experience no resume could match. Moneta converted my AntBox internship into a full-time engineering offer!"
     },
     {
       name: "Sofia Chen",
-      role: "Engineering Director at Apex Cloud",
-      avatar: "/avatars/avatar4.jpg",
-      tag: "CLOUD ARCHITECTURE",
-      text: "The transparency and accountability AntBox brings is refreshing. No middlemen, no vanity metrics — just high-performing builders who take ownership."
+      role: "Engineering Director at Apex Cloud (Hiring Partner)",
+      avatar: "/avatars/avatar1.jpg",
+      tag: "HIRING PARTNER",
+      text: "The transparency and rigor AntBox brings to student vetting is unprecedented. No credentials fluff — just exceptionally well-trained, proactive builders who take full ownership."
     }
   ],
   // Column 3
   [
     {
-      name: "Lucas Summers",
-      role: "Digital Sales Account Manager at Hewlett Packard Enterprise",
-      avatar: "/avatars/avatar3.jpg",
-      tag: "ENTERPRISE OUTCOMES",
-      text: "I went from a 5% open rate to an average of nearly 45% with our AntBox-trained cohort. The domain depth they instill makes a massive difference in complex sales cycles."
+      name: "Siddharth Nair",
+      role: "Growth Operations Intern deployed at Tidio",
+      avatar: "/avatars/avatar9.jpg",
+      tag: "GROWTH INTERN",
+      text: "The sprint-based training at AntBox pushed me to analyze real data pipelines. During my first month as an intern at Tidio, I optimized 4 automated workflows for the sales team."
     },
     {
       name: "Luke Sheehy",
-      role: "GTM at Tidio",
+      role: "GTM Lead at Tidio (Hiring Partner)",
       avatar: "/avatars/avatar6.jpg",
-      tag: "48-HOUR DEPLOYMENT",
-      text: "During the free trial alone, we generated 5-6 enterprise pipeline meetings. Every candidate arrived fully trained on our exact tech stack and CRM workflows."
+      tag: "HIRING PARTNER",
+      text: "AntBox candidates come pre-trained on domain rigor. Our intern generated enterprise pipeline in their second week. We now look to AntBox first for every upcoming student cohort."
+    },
+    {
+      name: "Kavya Iyer",
+      role: "Frontend Engineering Fellow deployed at Twinwin",
+      avatar: "/avatars/avatar2.jpg",
+      tag: "STUDENT TO BUILDER",
+      text: "AntBox taught me how to 'Own The Whole Box'. When our team faced a release deadline, I knew exactly how to trace edge cases and ship the patch under pressure."
     },
     {
       name: "Marcus Thorne",
-      role: "VP of Engineering at FinEdge",
-      avatar: "/avatars/avatar9.jpg",
-      tag: "FINTECH RELIABILITY",
-      text: "AntBox operators treated our mission-critical codebase with total care. They embody 'Own The Whole Box' — finding edge cases and patching them before release."
-    },
-    {
-      name: "Priya Nambiar",
-      role: "Talent Partner at VentureScale",
-      avatar: "/avatars/avatar3.jpg",
-      tag: "SERIES A TO C TEAMS",
-      text: "We recommend AntBox to all our portfolio founders. It's the most reliable way to hire pre-vetted, high-grit operators without burning engineering bandwidth on interviews."
+      role: "VP of Engineering at FinEdge (Hiring Partner)",
+      avatar: "/avatars/avatar8.jpg",
+      tag: "HIRING PARTNER",
+      text: "AntBox interns treat mission-critical software with real ownership and discipline. It's the most reliable pipeline for high-grit student talent we've ever partnered with."
     }
   ]
 ];
 
 function CustomerReviewsSection() {
+  const sectionRef = React.useRef(null);
+  const { scrollYProgress } = useScroll({
+    target: sectionRef,
+    offset: ["start end", "start start"]
+  });
+
+  // Roll over from the bottom of the screen (card deck overlap effect)
+  const deckRadius = useTransform(scrollYProgress, [0, 1], ["48px 48px 0 0", "36px 36px 0 0"]);
+  const deckShadow = useTransform(
+    scrollYProgress,
+    [0, 1],
+    [
+      "0 -25px 60px rgba(0, 0, 0, 0.7), 0 -1px 0 rgba(255, 255, 255, 0.1)",
+      "0 -50px 120px rgba(0, 0, 0, 0.98), 0 -1px 0 rgba(255, 255, 255, 0.18)"
+    ]
+  );
+
   const columnClasses = [styles.reviewsColUp, styles.reviewsColDown, styles.reviewsColUpFast];
 
   return (
-    <section className={styles.customerReviewsSection}>
+    <motion.section
+      ref={sectionRef}
+      style={{
+        position: 'relative',
+        width: '100vw',
+        left: '50%',
+        right: '50%',
+        marginLeft: '-50vw',
+        marginRight: '-50vw',
+        marginTop: '-100vh', // Overlays completely on top of the pinned Life at AntBox section
+        zIndex: 25,
+        overflow: 'hidden',
+        background: '#0A0A0E',
+        borderRadius: deckRadius,
+        boxShadow: deckShadow
+      }}
+      className={styles.customerReviewsSection}
+    >
       {/* Section Header */}
       <div className={styles.reviewsHeader}>
         <div className={styles.reviewsBadge}>
           <span>✦</span>
-          <span>WALL OF PROOF</span>
+          <span>PROOF OF IMPACT</span>
         </div>
         <h2 className={styles.reviewsTitle}>
-          Hear it directly from our customers & partners
+          Hear from our interns & partner companies
         </h2>
         <p className={styles.reviewsSubtitle}>
-          Real feedback from high-growth engineering leaders, founders, and operators scaling with AntBox.
+          Real feedback from students deployed into high-impact roles and the engineering leaders who hire them.
         </p>
       </div>
 
@@ -798,7 +907,7 @@ function CustomerReviewsSection() {
           })}
         </div>
       </div>
-    </section>
+    </motion.section>
   );
 }
 
@@ -905,115 +1014,10 @@ function AboutFooterSection() {
   );
 }
 
-function HeroCursorFollower({ containerRef }) {
-  const mouseX = useMotionValue(600);
-  const mouseY = useMotionValue(350);
-  const [isHovered, setIsHovered] = useState(false);
-
-  // Smooth responsive spring physics for cursor light
-  const springConfig = { damping: 28, stiffness: 200, mass: 0.4 };
-  const smoothX = useSpring(mouseX, springConfig);
-  const smoothY = useSpring(mouseY, springConfig);
-
-  // Ethereal trailing aura with slightly softer lag
-  const trailX = useSpring(mouseX, { damping: 38, stiffness: 110, mass: 0.85 });
-  const trailY = useSpring(mouseY, { damping: 38, stiffness: 110, mass: 0.85 });
-
-  useEffect(() => {
-    const container = containerRef.current;
-    if (!container) return;
-
-    const handleMouseMove = (e) => {
-      const rect = container.getBoundingClientRect();
-      mouseX.set(e.clientX - rect.left);
-      mouseY.set(e.clientY - rect.top);
-      setIsHovered(true);
-    };
-
-    const handleMouseLeave = () => {
-      setIsHovered(false);
-    };
-
-    container.addEventListener('mousemove', handleMouseMove);
-    container.addEventListener('mouseleave', handleMouseLeave);
-    container.addEventListener('mouseenter', () => setIsHovered(true));
-
-    return () => {
-      container.removeEventListener('mousemove', handleMouseMove);
-      container.removeEventListener('mouseleave', handleMouseLeave);
-    };
-  }, [containerRef, mouseX, mouseY]);
-
-  return (
-    <div style={{ position: 'absolute', inset: 0, overflow: 'hidden', pointerEvents: 'none', zIndex: 1 }}>
-      {/* Outer Ethereal Aurora Glow */}
-      <motion.div
-        style={{
-          position: 'absolute',
-          left: 0,
-          top: 0,
-          x: trailX,
-          y: trailY,
-          translateX: '-50%',
-          translateY: '-50%',
-          width: '640px',
-          height: '640px',
-          borderRadius: '50%',
-          background: 'radial-gradient(circle, rgba(187, 98, 222, 0.22) 0%, rgba(236, 72, 153, 0.12) 35%, rgba(192, 132, 252, 0.04) 65%, transparent 75%)',
-          filter: 'blur(55px)',
-          opacity: isHovered ? 1 : 0,
-          transition: 'opacity 0.6s ease'
-        }}
-      />
-
-      {/* Inner Responsive Ambient Spotlight Beam */}
-      <motion.div
-        style={{
-          position: 'absolute',
-          left: 0,
-          top: 0,
-          x: smoothX,
-          y: smoothY,
-          translateX: '-50%',
-          translateY: '-50%',
-          width: '260px',
-          height: '260px',
-          borderRadius: '50%',
-          background: 'radial-gradient(circle, rgba(216, 180, 254, 0.42) 0%, rgba(187, 98, 222, 0.16) 45%, transparent 70%)',
-          filter: 'blur(28px)',
-          opacity: isHovered ? 1 : 0,
-          transition: 'opacity 0.3s ease'
-        }}
-      />
-
-      {/* Subtle Luminous Focal Dot */}
-      <motion.div
-        style={{
-          position: 'absolute',
-          left: 0,
-          top: 0,
-          x: smoothX,
-          y: smoothY,
-          translateX: '-50%',
-          translateY: '-50%',
-          width: '36px',
-          height: '36px',
-          borderRadius: '50%',
-          background: 'radial-gradient(circle, rgba(255, 255, 255, 0.85) 0%, rgba(192, 132, 252, 0.5) 50%, transparent 100%)',
-          filter: 'blur(5px)',
-          opacity: isHovered ? 0.75 : 0,
-          transition: 'opacity 0.2s ease'
-        }}
-      />
-    </div>
-  );
-}
-
 export default function About() {
   const [activeFilter, setActiveFilter] = useState('View all');
   const [revealedCount, setRevealedCount] = useState(1);
   const valuesSectionRef = React.useRef(null);
-  const heroContainerRef = React.useRef(null);
 
   useEffect(() => {
     const observerCallback = (entries) => {
@@ -1192,35 +1196,16 @@ export default function About() {
   return (
     <main className={styles.main}>
       {/* ── Section 1: Operators Hero Section (Rich Immersive Aesthetics) ── */}
-      <div ref={heroContainerRef} className={styles.operatorsHeroSection}>
-        {/* Cursor-following interactive ambient spotlight element */}
-        <HeroCursorFollower containerRef={heroContainerRef} />
-
+      <div className={styles.operatorsHeroSection}>
         {/* Soft Ambient Glow Blurs */}
         <div className={styles.operatorsGlowTopLeft} />
         <div className={styles.operatorsGlowBottomRight} />
 
         <div className={styles.operatorsHeaderBlock}>
-          {/* Hero Category Badge */}
-          <div className={styles.heroCategoryTag}>
-            <span>✨</span>
-            <span>OPERATOR-LED TALENT ENGINE</span>
-          </div>
-
           <h1 className={styles.operatorsTitle}>
             We are operators who have <span className={styles.operatorsHighlight}>vetted, trained, and deployed</span> top talent for B2B companies.
           </h1>
           <TypingSubtitle text="We take final and pre-final year students, run them through real-world domain teardowns, and deploy them into fast-growing SaaS teams. We bring verified proof of work, owning candidate readiness so they contribute from Day 0." />
-
-          {/* Scroll Guidance Indicator */}
-          <motion.div
-            animate={{ y: [0, 5, 0] }}
-            transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
-            className={styles.scrollGuidancePill}
-          >
-            <span>SCROLL TO EXPLORE</span>
-            <span style={{ color: '#BB62DE', fontSize: '0.9rem', fontWeight: 800 }}>↓</span>
-          </motion.div>
         </div>
       </div>
 

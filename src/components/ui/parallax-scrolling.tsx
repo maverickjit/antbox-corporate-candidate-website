@@ -3,7 +3,7 @@
 import React, { useEffect, useRef } from 'react';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
-import Lenis from '@studio-freight/lenis';
+import Lenis from 'lenis';
 
 export interface ParallaxComponentProps {
   title?: string;
@@ -17,7 +17,7 @@ export function ParallaxComponent({
   layer1 = "https://cdn.prod.website-files.com/671752cd4027f01b1b8f1c7f/6717795be09b462b2e8ebf71_osmo-parallax-layer-3.webp",
   layer2 = "https://cdn.prod.website-files.com/671752cd4027f01b1b8f1c7f/6717795b4d5ac529e7d3a562_osmo-parallax-layer-2.webp",
   layer4 = "https://cdn.prod.website-files.com/671752cd4027f01b1b8f1c7f/6717795bb5aceca85011ad83_osmo-parallax-layer-1.webp",
-}: ParallaxComponentProps) {
+}: ParallaxComponentProps): React.JSX.Element {
   const parallaxRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -65,7 +65,6 @@ export function ParallaxComponent({
     gsap.ticker.lagSmoothing(0);
 
     return () => {
-      // Clean up GSAP and ScrollTrigger instances
       ScrollTrigger.getAll().forEach(st => st.kill());
       if (triggerElement) gsap.killTweensOf(triggerElement);
       gsap.ticker.remove(tickerCallback);
@@ -123,7 +122,6 @@ export function ParallaxComponent({
       </section>
     </div>
   );
-
 }
 
 export default ParallaxComponent;
