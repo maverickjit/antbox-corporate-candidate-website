@@ -642,9 +642,8 @@ function ReadyToBuildTribesSection() {
               }}
             >
               {/* Outer Orbit Ring with 2 Revolving Nodes */}
-              <motion.div
-                animate={{ rotate: 360 }}
-                transition={{ duration: 24, repeat: Infinity, ease: 'linear' }}
+              <div
+                className="orbit-spin-clockwise"
                 style={{
                   position: 'absolute',
                   width: '230px',
@@ -674,9 +673,8 @@ function ReadyToBuildTribesSection() {
                     boxShadow: '0 4px 14px rgba(0,0,0,0.5)',
                   }}
                 >
-                  <motion.div
-                    animate={{ rotate: -360 }}
-                    transition={{ duration: 24, repeat: Infinity, ease: 'linear' }}
+                  <div
+                    className="orbit-counter-rotate-outer"
                     style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}
                   >
                     <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -684,7 +682,7 @@ function ReadyToBuildTribesSection() {
                       <line x1="12" y1="20" x2="12" y2="4"></line>
                       <line x1="6" y1="20" x2="6" y2="14"></line>
                     </svg>
-                  </motion.div>
+                  </div>
                 </div>
 
                 {/* Planet 2 on Outer Orbit (Right) */}
@@ -705,9 +703,8 @@ function ReadyToBuildTribesSection() {
                     boxShadow: '0 4px 14px rgba(0,0,0,0.5)',
                   }}
                 >
-                  <motion.div
-                    animate={{ rotate: -360 }}
-                    transition={{ duration: 24, repeat: Infinity, ease: 'linear' }}
+                  <div
+                    className="orbit-counter-rotate-outer"
                     style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}
                   >
                     <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -715,14 +712,13 @@ function ReadyToBuildTribesSection() {
                       <line x1="2" y1="12" x2="22" y2="12"></line>
                       <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path>
                     </svg>
-                  </motion.div>
+                  </div>
                 </div>
-              </motion.div>
+              </div>
 
               {/* Inner Orbit Ring with 1 Revolving Node */}
-              <motion.div
-                animate={{ rotate: -360 }}
-                transition={{ duration: 16, repeat: Infinity, ease: 'linear' }}
+              <div
+                className="orbit-spin-counter"
                 style={{
                   position: 'absolute',
                   width: '142px',
@@ -752,9 +748,8 @@ function ReadyToBuildTribesSection() {
                     boxShadow: '0 4px 14px rgba(0,0,0,0.5)',
                   }}
                 >
-                  <motion.div
-                    animate={{ rotate: 360 }}
-                    transition={{ duration: 16, repeat: Infinity, ease: 'linear' }}
+                  <div
+                    className="orbit-counter-rotate-inner"
                     style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}
                   >
                     <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -762,9 +757,9 @@ function ReadyToBuildTribesSection() {
                       <line x1="8" y1="21" x2="16" y2="21"></line>
                       <line x1="12" y1="17" x2="12" y2="21"></line>
                     </svg>
-                  </motion.div>
+                  </div>
                 </div>
-              </motion.div>
+              </div>
 
               {/* Center Antbox Core without glow */}
               <div
@@ -1000,7 +995,7 @@ function CandidateFriction() {
   const [activeStep, setActiveStep] = useState(0);
 
   useEffect(() => {
-    return scrollYProgress.onChange(latest => {
+    return scrollYProgress.on('change', (latest) => {
       if (latest < 0.35) setActiveStep(0);
       else if (latest < 0.55) setActiveStep(1);
       else setActiveStep(2);
@@ -1013,20 +1008,45 @@ function CandidateFriction() {
     if (!el) return;
     const observer = new IntersectionObserver(
       ([entry]) => { if (entry.isIntersecting) setFlipped(true); },
-      { threshold: 0.4 }
+      { threshold: 0.3 }
     );
     observer.observe(el);
     return () => observer.disconnect();
   }, []);
 
   return (
-    <section className="problems-section candidate-friction" ref={sectionRef} style={{ minHeight: '85vh', padding: '4.5rem 0 2rem', display: 'flex', alignItems: 'center' }}>
-      <div style={{ width: '100%', display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'flex-start', background: 'transparent', padding: '0 clamp(2rem, 5vw, 5rem)' }}>
+    <section
+      className="problems-section candidate-friction"
+      ref={sectionRef}
+      style={{
+        width: '100vw',
+        minHeight: '100vh',
+        marginLeft: 'calc(-50vw + 50%)',
+        padding: 'clamp(5rem, 8vh, 7.5rem) clamp(2.5rem, 5.5vw, 6.5rem)',
+        display: 'flex',
+        flexDirection: 'column',
+        justifyContent: 'center',
+        background: 'var(--black)',
+        position: 'relative',
+        zIndex: 10,
+        boxSizing: 'border-box',
+      }}
+    >
+      <div style={{
+        width: '100%',
+        maxWidth: '1440px',
+        margin: '0 auto',
+        display: 'flex',
+        flexDirection: 'column',
+        justifyContent: 'center',
+        alignItems: 'flex-start',
+      }}>
+        {/* Big Impact Header */}
         <h2
           ref={titleRef}
           className="friction-header"
           style={{
-            marginBottom: '0.85rem',
+            marginBottom: 'clamp(2.5rem, 4.5vh, 4rem)',
             textAlign: 'left',
             perspective: '800px',
             display: 'block',
@@ -1035,6 +1055,12 @@ function CandidateFriction() {
           <span
             style={{
               display: 'block',
+              fontFamily: 'Poppins, sans-serif',
+              fontSize: 'clamp(3.8rem, 6.5vw, 6rem)',
+              fontWeight: 900,
+              lineHeight: 0.92,
+              letterSpacing: '-0.04em',
+              color: '#ffffff',
               transformStyle: 'preserve-3d',
               transition: 'transform 0.9s cubic-bezier(0.22,1,0.36,1)',
               transform: flipped ? 'rotateY(0deg)' : 'rotateY(-90deg)',
@@ -1044,9 +1070,11 @@ function CandidateFriction() {
           <span
             style={{
               display: 'block',
-              fontFamily: '"Poppins", sans-serif',
-              fontStyle: 'normal',
-              fontWeight: 800,
+              fontFamily: 'Poppins, sans-serif',
+              fontSize: 'clamp(3.8rem, 6.5vw, 6rem)',
+              fontWeight: 900,
+              lineHeight: 0.92,
+              letterSpacing: '-0.04em',
               color: 'var(--accent-purple)',
               transformStyle: 'preserve-3d',
               transition: 'transform 0.9s cubic-bezier(0.22,1,0.36,1)',
@@ -1056,89 +1084,178 @@ function CandidateFriction() {
           >FRICTION</span>
         </h2>
 
-        <div className="process-layout" style={{ width: '100%', marginTop: '1rem' }}>
-          <div className="process-timeline" style={{ display: 'flex', gap: '2.5rem', width: '100%', position: 'relative' }}>
-            <motion.div className="process-timeline-active-line" style={{ position: 'absolute', top: 0, left: 0, height: '2px', background: 'var(--accent-purple)', zIndex: 2, transformOrigin: 'left', scaleX: lineScaleX, width: '100%' }}></motion.div>
+        {/* 3 Full Width Friction Cards with Connected Progress Line */}
+        <div className="process-layout" style={{ width: '100%' }}>
+          <div
+            className="process-timeline"
+            style={{
+              display: 'grid',
+              gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))',
+              gap: 'clamp(2rem, 4vw, 4rem)',
+              width: '100%',
+              position: 'relative',
+            }}
+          >
+            <motion.div
+              className="process-timeline-active-line"
+              style={{
+                position: 'absolute',
+                top: 0,
+                left: 0,
+                height: '3px',
+                background: 'linear-gradient(90deg, var(--accent-purple) 0%, #e093ff 100%)',
+                zIndex: 2,
+                transformOrigin: 'left',
+                scaleX: lineScaleX,
+                width: '100%',
+              }}
+            />
 
             {/* Step 01 */}
             <motion.div
               className={`process-step ${activeStep >= 0 ? 'active' : ''}`}
-              animate={{ opacity: activeStep >= 0 ? 1 : 0.35, y: activeStep >= 0 ? 0 : 15 }}
+              animate={{ opacity: activeStep >= 0 ? 1 : 0.45, y: activeStep >= 0 ? 0 : 12 }}
               transition={{ duration: 0.4, ease: "easeOut" }}
-              style={{ flex: 1, position: 'relative', paddingTop: '0.85rem' }}
+              style={{ position: 'relative', paddingTop: '1.5rem' }}
             >
               <div
                 className="process-number"
                 style={{
                   fontFamily: 'Poppins, sans-serif',
-                  fontSize: 'clamp(3rem, 6vw, 4.5rem)',
+                  fontSize: 'clamp(3.2rem, 5.5vw, 4.8rem)',
                   fontWeight: 900,
                   lineHeight: 1,
                   letterSpacing: '-0.05em',
-                  color: activeStep >= 0 ? 'var(--accent-purple)' : 'rgba(255,255,255,0.2)',
-                  marginBottom: '0.75rem',
-                  textShadow: 'none',
+                  color: activeStep >= 0 ? 'var(--accent-purple)' : 'rgba(255,255,255,0.25)',
+                  marginBottom: '1rem',
                   transition: 'all 0.4s ease',
                 }}
               >
                 01
               </div>
-              <h3 className="tc-heading" style={{ fontSize: '1.35rem', fontWeight: 800, color: 'var(--cream)', marginBottom: '0.5rem' }}>Outdated Campus Tech Stack</h3>
-              <p className="tc-body" style={{ color: '#a6a6a6', fontSize: '0.98rem', lineHeight: 1.6 }}>AI and tech evolve every 12 months, but university courses take years to update. What you learn in class often falls short of what top companies demand on Day 1.</p>
+              <h3
+                className="tc-heading"
+                style={{
+                  fontFamily: 'Poppins, sans-serif',
+                  fontSize: 'clamp(1.35rem, 1.8vw, 1.65rem)',
+                  fontWeight: 800,
+                  color: 'var(--cream)',
+                  marginBottom: '0.75rem',
+                  lineHeight: 1.25,
+                }}
+              >
+                Outdated Campus Tech Stack
+              </h3>
+              <p
+                className="tc-body"
+                style={{
+                  fontFamily: 'Century Gothic, sans-serif',
+                  color: '#b0b0b8',
+                  fontSize: 'clamp(1rem, 1.15vw, 1.12rem)',
+                  lineHeight: 1.65,
+                  margin: 0,
+                }}
+              >
+                AI and tech evolve every 12 months, but university courses take years to update. What you learn in class often falls short of what top companies demand on Day 1.
+              </p>
             </motion.div>
 
             {/* Step 02 */}
             <motion.div
               className={`process-step ${activeStep >= 1 ? 'active' : ''}`}
-              animate={{ opacity: activeStep >= 1 ? 1 : 0.35, y: activeStep >= 1 ? 0 : 15 }}
+              animate={{ opacity: activeStep >= 1 ? 1 : 0.45, y: activeStep >= 1 ? 0 : 12 }}
               transition={{ duration: 0.4, ease: "easeOut" }}
-              style={{ flex: 1, position: 'relative', paddingTop: '0.85rem' }}
+              style={{ position: 'relative', paddingTop: '1.5rem' }}
             >
               <div
                 className="process-number"
                 style={{
                   fontFamily: 'Poppins, sans-serif',
-                  fontSize: 'clamp(3rem, 6vw, 4.5rem)',
+                  fontSize: 'clamp(3.2rem, 5.5vw, 4.8rem)',
                   fontWeight: 900,
                   lineHeight: 1,
                   letterSpacing: '-0.05em',
-                  color: activeStep >= 1 ? 'var(--accent-purple)' : 'rgba(255,255,255,0.2)',
-                  marginBottom: '0.75rem',
-                  textShadow: 'none',
+                  color: activeStep >= 1 ? 'var(--accent-purple)' : 'rgba(255,255,255,0.25)',
+                  marginBottom: '1rem',
                   transition: 'all 0.4s ease',
                 }}
               >
                 02
               </div>
-              <h3 className="tc-heading" style={{ fontSize: '1.35rem', fontWeight: 800, color: 'var(--cream)', marginBottom: '0.5rem' }}>Judged in Hours After 4 Years</h3>
-              <p className="tc-body" style={{ color: '#a6a6a6', fontSize: '0.98rem', lineHeight: 1.6 }}>Traditional hiring compresses your entire degree into a single resume screening or a 30-minute interview, leading to higher drop-offs and missed opportunities.</p>
+              <h3
+                className="tc-heading"
+                style={{
+                  fontFamily: 'Poppins, sans-serif',
+                  fontSize: 'clamp(1.35rem, 1.8vw, 1.65rem)',
+                  fontWeight: 800,
+                  color: 'var(--cream)',
+                  marginBottom: '0.75rem',
+                  lineHeight: 1.25,
+                }}
+              >
+                Judged in Hours After 4 Years
+              </h3>
+              <p
+                className="tc-body"
+                style={{
+                  fontFamily: 'Century Gothic, sans-serif',
+                  color: '#b0b0b8',
+                  fontSize: 'clamp(1rem, 1.15vw, 1.12rem)',
+                  lineHeight: 1.65,
+                  margin: 0,
+                }}
+              >
+                Traditional hiring compresses your entire degree into a single resume screening or a 30-minute interview, leading to higher drop-offs and missed opportunities.
+              </p>
             </motion.div>
 
             {/* Step 03 */}
             <motion.div
               className={`process-step ${activeStep >= 2 ? 'active' : ''}`}
-              animate={{ opacity: activeStep >= 2 ? 1 : 0.35, y: activeStep >= 2 ? 0 : 15 }}
+              animate={{ opacity: activeStep >= 2 ? 1 : 0.45, y: activeStep >= 2 ? 0 : 12 }}
               transition={{ duration: 0.4, ease: "easeOut" }}
-              style={{ flex: 1, position: 'relative', paddingTop: '0.85rem' }}
+              style={{ position: 'relative', paddingTop: '1.5rem' }}
             >
               <div
                 className="process-number"
                 style={{
                   fontFamily: 'Poppins, sans-serif',
-                  fontSize: 'clamp(3rem, 6vw, 4.5rem)',
+                  fontSize: 'clamp(3.2rem, 5.5vw, 4.8rem)',
                   fontWeight: 900,
                   lineHeight: 1,
                   letterSpacing: '-0.05em',
-                  color: activeStep >= 2 ? 'var(--accent-purple)' : 'rgba(255,255,255,0.2)',
-                  marginBottom: '0.75rem',
-                  textShadow: 'none',
+                  color: activeStep >= 2 ? 'var(--accent-purple)' : 'rgba(255,255,255,0.25)',
+                  marginBottom: '1rem',
                   transition: 'all 0.4s ease',
                 }}
               >
                 03
               </div>
-              <h3 className="tc-heading" style={{ fontSize: '1.35rem', fontWeight: 800, color: 'var(--cream)', marginBottom: '0.5rem' }}>The Experience Needed Paradox</h3>
-              <p className="tc-body" style={{ color: '#a6a6a6', fontSize: '0.98rem', lineHeight: 1.6 }}>Companies expect prior experience for entry-level roles, but few give you the chance to gain it. Over 77% of grads end up learning everything from scratch on the job.</p>
+              <h3
+                className="tc-heading"
+                style={{
+                  fontFamily: 'Poppins, sans-serif',
+                  fontSize: 'clamp(1.35rem, 1.8vw, 1.65rem)',
+                  fontWeight: 800,
+                  color: 'var(--cream)',
+                  marginBottom: '0.75rem',
+                  lineHeight: 1.25,
+                }}
+              >
+                The Experience Needed Paradox
+              </h3>
+              <p
+                className="tc-body"
+                style={{
+                  fontFamily: 'Century Gothic, sans-serif',
+                  color: '#b0b0b8',
+                  fontSize: 'clamp(1rem, 1.15vw, 1.12rem)',
+                  lineHeight: 1.65,
+                  margin: 0,
+                }}
+              >
+                Companies expect prior experience for entry-level roles, but few give you the chance to gain it. Over 77% of grads end up learning everything from scratch on the job.
+              </p>
             </motion.div>
           </div>
         </div>
@@ -1146,8 +1263,6 @@ function CandidateFriction() {
     </section>
   );
 }
-
-
 
 const ROTATING_HERO_WORDS = ["TALENT", "PIPELINE", "PROOF"];
 
@@ -2079,232 +2194,6 @@ function CandidateStorySection() {
   );
 }
 
-const hiringCompanies = [
-  {
-    name: 'SKYDO',
-    symbol: '◆',
-    color: '#38BDF8',
-    category: 'Cross-border Payments',
-    desc: 'B2B cross-border payment platform with zero-markup FX for global exporters.',
-    roles: 'Full Stack, Growth Ops',
-    hired: '4 Hired',
-  },
-  {
-    name: 'QAPITA',
-    symbol: '●',
-    color: '#2DD4BF',
-    category: 'CapTable & Equity SaaS',
-    desc: 'Digital equity management and private market liquidity software platform.',
-    roles: 'Backend Dev, Product Analyst',
-    hired: '6 Hired',
-  },
-  {
-    name: 'KUTLERRI',
-    symbol: '▲',
-    color: '#FB923C',
-    category: 'Smart Kitchen Tech',
-    desc: 'Next-gen automated culinary hardware and connected kitchen systems.',
-    roles: 'Frontend Dev, Supply Ops',
-    hired: '3 Hired',
-  },
-  {
-    name: 'LEADRAT',
-    symbol: '■',
-    color: '#A78BFA',
-    category: 'Real Estate CRM',
-    desc: 'High-velocity lead management and sales acceleration platform for developers.',
-    roles: 'Full Stack, QA Eng',
-    hired: '5 Hired',
-  },
-  {
-    name: 'RAZORPAY',
-    symbol: '★',
-    color: '#F43F5E',
-    category: 'Payments & Neo-banking',
-    desc: 'Full-stack financial services and payments infrastructure unicorn.',
-    roles: 'Platform Eng, Backend Systems',
-    hired: '8 Hired',
-  },
-  {
-    name: 'CRED',
-    symbol: '●',
-    color: '#E2E8F0',
-    category: 'Fintech Ecosystem',
-    desc: 'Premium rewards and high-trust financial ecosystem platform.',
-    roles: 'Mobile Dev, UI/UX Designer',
-    hired: '4 Hired',
-  },
-  {
-    name: 'DEEL',
-    symbol: '◆',
-    color: '#60A5FA',
-    category: 'Global Payroll & HR',
-    desc: 'International contractor compliance and automated global payroll solutions.',
-    roles: 'Full Stack, Compliance Ops',
-    hired: '7 Hired',
-  },
-  {
-    name: 'ZETA',
-    symbol: '▲',
-    color: '#F472B6',
-    category: 'Next-Gen Core Banking',
-    desc: 'Cloud-native modern banking stack powering scalable credit & cards programs.',
-    roles: 'Java Systems, Cloud Eng',
-    hired: '5 Hired',
-  },
-];
-
-function CompanyLogoBadge({ company }) {
-  const [isHovered, setIsHovered] = useState(false);
-
-  return (
-    <div
-      className="relative shrink-0 flex items-center gap-2 cursor-pointer font-bold text-sm select-none"
-      style={{
-        background: isHovered ? 'rgba(255, 255, 255, 0.08)' : 'rgba(255, 255, 255, 0.04)',
-        color: '#fff',
-        border: isHovered ? `1px solid ${company.color}` : '1px solid rgba(255,255,255,0.08)',
-        borderRadius: '12px',
-        padding: '0.9rem 2rem',
-        boxShadow: 'none',
-        transform: isHovered ? 'translateY(-2px)' : 'none',
-        zIndex: isHovered ? 50 : 1,
-        transition: 'border 0.2s, background 0.2s, transform 0.2s',
-      }}
-      onMouseEnter={() => setIsHovered(true)}
-      onMouseLeave={() => setIsHovered(false)}
-    >
-      <span style={{ color: company.color }}>{company.symbol}</span>
-      <span>{company.name}</span>
-
-      {/* Floating brief card on hover */}
-      <AnimatePresence>
-        {isHovered && (
-          <motion.div
-            initial={{ opacity: 0, y: -6, scale: 0.96 }}
-            animate={{ opacity: 1, y: 0, scale: 1 }}
-            exit={{ opacity: 0, y: -6, scale: 0.96 }}
-            transition={{ duration: 0.18, ease: [0.16, 1, 0.3, 1] }}
-            style={{
-              position: 'absolute',
-              top: 'calc(100% + 12px)',
-              left: '50%',
-              transform: 'translateX(-50%)',
-              width: '250px',
-              background: '#16161a',
-              border: `1px solid ${company.color}88`,
-              borderRadius: '14px',
-              padding: '0.75rem 0.9rem',
-              boxShadow: 'none',
-              zIndex: 9999,
-              pointerEvents: 'none',
-              textAlign: 'left',
-              whiteSpace: 'normal',
-            }}
-          >
-            {/* Header */}
-            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '0.5rem', marginBottom: '0.35rem' }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '0.35rem', fontWeight: 800, fontSize: '0.88rem', color: '#fff', whiteSpace: 'nowrap' }}>
-                <span style={{ color: company.color }}>{company.symbol}</span>
-                {company.name}
-              </div>
-              <span
-                style={{
-                  fontSize: '0.62rem',
-                  padding: '0.15rem 0.45rem',
-                  borderRadius: '999px',
-                  background: 'rgba(255,255,255,0.08)',
-                  color: company.color,
-                  fontWeight: 600,
-                  border: `1px solid ${company.color}44`,
-                  whiteSpace: 'nowrap',
-                  flexShrink: 0,
-                }}
-              >
-                {company.category}
-              </span>
-            </div>
-
-            {/* Description */}
-            <p style={{ margin: '0 0 0.45rem', fontSize: '0.74rem', color: '#b3b3b3', lineHeight: 1.35, fontWeight: 400 }}>
-              {company.desc}
-            </p>
-
-            {/* Footer */}
-            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', paddingTop: '0.35rem', borderTop: '1px solid rgba(255,255,255,0.08)', fontSize: '0.68rem' }}>
-              <span style={{ color: '#888' }}>Roles: <strong style={{ color: '#e5e5e5', fontWeight: 600 }}>{company.roles}</strong></span>
-              <span style={{ color: 'var(--accent-purple)', fontWeight: 700, background: 'rgba(187,98,222,0.15)', padding: '0.1rem 0.35rem', borderRadius: '4px' }}>
-                ✓ {company.hired}
-              </span>
-            </div>
-
-            {/* Upward triangle pointer */}
-            <div
-              style={{
-                position: 'absolute',
-                bottom: '100%',
-                left: '50%',
-                transform: 'translateX(-50%)',
-                width: 0,
-                height: 0,
-                borderLeft: '6px solid transparent',
-                borderRight: '6px solid transparent',
-                borderBottom: '6px solid #16161a',
-              }}
-            />
-          </motion.div>
-        )}
-      </AnimatePresence>
-    </div>
-  );
-}
-
-function CompanyMarqueeSection() {
-  // Triple array duplicate ensures 100% infinite continuous stream with zero gaps at any screen width
-  const marqueeList = [...hiringCompanies, ...hiringCompanies, ...hiringCompanies];
-
-  return (
-    <section
-      className="social-proof-section"
-      style={{
-        width: '100vw',
-        marginLeft: 'calc(-50vw + 50%)',
-        padding: '0 0 1.5rem',
-        overflow: 'visible',
-        background: 'var(--black)',
-        position: 'relative',
-        zIndex: 20,
-      }}
-    >
-      <div
-        className="company-logos-wrapper relative w-full"
-        style={{
-          width: '100%',
-          overflow: 'hidden',
-          paddingTop: '25px',
-          paddingBottom: '160px',
-          marginBottom: '-135px',
-          maskImage: 'linear-gradient(to right, transparent 0%, black 5%, black 95%, transparent 100%)',
-          WebkitMaskImage: 'linear-gradient(to right, transparent 0%, black 5%, black 95%, transparent 100%)',
-        }}
-      >
-        <div className="infinite-marquee-track" style={{ overflow: 'visible' }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '2.5rem', paddingRight: '2.5rem', flexShrink: 0, overflow: 'visible' }}>
-            {marqueeList.map((company, cIndex) => (
-              <CompanyLogoBadge key={`m1-${cIndex}`} company={company} />
-            ))}
-          </div>
-          <div aria-hidden="true" style={{ display: 'flex', alignItems: 'center', gap: '2.5rem', paddingRight: '2.5rem', flexShrink: 0, overflow: 'visible' }}>
-            {marqueeList.map((company, cIndex) => (
-              <CompanyLogoBadge key={`m2-${cIndex}`} company={company} />
-            ))}
-          </div>
-        </div>
-      </div>
-    </section>
-  );
-}
-
 function CandidateView() {
   const heroRef = useRef(null);
   const { scrollYProgress } = useScroll({
@@ -2439,9 +2328,6 @@ function CandidateView() {
         }}
       >
         <CandidateFriction />
-
-        {/* Social Proof Marquee with pause on hover & company brief popups */}
-        <CompanyMarqueeSection />
 
         <CandidateHowItWorks />
         <div style={{ position: 'relative', zIndex: 10, background: '#F7F5EE' }}>

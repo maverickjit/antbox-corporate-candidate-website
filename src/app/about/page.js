@@ -1,6 +1,7 @@
 "use client";
 import React, { useState, useEffect } from 'react';
 import Image from 'next/image';
+import Link from 'next/link';
 import Lenis from 'lenis';
 import { motion, useScroll, useTransform, useInView, useSpring, useMotionValue } from 'framer-motion';
 import styles from './about.module.css';
@@ -37,110 +38,38 @@ function Word({ word, progress, range }) {
 
 
 function StackedValueCard({ value, index, scrollYProgress, cardTags }) {
-  // Dynamic transforms per card: 900px offscreen start + binary opacity gating to prevent overlap
-  let y, scale, rotate, opacity;
+  const configs = [
+    { range: [0.10, 0.22, 0.28, 0.40, 0.46, 0.58, 0.64, 0.74], y: [0, -8, -8, -16, -16, -24, -24, -32], scale: [1, .98, .98, .96, .96, .94, .94, .92], rotate: [0, 0], opacityAt: 0 },
+    { range: [0.10, 0.22, 0.28, 0.40, 0.46, 0.58, 0.64, 0.74], y: [900, 0, 0, -8, -8, -16, -16, -24], scale: [1, 1, 1, .98, .98, .96, .96, .94], rotate: [2, 0], opacityAt: .08 },
+    { range: [0.28, 0.40, 0.46, 0.58, 0.64, 0.74], y: [900, 0, 0, -8, -8, -16], scale: [1, 1, 1, .98, .98, .96], rotate: [-2, 0], opacityAt: .26 },
+    { range: [0.46, 0.58, 0.64, 0.74], y: [900, 0, 0, -8], scale: [1, 1, 1, .98], rotate: [1.5, 0], opacityAt: .44 },
+    { range: [0.64, 0.74], y: [900, 0], scale: [1, 1], rotate: [-1, 0], opacityAt: .62 },
+  ];
+  const config = configs[index] ?? configs[configs.length - 1];
 
-  if (index === 0) {
-    y = useTransform(
-      scrollYProgress,
-      [0.10, 0.22, 0.28, 0.40, 0.46, 0.58, 0.64, 0.74],
-      [0, -8, -8, -16, -16, -24, -24, -32]
-    );
-    scale = useTransform(
-      scrollYProgress,
-      [0.10, 0.22, 0.28, 0.40, 0.46, 0.58, 0.64, 0.74],
-      [1.0, 0.98, 0.98, 0.96, 0.96, 0.94, 0.94, 0.92]
-    );
-    rotate = 0;
-    opacity = 1;
-  } else if (index === 1) {
-    y = useTransform(
-      scrollYProgress,
-      [0.10, 0.22, 0.28, 0.40, 0.46, 0.58, 0.64, 0.74],
-      [900, 0, 0, -8, -8, -16, -16, -24]
-    );
-    scale = useTransform(
-      scrollYProgress,
-      [0.10, 0.22, 0.28, 0.40, 0.46, 0.58, 0.64, 0.74],
-      [1.0, 1.0, 1.0, 0.98, 0.98, 0.96, 0.96, 0.94]
-    );
-    rotate = useTransform(scrollYProgress, [0.10, 0.22], [2, 0]);
-    opacity = useTransform(scrollYProgress, (v) => (v < 0.08 ? 0 : 1));
-  } else if (index === 2) {
-    y = useTransform(
-      scrollYProgress,
-      [0.28, 0.40, 0.46, 0.58, 0.64, 0.74],
-      [900, 0, 0, -8, -8, -16]
-    );
-    scale = useTransform(
-      scrollYProgress,
-      [0.28, 0.40, 0.46, 0.58, 0.64, 0.74],
-      [1.0, 1.0, 1.0, 0.98, 0.98, 0.96]
-    );
-    rotate = useTransform(scrollYProgress, [0.28, 0.40], [-2, 0]);
-    opacity = useTransform(scrollYProgress, (v) => (v < 0.26 ? 0 : 1));
-  } else if (index === 3) {
-    y = useTransform(
-      scrollYProgress,
-      [0.46, 0.58, 0.64, 0.74],
-      [900, 0, 0, -8]
-    );
-    scale = useTransform(
-      scrollYProgress,
-      [0.46, 0.58, 0.64, 0.74],
-      [1.0, 1.0, 1.0, 0.98]
-    );
-    rotate = useTransform(scrollYProgress, [0.46, 0.58], [1.5, 0]);
-    opacity = useTransform(scrollYProgress, (v) => (v < 0.44 ? 0 : 1));
-  } else {
-    // Card 4 (final card: finishes at 0.74, staying fully visible until next section enters at 0.83)
-    y = useTransform(scrollYProgress, [0.64, 0.74], [900, 0]);
-    scale = 1.0;
-    rotate = useTransform(scrollYProgress, [0.64, 0.74], [-1, 0]);
-    opacity = useTransform(scrollYProgress, (v) => (v < 0.62 ? 0 : 1));
-  }
+  const y = useTransform(scrollYProgress, config.range, config.y);
+  const scale = useTransform(scrollYProgress, config.range, config.scale);
+  const rotate = useTransform(scrollYProgress, [config.range[0], config.range[1]], config.rotate);
+  const opacity = useTransform(scrollYProgress, value =>
+    index === 0 || value >= config.opacityAt ? 1 : 0
+  );
 
   return (
     <motion.div
       className={styles.arcPlayCard}
-      style={{
-        y,
-        scale,
-        rotate,
-        opacity,
-        zIndex: index + 1,
-        backgroundColor: '#FFFFFF',
-        borderTop: `6px solid ${value.bg}`,
-      }}
+      style={{ y, scale, rotate, opacity, zIndex: index + 1, backgroundColor: '#FFFFFF', borderTop: `6px solid ${value.bg}` }}
     >
-      {/* Left Column: Text Content */}
       <div className={styles.arcCardLeft}>
         <div>
-          <h3 className={styles.arcCardTitle}>
-            {value.title}
-          </h3>
-          <p className={styles.arcCardDesc}>
-            {value.desc}
-          </p>
+          <h3 className={styles.arcCardTitle}>{value.title}</h3>
+          <p className={styles.arcCardDesc}>{value.desc}</p>
         </div>
-
         <div className={styles.arcCardFooter}>
-          <span>✦</span>
-          <span>{cardTags[index]}</span>
+          <span>✦</span><span>{cardTags[index]}</span>
         </div>
       </div>
-
-      {/* Right Column: Image Artwork */}
       <div className={styles.arcCardRight} style={{ backgroundColor: value.bg }}>
-        {value.image ? (
-          <Image
-            src={value.image}
-            alt={value.title}
-            fill
-            unoptimized
-            className={styles.arcCardImg}
-          />
-        ) : null}
+        {value.image && <Image src={value.image} alt={value.title} fill unoptimized className={styles.arcCardImg} />}
       </div>
     </motion.div>
   );
@@ -148,6 +77,22 @@ function StackedValueCard({ value, index, scrollYProgress, cardTags }) {
 
 function CompanyValuesCardsSection({ values }) {
   const containerRef = React.useRef(null);
+
+  // Deck entrance animation as this section overlaps the previous statement section
+  const { scrollYProgress: deckProgress } = useScroll({
+    target: containerRef,
+    offset: ["start end", "start start"]
+  });
+
+  const deckRadius = useTransform(deckProgress, [0, 1], ["48px 48px 0 0", "0px 0px 0 0"]);
+  const deckShadow = useTransform(
+    deckProgress,
+    [0, 1],
+    [
+      "0 -25px 60px rgba(0, 0, 0, 0.4), 0 -1px 0 rgba(0, 0, 0, 0.05)",
+      "0 -50px 120px rgba(0, 0, 0, 0.7), 0 -1px 0 rgba(0, 0, 0, 0.1)"
+    ]
+  );
 
   const { scrollYProgress } = useScroll({
     target: containerRef,
@@ -163,9 +108,13 @@ function CompanyValuesCardsSection({ values }) {
   ];
 
   return (
-    <div
+    <motion.div
       ref={containerRef}
       className={styles.valuesArcSection}
+      style={{
+        borderRadius: deckRadius,
+        boxShadow: deckShadow
+      }}
     >
       <div className={styles.valuesArcDotGrid} />
       <div className={styles.valuesArcSticky}>
@@ -189,7 +138,7 @@ function CompanyValuesCardsSection({ values }) {
           ))}
         </div>
       </div>
-    </div>
+    </motion.div>
   );
 }
 
@@ -422,77 +371,8 @@ function ScribbleUnderline({ children, color = "#BB62DE", active = false }) {
   );
 }
 
-function MaskedLineRevealStatement() {
-  const containerRef = React.useRef(null);
-  const isInView = useInView(containerRef, { once: true, amount: 0.3 });
-
-  const [part1, setPart1] = React.useState('');
-  const [part2, setPart2] = React.useState('');
-  const [part3, setPart3] = React.useState('');
-  const [part4, setPart4] = React.useState('');
-
-  const [activePart, setActivePart] = React.useState(0);
-  const [showUnderline, setShowUnderline] = React.useState(false);
-
-  const full1 = "AntBox is built on a simple idea: the degree was never a skill";
-  const full2 = "test ";
-  const full3 = "it was a proxy.";
-  const full4 = "Nobody built the replacement. So we did.";
-
-  useEffect(() => {
-    if (!isInView) return;
-
-    let i1 = 0, i2 = 0, i3 = 0, i4 = 0;
-    const speed = 40;
-
-    setActivePart(1);
-
-    const t1 = setInterval(() => {
-      if (i1 < full1.length) {
-        setPart1(full1.slice(0, i1 + 1));
-        i1++;
-      } else {
-        clearInterval(t1);
-        setActivePart(2);
-        const t2 = setInterval(() => {
-          if (i2 < full2.length) {
-            setPart2(full2.slice(0, i2 + 1));
-            i2++;
-          } else {
-            clearInterval(t2);
-            setActivePart(3);
-            const t3 = setInterval(() => {
-              if (i3 < full3.length) {
-                setPart3(full3.slice(0, i3 + 1));
-                i3++;
-              } else {
-                clearInterval(t3);
-                setTimeout(() => {
-                  setActivePart(4);
-                  const t4 = setInterval(() => {
-                    if (i4 < full4.length) {
-                      setPart4(full4.slice(0, i4 + 1));
-                      i4++;
-                    } else {
-                      clearInterval(t4);
-                      setShowUnderline(true);
-                      setTimeout(() => setActivePart(0), 400);
-                    }
-                  }, speed);
-                }, 180);
-              }
-            }, speed);
-          }
-        }, speed);
-      }
-    }, speed);
-
-    return () => {
-      clearInterval(t1);
-    };
-  }, [isInView]);
-
-  const Cursor = () => (
+function Cursor() {
+  return (
     <motion.span
       animate={{ opacity: [1, 0] }}
       transition={{ duration: 0.4, repeat: Infinity, repeatType: 'reverse' }}
@@ -507,33 +387,83 @@ function MaskedLineRevealStatement() {
       }}
     />
   );
+}
+
+function MaskedLineRevealStatement() {
+  const containerRef = React.useRef(null);
+  const isInView = useInView(containerRef, { once: true, amount: 0.3 });
+  const [part1, setPart1] = React.useState('');
+  const [part2, setPart2] = React.useState('');
+  const [part3, setPart3] = React.useState('');
+  const [part4, setPart4] = React.useState('');
+  // Begin in part 1. The cursor is gated by isInView, so it is hidden until animation starts.
+  const [activePart, setActivePart] = React.useState(1);
+  const [showUnderline, setShowUnderline] = React.useState(false);
+
+  const full1 = 'AntBox is built on a simple idea: the degree was never a skill';
+  const full2 = 'test ';
+  const full3 = 'it was a proxy.';
+  const full4 = 'Nobody built the replacement. So we did.';
+
+  React.useEffect(() => {
+    if (!isInView) return;
+
+    let i1 = 0, i2 = 0, i3 = 0, i4 = 0;
+    const speed = 40;
+    let t1, t2, t3, t4, to1, to2;
+
+    t1 = setInterval(() => {
+      if (i1 < full1.length) {
+        setPart1(full1.slice(0, ++i1));
+        return;
+      }
+      clearInterval(t1);
+      setActivePart(2);
+      t2 = setInterval(() => {
+        if (i2 < full2.length) {
+          setPart2(full2.slice(0, ++i2));
+          return;
+        }
+        clearInterval(t2);
+        setActivePart(3);
+        t3 = setInterval(() => {
+          if (i3 < full3.length) {
+            setPart3(full3.slice(0, ++i3));
+            return;
+          }
+          clearInterval(t3);
+          to1 = setTimeout(() => {
+            setActivePart(4);
+            t4 = setInterval(() => {
+              if (i4 < full4.length) {
+                setPart4(full4.slice(0, ++i4));
+                return;
+              }
+              clearInterval(t4);
+              setShowUnderline(true);
+              to2 = setTimeout(() => setActivePart(0), 400);
+            }, speed);
+          }, 180);
+        }, speed);
+      }, speed);
+    }, speed);
+
+    return () => {
+      clearInterval(t1); clearInterval(t2); clearInterval(t3); clearInterval(t4);
+      clearTimeout(to1); clearTimeout(to2);
+    };
+  }, [isInView]);
 
   return (
     <div ref={containerRef} className={styles.valuesStatement} style={{ minHeight: '160px', textAlign: 'center' }}>
-      <p style={{ margin: 0, textAlign: 'center' }}>
-        {part1}
-        {activePart === 1 && <Cursor />}
-      </p>
-
+      <p style={{ margin: 0, textAlign: 'center' }}>{part1}{isInView && activePart === 1 && <Cursor />}</p>
       <p style={{ margin: 0, marginTop: '0.2rem', textAlign: 'center' }}>
-        {part2}
-        {part3 && (
-          <span style={{ color: '#D8B4FE', fontStyle: 'italic', fontWeight: 700 }}>
-            {part3}
-          </span>
-        )}
-        {(activePart === 2 || activePart === 3) && <Cursor />}
+        {part2}{part3 && <span style={{ color: '#D8B4FE', fontStyle: 'italic', fontWeight: 700 }}>{part3}</span>}
+        {isInView && (activePart === 2 || activePart === 3) && <Cursor />}
       </p>
-
       <p style={{ margin: 0, marginTop: '0.2rem', textAlign: 'center' }}>
-        {part4 && (
-          <ScribbleUnderline color="#BB62DE" active={showUnderline}>
-            <span>
-              {part4}
-            </span>
-          </ScribbleUnderline>
-        )}
-        {activePart === 4 && <Cursor />}
+        {part4 && <ScribbleUnderline color="#BB62DE" active={showUnderline}><span>{part4}</span></ScribbleUnderline>}
+        {isInView && activePart === 4 && <Cursor />}
       </p>
     </div>
   );
@@ -629,9 +559,25 @@ function RollingImageCardBox({ children }) {
 function ParallaxCultureCard() {
   const containerRef = React.useRef(null);
 
+  // Deck entrance animation as this section overlays the previous section
+  const { scrollYProgress: deckProgress } = useScroll({
+    target: containerRef,
+    offset: ["start end", "start start"]
+  });
+
+  const deckRadius = useTransform(deckProgress, [0, 1], ["48px 48px 0 0", "0px 0px 0 0"]);
+  const deckShadow = useTransform(
+    deckProgress,
+    [0, 1],
+    [
+      "0 -25px 60px rgba(0, 0, 0, 0.7), 0 -1px 0 rgba(255, 255, 255, 0.1)",
+      "0 -50px 120px rgba(0, 0, 0, 0.98), 0 -1px 0 rgba(255, 255, 255, 0.18)"
+    ]
+  );
+
   const { scrollYProgress } = useScroll({
     target: containerRef,
-    offset: ["start end", "end end"]
+    offset: ["start start", "end end"]
   });
 
   // Smooth scroll transformations for Full-Screen Expansion (0.05 -> 0.45)
@@ -650,7 +596,14 @@ function ParallaxCultureCard() {
   const overlayOpacity = useTransform(scrollYProgress, [0.05, 0.45], [0.65, 0.45]);
 
   return (
-    <div ref={containerRef} className={styles.cultureStickyTrack}>
+    <motion.div
+      ref={containerRef}
+      className={styles.cultureStickyTrack}
+      style={{
+        borderRadius: deckRadius,
+        boxShadow: deckShadow
+      }}
+    >
       <div className={styles.cultureStickyInner}>
         <motion.div
           style={{
@@ -683,7 +636,7 @@ function ParallaxCultureCard() {
               <span className={styles.cultureAccentLine}>ANTBOX.</span>
             </h2>
             <p className={styles.cultureSubtitle}>
-              High standard. High velocity. But we don't burn out doing it.
+              High standard. High velocity. But we do not burn out doing it.
             </p>
             <div className={styles.cultureCtaWrapper}>
               <a href="/candidates" className={styles.cultureCtaBtn}>
@@ -696,7 +649,7 @@ function ParallaxCultureCard() {
           </motion.div>
         </motion.div>
       </div>
-    </div>
+    </motion.div>
   );
 }
 
@@ -785,7 +738,7 @@ function CustomerReviewsSection() {
         marginLeft: '-50vw',
         marginRight: '-50vw',
         marginTop: '-100vh', // Overlays completely on top of the pinned Life at AntBox section
-        zIndex: 25,
+        zIndex: 30,
         overflow: 'hidden',
         background: '#0A0A0E',
         borderRadius: deckRadius,
@@ -831,19 +784,12 @@ function CustomerReviewsSection() {
                       <div className={styles.reviewAuthorMeta}>
                         <span className={styles.reviewAuthorName}>{item.name}</span>
                         <span className={styles.reviewAuthorRole}>{item.role}</span>
-                        <div className={styles.reviewStars}>
-                          {'★'.repeat(5)}
-                        </div>
                       </div>
                     </div>
 
                     <p className={styles.reviewText}>
-                      "{item.text}"
+                      {`"${item.text}"`}
                     </p>
-
-                    <div className={styles.reviewTag}>
-                      {item.tag}
-                    </div>
                   </div>
                 ))}
               </div>
@@ -874,7 +820,7 @@ function AboutFooterSection() {
           Join our team or stay in the loop
         </h2>
         <p className={styles.footerSubtitle}>
-          Whether you want to join our operator engine or get weekly dispatches on scaling high-performing teams, we'd love to connect.
+          Whether you want to join our operator engine or get weekly dispatches on scaling high-performing teams, we&apos;d love to connect.
         </p>
 
         {/* Dual Actions Grid: Join Team (Left) + Email Updates (Right) */}
@@ -887,12 +833,12 @@ function AboutFooterSection() {
                 We are always looking for high-grit product designers, engineers, and growth operators ready to own real work.
               </p>
             </div>
-            <a href="/candidates" className={styles.joinTeamBtn}>
+            <Link href="/candidates" className={styles.joinTeamBtn}>
               Explore Open Roles
               <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
                 <line x1="7" y1="17" x2="17" y2="7" /><polyline points="7 7 17 7 17 17" />
               </svg>
-            </a>
+            </Link>
           </div>
 
           {/* Card B: Email Updates */}
@@ -909,7 +855,7 @@ function AboutFooterSection() {
                 <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
                   <path d="M20 6L9 17l-5-5" />
                 </svg>
-                <span>You're in the loop! Check your inbox soon.</span>
+                <span>You are in the loop! Check your inbox soon.</span>
               </div>
             ) : (
               <form onSubmit={handleSubscribe} className={styles.newsletterForm}>
@@ -937,14 +883,14 @@ function AboutFooterSection() {
           </div>
 
           <div className={styles.footerLinks}>
-            <a href="/corporates">Corporates</a>
-            <a href="/candidates">Candidates</a>
-            <a href="/about">About</a>
-            <a href="/resources">Resources</a>
+            <Link href="/corporates">Corporates</Link>
+            <Link href="/candidates">Candidates</Link>
+            <Link href="/about">About</Link>
+            <Link href="/resources">Resources</Link>
           </div>
 
           <div>
-            <span>© 2026 AntBox Inc. All rights reserved.</span>
+            <span>&copy; 2026 AntBox Inc. All rights reserved.</span>
           </div>
         </div>
       </div>
@@ -1247,9 +1193,11 @@ export default function About() {
         </div>
 
         {/* ── Section 2A: Full Screen Statement Section (Smooth continuous dark transition) ── */}
-        <div className={styles.statementSectionWrap}>
-          <div className={styles.heroQuoteContainer}>
-            <MaskedLineRevealStatement />
+        <div className={styles.statementStickyTrack}>
+          <div className={styles.statementSectionWrap}>
+            <div className={styles.heroQuoteContainer}>
+              <MaskedLineRevealStatement />
+            </div>
           </div>
         </div>
       </motion.div>

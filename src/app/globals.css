@@ -17,6 +17,49 @@ body {
   padding: 0;
 }
 
+/* Bulletproof GPU-Accelerated Orbit Animations for Tribe Analytics Engine */
+@keyframes orbitSpinClockwise {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes orbitSpinCounterClockwise {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(-360deg);
+  }
+}
+
+.orbit-spin-clockwise {
+  animation: orbitSpinClockwise 24s linear infinite !important;
+  will-change: transform;
+  transform-origin: center center;
+}
+
+.orbit-spin-counter {
+  animation: orbitSpinCounterClockwise 16s linear infinite !important;
+  will-change: transform;
+  transform-origin: center center;
+}
+
+.orbit-counter-rotate-outer {
+  animation: orbitSpinCounterClockwise 24s linear infinite !important;
+  will-change: transform;
+  transform-origin: center center;
+}
+
+.orbit-counter-rotate-inner {
+  animation: orbitSpinClockwise 16s linear infinite !important;
+  will-change: transform;
+  transform-origin: center center;
+}
+
 :root {
   --cream: #F7F5EE;
   --purple: #BB62DE;
