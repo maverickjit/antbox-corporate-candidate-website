@@ -33,51 +33,6 @@ function Word({ word, progress, range }) {
   );
 }
 
-function TypingSubtitle({ text }) {
-  const containerRef = React.useRef(null);
-  const isInView = useInView(containerRef, { once: true, amount: 0.3 });
-  const [displayedLength, setDisplayedLength] = useState(0);
-  const [isTypingComplete, setIsTypingComplete] = useState(false);
-
-  useEffect(() => {
-    if (!isInView) return;
-
-    let index = 0;
-    const speed = 18; // smooth typing animation speed
-
-    const timer = setInterval(() => {
-      index++;
-      setDisplayedLength(index);
-      if (index >= text.length) {
-        setIsTypingComplete(true);
-        clearInterval(timer);
-      }
-    }, speed);
-
-    return () => clearInterval(timer);
-  }, [isInView, text]);
-
-  return (
-    <p ref={containerRef} className={styles.operatorsSubtitle}>
-      <span>{text.slice(0, displayedLength)}</span>
-      {!isTypingComplete && (
-        <motion.span
-          animate={{ opacity: [1, 0] }}
-          transition={{ duration: 0.35, repeat: Infinity, repeatType: "reverse" }}
-          style={{
-            display: 'inline-block',
-            width: '2.5px',
-            height: '1.1em',
-            backgroundColor: '#8B5CF6',
-            marginLeft: '3px',
-            verticalAlign: '-0.15em',
-            borderRadius: '1px'
-          }}
-        />
-      )}
-    </p>
-  );
-}
 
 
 
@@ -238,94 +193,151 @@ function CompanyValuesCardsSection({ values }) {
   );
 }
 
+
 function FoundersManifestoSection() {
   const sectionRef = React.useRef(null);
+
   const { scrollYProgress } = useScroll({
     target: sectionRef,
-    offset: ["start end", "start start"]
+    offset: ["start start", "end end"]
   });
 
-  // Smooth deck card entrance: overlays directly over the stationary cards section
-  const deckRadius = useTransform(scrollYProgress, [0, 1], ["48px 48px 0 0", "36px 36px 0 0"]);
+  // Smooth deck card entrance overlaying the values section
+  const deckRadius = useTransform(scrollYProgress, [0, 0.12], ["48px 48px 0 0", "0px 0px 0 0"]);
   const deckShadow = useTransform(
     scrollYProgress,
-    [0, 1],
+    [0, 0.12],
     [
       "0 -25px 60px rgba(0, 0, 0, 0.7), 0 -1px 0 rgba(255, 255, 255, 0.1)",
       "0 -50px 120px rgba(0, 0, 0, 0.98), 0 -1px 0 rgba(255, 255, 255, 0.18)"
     ]
   );
 
+  // 1. Initial State: "Meet Rohit" & image centered in the screen (16vh)
+  //    As user scrolls: glides smoothly to center top (0vh, safely clear of the navbar)
+  const headerY = useTransform(scrollYProgress, [0.03, 0.16], ["16vh", "0vh"]);
+  const headerScale = useTransform(scrollYProgress, [0.03, 0.16], [1.1, 1.0]);
+
+  // 2. The squircle image in the center of the header:
+  //    Smoothly scales down/fades out as "Meet" and "Rohit" come closer together
+  const squircleWidth = useTransform(scrollYProgress, [0.05, 0.15], [86, 0]);
+  const squircleScale = useTransform(scrollYProgress, [0.05, 0.14], [1, 0]);
+  const squircleMargin = useTransform(scrollYProgress, [0.05, 0.15], [16, 0]);
+  const squircleOpacity = useTransform(scrollYProgress, [0.05, 0.13], [1, 0]);
+  const squircleDisplay = useTransform(scrollYProgress, v => v >= 0.14 ? 'none' : 'flex');
+
+  // 3. The photo card on the left:
+  //    Animates from center to the left column position
+  const photoX = useTransform(scrollYProgress, [0.05, 0.16], [180, 0]);
+  const photoY = useTransform(scrollYProgress, [0.05, 0.16], [-60, 0]);
+  const photoScale = useTransform(scrollYProgress, [0.05, 0.16], [0.45, 1.0]);
+  const photoOpacity = useTransform(scrollYProgress, [0.05, 0.13], [0, 1]);
+
+  // 4. Signature block below photo
+  const sigOpacity = useTransform(scrollYProgress, [0.13, 0.18], [0, 1]);
+
+  // 5. Right column manifesto text
+  const manifestoOpacity = useTransform(scrollYProgress, [0.10, 0.18], [0, 1]);
+  const manifestoX = useTransform(scrollYProgress, [0.10, 0.18], [40, 0]);
+
+  // 6. Complete word-by-word reading highlight from 0.18 to 0.70
+  //    All 5 paragraphs are 100% highlighted and stay fully bright from 0.70 to 0.94!
+  const manifestoProgress = useTransform(scrollYProgress, [0.18, 0.70], [0, 1]);
+
   return (
-    <motion.div
+    <div
       ref={sectionRef}
+      className={styles.manifestoStickyTrack}
       style={{
-        position: 'relative',
-        width: '100vw',
-        left: '50%',
-        right: '50%',
-        marginLeft: '-50vw',
-        marginRight: '-50vw',
-        marginTop: '-100vh', // Overlays directly over the pinned cards section
-        zIndex: 25,
-        overflow: 'hidden',
-        background: '#0A0A0E',
         borderRadius: deckRadius,
         boxShadow: deckShadow
       }}
     >
-      <div
-        className={styles.darkOverlapSheet}
-        style={{ margin: 0, padding: '6rem 0 6.5rem', borderRadius: 0, background: '#0A0A0E' }}
-      >
-        <div className={styles.darkOverlapContent} style={{ width: '100%', maxWidth: '1050px', margin: '0 auto', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
+      <div className={styles.manifestoStickyStage}>
+        <div className={styles.founderSectionWrap}>
 
-          {/* Centered Heading */}
-          <div style={{ textAlign: 'center', marginBottom: '2.5rem' }}>
-            <h2 className={styles.manifestoTitle} style={{
-              fontSize: '2.5rem',
-              fontWeight: 800,
-              letterSpacing: '-0.03em',
-              textAlign: 'center',
-              background: 'linear-gradient(135deg, #FFFFFF 0%, #F3E8FF 50%, #C084FC 100%)',
-              WebkitBackgroundClip: 'text',
-              WebkitTextFillColor: 'transparent'
-            }}>
-              Founders Manifesto
-            </h2>
-          </div>
+          {/* ── Headline: "Meet [Squircle Card] Rohit" animated from center to center top ── */}
+          <motion.div
+            style={{
+              y: headerY,
+              scale: headerScale,
+              display: 'flex',
+              flexDirection: 'column',
+              alignItems: 'center',
+              zIndex: 4
+            }}
+          >
+            <div className={styles.founderMeetHeader}>
+              <span className={styles.founderMeetWord}>Meet</span>
 
-          {/* Centered 2-Column Grid (Founder Photo + Manifesto Content) */}
-          <div className={styles.manifestoSection} style={{ display: 'grid', gridTemplateColumns: '310px 1fr', gap: '2.75rem', alignItems: 'center', width: '100%', maxWidth: '1040px', margin: '0 auto' }}>
-            <div className={styles.manifestoImageContainer} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
-              <div className={styles.founderPhotoWrapper} style={{
-                border: '1px solid rgba(255, 255, 255, 0.15)',
-                boxShadow: '0 15px 35px rgba(0, 0, 0, 0.4)',
-                borderRadius: '22px',
-                width: '100%',
-                maxWidth: '310px',
-                height: '335px'
-              }}>
-                <Image
-                  src="/founder-photo-portrait.jpg"
-                  alt="Rohit Singh - Founder & CEO"
-                  fill
-                  unoptimized
-                  className={styles.founderPhoto}
-                />
+              <motion.div
+                className={styles.founderSquircleCard}
+                style={{
+                  width: squircleWidth,
+                  scale: squircleScale,
+                  opacity: squircleOpacity,
+                  display: squircleDisplay,
+                  marginLeft: squircleMargin,
+                  marginRight: squircleMargin,
+                  overflow: 'hidden',
+                  padding: 0,
+                  borderWidth: squircleOpacity,
+                }}
+              >
+                <div className={styles.founderSquircleInner}>
+                  <Image
+                    src="/founder-photo-portrait.jpg"
+                    alt="Rohit Singh"
+                    fill
+                    unoptimized
+                    style={{ objectFit: 'cover' }}
+                  />
+                </div>
+              </motion.div>
+
+              <span className={styles.founderMeetWord}>Rohit</span>
+            </div>
+          </motion.div>
+
+          {/* ── Centered 2-Column Grid: Left (Photo & Bio) + Right (Full Manifesto) ── */}
+          <div className={styles.manifestoGridNew}>
+
+            {/* Left Column: Photo glides from center to the left column */}
+            <motion.div
+              className={styles.founderMediaColumn}
+              style={{
+                x: photoX,
+                y: photoY,
+                scale: photoScale,
+                opacity: photoOpacity
+              }}
+            >
+              <div className={styles.founderHeroCard}>
+                <div className={styles.founderHeroCardInner}>
+                  <Image
+                    src="/founder-photo-portrait.jpg"
+                    alt="Rohit Singh - Founder & CEO"
+                    fill
+                    unoptimized
+                    style={{ objectFit: 'cover' }}
+                  />
+                </div>
               </div>
 
               {/* Signature Name Block Below Image */}
-              <div style={{
-                marginTop: '0.85rem',
-                display: 'flex',
-                flexDirection: 'column',
-                alignItems: 'center',
-                textAlign: 'center'
-              }}>
+              <motion.div
+                style={{
+                  opacity: sigOpacity,
+                  marginTop: '0.3rem',
+                  display: 'flex',
+                  flexDirection: 'column',
+                  alignItems: 'center',
+                  textAlign: 'center'
+                }}
+              >
                 <span style={{
                   fontFamily: "'Caveat', 'Dancing Script', 'Brush Script MT', cursive",
-                  fontSize: '1.75rem',
+                  fontSize: '1.85rem',
                   fontWeight: 700,
                   color: '#E9D5FF',
                   letterSpacing: '0.5px',
@@ -335,7 +347,7 @@ function FoundersManifestoSection() {
                   Rohit Singh
                 </span>
                 <span style={{
-                  fontSize: '0.72rem',
+                  fontSize: '0.74rem',
                   fontWeight: 700,
                   letterSpacing: '2px',
                   textTransform: 'uppercase',
@@ -343,16 +355,25 @@ function FoundersManifestoSection() {
                 }}>
                   Founder & CEO
                 </span>
-              </div>
-            </div>
-            <div className={styles.manifestoContent}>
-              <ContinuousScrollManifesto />
-            </div>
+              </motion.div>
+            </motion.div>
+
+            {/* Right Column: Complete Manifesto Content with continuous word reveal */}
+            <motion.div
+              className={styles.manifestoContent}
+              style={{
+                x: manifestoX,
+                opacity: manifestoOpacity
+              }}
+            >
+              <ContinuousScrollManifesto externalProgress={manifestoProgress} />
+            </motion.div>
+
           </div>
 
         </div>
       </div>
-    </motion.div>
+    </div>
   );
 }
 
@@ -538,12 +559,14 @@ function ManifestoWord({ word, progress, range }) {
   );
 }
 
-function ContinuousScrollManifesto() {
+function ContinuousScrollManifesto({ externalProgress }) {
   const containerRef = React.useRef(null);
-  const { scrollYProgress } = useScroll({
+  const { scrollYProgress: internalProgress } = useScroll({
     target: containerRef,
     offset: ["start 0.85", "end 0.35"]
   });
+
+  const scrollYProgress = externalProgress || internalProgress;
 
   const parsedParagraphs = React.useMemo(() => {
     let globalIndexCounter = 0;
@@ -655,10 +678,6 @@ function ParallaxCultureCard() {
 
           {/* Parallax Zoom Centered Heading & CTA Block */}
           <motion.div style={{ y: textY, scale: textScale }} className={styles.cultureTextBlock}>
-            <div className={styles.cultureBadge}>
-              <span>✦</span>
-              <span>LIFE AT ANTBOX</span>
-            </div>
             <h2 className={styles.cultureStackedHeading}>
               <span>LIFE AT</span>
               <span className={styles.cultureAccentLine}>ANTBOX.</span>
@@ -776,10 +795,6 @@ function CustomerReviewsSection() {
     >
       {/* Section Header */}
       <div className={styles.reviewsHeader}>
-        <div className={styles.reviewsBadge}>
-          <span>✦</span>
-          <span>STUDENT VOICES</span>
-        </div>
         <h2 className={styles.reviewsTitle}>
           Hear from students at AntBox
         </h2>
@@ -854,12 +869,6 @@ function AboutFooterSection() {
   return (
     <footer className={styles.subtleFooterSection}>
       <div className={styles.footerContainer}>
-        {/* Subtle Badge */}
-        <div className={styles.footerBadge}>
-          <span>✦</span>
-          <span>BUILD WITH US</span>
-        </div>
-
         {/* Heading & Subtitle */}
         <h2 className={styles.footerTitle}>
           Join our team or stay in the loop
@@ -1228,7 +1237,9 @@ export default function About() {
             <h1 className={styles.operatorsTitle}>
               We are operators who have <span className={styles.operatorsHighlight}>vetted, trained, and deployed</span> top talent for B2B companies.
             </h1>
-            <TypingSubtitle text="We take final and pre-final year students, run them through real-world domain teardowns, and deploy them into fast-growing SaaS teams. We bring verified proof of work, owning candidate readiness so they contribute from Day 0." />
+            <p className={styles.operatorsSubtitle}>
+              We take final and pre-final year students, run them through real-world domain teardowns, and deploy them into fast-growing SaaS teams. We bring verified proof of work, owning candidate readiness so they contribute from Day 0.
+            </p>
 
             {/* New Element Below the Hero Text: Vetted, Trained, Deployed Process Flow */}
             <OperatorsProcessPipeline />
