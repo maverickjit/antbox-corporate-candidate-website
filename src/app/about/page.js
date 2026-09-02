@@ -79,34 +79,9 @@ function TypingSubtitle({ text }) {
   );
 }
 
-function BlackQuoteStatementSection() {
-  return (
-    <div
-      className={styles.panelBlackQuote}
-      style={{
-        width: '100vw',
-        left: '50%',
-        marginLeft: '-50vw',
-        minHeight: '100vh',
-        height: '100vh',
-        borderRadius: 0,
-        padding: '2rem',
-        background: '#0A0A0E',
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center',
-        position: 'relative',
-        zIndex: 2
-      }}
-    >
-      <div className={styles.heroQuoteContainer} style={{ width: '100%', maxWidth: '1100px', margin: '0 auto', textAlign: 'center' }}>
-        <MaskedLineRevealStatement />
-      </div>
-    </div>
-  );
-}
 
-function StackedValueCard({ value, index, scrollYProgress, cardSuits, cardTags }) {
+
+function StackedValueCard({ value, index, scrollYProgress, cardTags }) {
   // Dynamic transforms per card: 900px offscreen start + binary opacity gating to prevent overlap
   let y, scale, rotate, opacity;
 
@@ -186,12 +161,6 @@ function StackedValueCard({ value, index, scrollYProgress, cardSuits, cardTags }
       {/* Left Column: Text Content */}
       <div className={styles.arcCardLeft}>
         <div>
-          <div className={styles.arcCardStepRow}>
-            <span className={styles.arcCardSuitIcon}>
-              {cardSuits[index]}
-            </span>
-          </div>
-
           <h3 className={styles.arcCardTitle}>
             {value.title}
           </h3>
@@ -230,7 +199,6 @@ function CompanyValuesCardsSection({ values }) {
     offset: ["start start", "end end"]
   });
 
-  const cardSuits = ['♠', '♥', '♦', '♣', '★'];
   const cardTags = [
     'RADICAL TRANSPARENCY • OPEN CREDIT • NO CLOSED DOORS',
     'FIRST PRINCIPLES • CLARITY FIRST • SIMPLIFY EVERYTHING',
@@ -240,7 +208,11 @@ function CompanyValuesCardsSection({ values }) {
   ];
 
   return (
-    <div ref={containerRef} className={styles.valuesArcSection}>
+    <div
+      ref={containerRef}
+      className={styles.valuesArcSection}
+    >
+      <div className={styles.valuesArcDotGrid} />
       <div className={styles.valuesArcSticky}>
         {/* Section Header */}
         <div className={styles.valuesArcHeader}>
@@ -257,7 +229,6 @@ function CompanyValuesCardsSection({ values }) {
               value={value}
               index={index}
               scrollYProgress={scrollYProgress}
-              cardSuits={cardSuits}
               cardTags={cardTags}
             />
           ))}
@@ -714,94 +685,52 @@ const customerReviewsData = [
   // Column 1
   [
     {
-      name: "Rohan Verma",
-      role: "Software Engineering Intern deployed at FinEdge",
+      name: "Bhumika Sahu",
+      role: "Trainee at AntBox",
+      avatar: "/avatars/avatar3.jpg",
+      tag: "STUDENT SUCCESS",
+      text: "My experience at AntBox has been genuinely enriching, both professionally and personally. Arriving with expectations of the usual corporate pleasantries, I was surprised to find something far more sincere in their place. From the outset, the warmth and authenticity with which colleagues engaged with one another stood out, qualities not always found in a professional setting. Interacting with individuals across a wide range of domains broadened my perspective in ways I had not anticipated."
+    },
+    {
+      name: "Raunit Singh",
+      role: "Deployment Engineer Intern at AntBox",
       avatar: "/avatars/avatar8.jpg",
       tag: "STUDENT TO ENGINEER",
-      text: "AntBox was a game changer for my career. Instead of rote DSA questions, I built production-grade microservices and handled live traffic teardowns. Deployed into FinEdge on Day 0 with zero friction."
-    },
-    {
-      name: "Alexandra Giraldo",
-      role: "Global SDR Manager at Cabify (Hiring Partner)",
-      avatar: "/avatars/avatar1.jpg",
-      tag: "HIRING PARTNER",
-      text: "The interns from AntBox arrived knowing our exact tech stack, CRM workflows, and cadence tools. They required zero ramp-up time and delivered outbound pipeline from their very first week."
-    },
-    {
-      name: "Ananya Sen",
-      role: "Product Design Fellow deployed at Clara",
-      avatar: "/avatars/avatar2.jpg",
-      tag: "DESIGN INTERN",
-      text: "The Glass Kitchen environment at AntBox taught me how real design systems are shipped. When I started my internship at Clara, I was already contributing to production component libraries on Day 1."
-    },
-    {
-      name: "David Vance",
-      role: "CTO at HyperScale Systems (Hiring Partner)",
-      avatar: "/avatars/avatar5.jpg",
-      tag: "HIRING PARTNER",
-      text: "AntBox solved our junior engineering bandwidth bottleneck. We brought in 3 backend interns, and their code velocity and discipline matched mid-level engineers within their first two weeks."
+      text: "My journey at Antbox started as a trainee, where I explored diverse areas across Tech, MarkOps & GTM. This exposure helped me understand different facets of a business while learning to adapt and grow through its highs & lows. The guidance from my mentors at Antbox Academy played a key role in helping me overcome challenges and transition into my current role as a Deployment Engineer Intern."
     }
   ],
   // Column 2
   [
     {
-      name: "Aditya Patel",
-      role: "Full-Stack Intern deployed at Dokutech",
-      avatar: "/avatars/avatar7.jpg",
-      tag: "STUDENT TO OPERATOR",
-      text: "Most college courses don't prepare you for real-world codebases. AntBox gave me the grit to debug legacy systems, write comprehensive tests, and ship clean pull requests with complete confidence."
-    },
-    {
-      name: "José Marques",
-      role: "CMO & Business Lead at Dokutech (Hiring Partner)",
-      avatar: "/avatars/avatar4.jpg",
-      tag: "HIRING PARTNER",
-      text: "AntBox is an incredible talent partner for scaling startups. Every student intern we hosted had verified proof-of-work and a relentless hunger to execute. Truly Day-0 ready."
-    },
-    {
-      name: "Pooja Sundaram",
-      role: "AI/ML Intern deployed at Moneta",
-      avatar: "/avatars/avatar3.jpg",
-      tag: "STUDENT SUCCESS",
-      text: "Building real domain projects under senior operator mentorship gave me practical experience no resume could match. Moneta converted my AntBox internship into a full-time engineering offer!"
-    },
-    {
-      name: "Sofia Chen",
-      role: "Engineering Director at Apex Cloud (Hiring Partner)",
+      name: "Subhashree Patra",
+      role: "Intern at AntBox",
       avatar: "/avatars/avatar1.jpg",
-      tag: "HIRING PARTNER",
-      text: "The transparency and rigor AntBox brings to student vetting is unprecedented. No credentials fluff — just exceptionally well-trained, proactive builders who take full ownership."
+      tag: "INTERN EXPERIENCE",
+      text: "At Antbox, where even as an intern, my opinions are heard and valued. The open culture, especially sessions with our CEO where questions are always welcomed, makes learning feel effortless. I love the energy of Fun Fridays and the balance between giving our best at work and enjoying ourselves together."
+    },
+    {
+      name: "Udayaditya Parbat",
+      role: "Bootcamp Trainee at AntBox",
+      avatar: "/avatars/avatar7.jpg",
+      tag: "BOOTCAMP TRAINEE",
+      text: "It’s been around a month since I started working at Antbox, and honestly, the experience has been really great so far. Right from the beginning, everyone has been really friendly, supportive, and understanding. The boot camp training helped us get started, and the team was always there to guide us, even with small things like our introductions and getting comfortable with everyone."
     }
   ],
   // Column 3
   [
     {
-      name: "Siddharth Nair",
-      role: "Growth Operations Intern deployed at Tidio",
-      avatar: "/avatars/avatar9.jpg",
-      tag: "GROWTH INTERN",
-      text: "The sprint-based training at AntBox pushed me to analyze real data pipelines. During my first month as an intern at Tidio, I optimized 4 automated workflows for the sales team."
+      name: "Bhumika Sahu",
+      role: "Trainee at AntBox",
+      avatar: "/avatars/avatar3.jpg",
+      tag: "STUDENT SUCCESS",
+      text: "My experience at AntBox has been genuinely enriching, both professionally and personally. Arriving with expectations of the usual corporate pleasantries, I was surprised to find something far more sincere in their place. From the outset, the warmth and authenticity with which colleagues engaged with one another stood out, qualities not always found in a professional setting. Interacting with individuals across a wide range of domains broadened my perspective in ways I had not anticipated."
     },
     {
-      name: "Luke Sheehy",
-      role: "GTM Lead at Tidio (Hiring Partner)",
-      avatar: "/avatars/avatar6.jpg",
-      tag: "HIRING PARTNER",
-      text: "AntBox candidates come pre-trained on domain rigor. Our intern generated enterprise pipeline in their second week. We now look to AntBox first for every upcoming student cohort."
-    },
-    {
-      name: "Kavya Iyer",
-      role: "Frontend Engineering Fellow deployed at Twinwin",
-      avatar: "/avatars/avatar2.jpg",
-      tag: "STUDENT TO BUILDER",
-      text: "AntBox taught me how to 'Own The Whole Box'. When our team faced a release deadline, I knew exactly how to trace edge cases and ship the patch under pressure."
-    },
-    {
-      name: "Marcus Thorne",
-      role: "VP of Engineering at FinEdge (Hiring Partner)",
-      avatar: "/avatars/avatar8.jpg",
-      tag: "HIRING PARTNER",
-      text: "AntBox interns treat mission-critical software with real ownership and discipline. It's the most reliable pipeline for high-grit student talent we've ever partnered with."
+      name: "Subhashree Patra",
+      role: "Intern at AntBox",
+      avatar: "/avatars/avatar1.jpg",
+      tag: "INTERN EXPERIENCE",
+      text: "At Antbox, where even as an intern, my opinions are heard and valued. The open culture, especially sessions with our CEO where questions are always welcomed, makes learning feel effortless. I love the energy of Fun Fridays and the balance between giving our best at work and enjoying ourselves together."
     }
   ]
 ];
@@ -849,13 +778,13 @@ function CustomerReviewsSection() {
       <div className={styles.reviewsHeader}>
         <div className={styles.reviewsBadge}>
           <span>✦</span>
-          <span>PROOF OF IMPACT</span>
+          <span>STUDENT VOICES</span>
         </div>
         <h2 className={styles.reviewsTitle}>
-          Hear from our interns & partner companies
+          Hear from students at AntBox
         </h2>
         <p className={styles.reviewsSubtitle}>
-          Real feedback from students deployed into high-impact roles and the engineering leaders who hire them.
+          Real feedback and experiences from students, trainees, and interns growing their careers with us.
         </p>
       </div>
 
@@ -1193,24 +1122,133 @@ export default function About() {
     }
   ];
 
+  function OperatorsProcessPipeline() {
+    const steps = [
+      {
+        step: '01',
+        title: 'Vetted',
+        desc: 'Rigorous domain teardowns & signal extraction to identify high-agency talent.',
+        icon: (
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+            <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
+            <polyline points="9 12 11 14 15 10" />
+          </svg>
+        )
+      },
+      {
+        step: '02',
+        title: 'Trained',
+        desc: 'Hands-on simulation on real-world enterprise SaaS workflows and stacks.',
+        icon: (
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+            <polyline points="16 18 22 12 16 6" />
+            <polyline points="8 6 2 12 8 18" />
+            <line x1="14" y1="4" x2="10" y2="20" />
+          </svg>
+        )
+      },
+      {
+        step: '03',
+        title: 'Deployed',
+        desc: 'Placed directly into fast-paced teams ready to deliver real ROI from Day 0.',
+        icon: (
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+            <path d="M4.5 16.5c-1.5 1.26-2 5-2 5s3.74-.5 5-2c.71-.84.7-2.13-.09-2.91a2.18 2.18 0 0 0-2.91-.09z" />
+            <path d="m12 15-3-3a22 22 0 0 1 2-3.95A12.88 12.88 0 0 1 22 2c0 2.72-.78 7.5-6 11a22.35 22.35 0 0 1-4 2z" />
+            <path d="M9 12H4s.55-3.03 2-4c1.62-1.08 5 0 5 0" />
+            <path d="M12 15v5s3.03-.55 4-2c1.08-1.62 0-5 0-5" />
+          </svg>
+        )
+      }
+    ];
+
+    return (
+      <div className={styles.pipelineContainer}>
+        {steps.map((item, index) => (
+          <React.Fragment key={index}>
+            <motion.div
+              className={styles.pipelineCard}
+              initial={{ opacity: 0, y: 22 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6, delay: 0.2 + index * 0.12 }}
+              whileHover={{ y: -4, transition: { duration: 0.2 } }}
+            >
+              <div className={styles.pipelineCardHeader}>
+                <span className={styles.pipelineStepBadge}>{item.step}</span>
+                <div className={styles.pipelineIconWrap}>{item.icon}</div>
+              </div>
+              <div className={styles.pipelineCardBody}>
+                <h3 className={styles.pipelineTitle}>{item.title}</h3>
+                <p className={styles.pipelineDesc}>{item.desc}</p>
+              </div>
+            </motion.div>
+            {index < steps.length - 1 && (
+              <div className={styles.pipelineConnector}>
+                <span className={styles.pipelineArrow}>→</span>
+              </div>
+            )}
+          </React.Fragment>
+        ))}
+      </div>
+    );
+  }
+
+  function HeroAndStatementSection() {
+    const containerRef = React.useRef(null);
+    const { scrollYProgress } = useScroll({
+      target: containerRef,
+      offset: ["start start", "end end"]
+    });
+
+    // Smooth fluent background color interpolation like Tennr (bgcolortrans.mp4)
+    // Starts cream (#FAF8F5) -> progressively morphs into deep dark (#0A0A0E)
+    const backgroundColor = useTransform(
+      scrollYProgress,
+      [0, 0.32, 0.62, 1],
+      ["#FAF8F5", "#FAF8F5", "#0A0A0E", "#0A0A0E"]
+    );
+
+    const glowOpacity = useTransform(scrollYProgress, [0.12, 0.35], [1, 0]);
+
+    return (
+      <motion.div
+        ref={containerRef}
+        className={styles.heroAndStatementTransitionContainer}
+        style={{
+          backgroundColor,
+        }}
+      >
+        {/* ── Section 1: Operators Hero Section (Rich Immersive Aesthetics) ── */}
+        <div className={styles.operatorsHeroSection}>
+          {/* Soft Ambient Glow Blurs */}
+          <motion.div className={styles.operatorsGlowTopLeft} style={{ opacity: glowOpacity }} />
+          <motion.div className={styles.operatorsGlowBottomRight} style={{ opacity: glowOpacity }} />
+
+          <div className={styles.operatorsHeaderBlock}>
+            <h1 className={styles.operatorsTitle}>
+              We are operators who have <span className={styles.operatorsHighlight}>vetted, trained, and deployed</span> top talent for B2B companies.
+            </h1>
+            <TypingSubtitle text="We take final and pre-final year students, run them through real-world domain teardowns, and deploy them into fast-growing SaaS teams. We bring verified proof of work, owning candidate readiness so they contribute from Day 0." />
+
+            {/* New Element Below the Hero Text: Vetted, Trained, Deployed Process Flow */}
+            <OperatorsProcessPipeline />
+          </div>
+        </div>
+
+        {/* ── Section 2A: Full Screen Statement Section (Smooth continuous dark transition) ── */}
+        <div className={styles.statementSectionWrap}>
+          <div className={styles.heroQuoteContainer}>
+            <MaskedLineRevealStatement />
+          </div>
+        </div>
+      </motion.div>
+    );
+  }
+
   return (
     <main className={styles.main}>
-      {/* ── Section 1: Operators Hero Section (Rich Immersive Aesthetics) ── */}
-      <div className={styles.operatorsHeroSection}>
-        {/* Soft Ambient Glow Blurs */}
-        <div className={styles.operatorsGlowTopLeft} />
-        <div className={styles.operatorsGlowBottomRight} />
-
-        <div className={styles.operatorsHeaderBlock}>
-          <h1 className={styles.operatorsTitle}>
-            We are operators who have <span className={styles.operatorsHighlight}>vetted, trained, and deployed</span> top talent for B2B companies.
-          </h1>
-          <TypingSubtitle text="We take final and pre-final year students, run them through real-world domain teardowns, and deploy them into fast-growing SaaS teams. We bring verified proof of work, owning candidate readiness so they contribute from Day 0." />
-        </div>
-      </div>
-
-      {/* ── Section 2A: Whole Screen Black Statement Section ── */}
-      <BlackQuoteStatementSection />
+      {/* ── Section 1 & 2A: Smooth Scroll Background Interpolation (Light to Dark) ── */}
+      <HeroAndStatementSection />
 
       {/* ── Section 2B: Company Core Values (3D Cards Stack with New 1.mp4 Video Animation) ── */}
       <CompanyValuesCardsSection values={values} />

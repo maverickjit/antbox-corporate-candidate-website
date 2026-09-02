@@ -11,7 +11,7 @@ export function TabProvider({ children }) {
   const [activeTab, setActiveTabState] = useState('corporates');
   const pathname = usePathname();
 
-  // Load persisted tab from URL query param or localStorage on initial mount
+  // On client mount, sync with stored tab or URL param
   useEffect(() => {
     try {
       if (typeof window !== 'undefined') {
@@ -19,7 +19,6 @@ export function TabProvider({ children }) {
         const urlTab = urlParams.get('tab');
         if (urlTab === 'candidates' || urlTab === 'corporates') {
           setActiveTabState(urlTab);
-          localStorage.setItem('antbox_active_tab', urlTab);
           return;
         }
 
@@ -28,9 +27,7 @@ export function TabProvider({ children }) {
           setActiveTabState(savedTab);
         }
       }
-    } catch (e) {
-      // Ignore storage errors in restricted contexts
-    }
+    } catch (e) {}
   }, []);
 
   const setActiveTab = useCallback((tab) => {
@@ -43,16 +40,12 @@ export function TabProvider({ children }) {
           url.searchParams.set('tab', tab);
           window.history.replaceState(null, '', url.toString());
         }
-        // Always reset scroll position to the top of the webpage when toggling tabs
         window.scrollTo({ top: 0, left: 0, behavior: 'instant' });
       }
-    } catch (e) {
-      // Ignore storage errors in restricted contexts
-    }
+    } catch (e) {}
   }, []);
 
   useEffect(() => {
-    // Only apply candidate dark theme class to body on the homepage
     if (pathname === '/' && activeTab === 'candidates') {
       document.body.classList.add('theme-candidate');
     } else {

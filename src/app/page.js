@@ -455,6 +455,419 @@ function WhatWeBringSection() {
   );
 }
 
+// 3. Dedicated Section: "Ready to build your tribes?" matching exact screenshot
+function ReadyToBuildTribesSection() {
+  const sectionRef = useRef(null);
+
+  return (
+    <section
+      ref={sectionRef}
+      style={{
+        position: 'relative',
+        width: '100%',
+        minHeight: '100vh',
+        background: 'var(--black)',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        padding: 'clamp(5rem, 8vw, 8rem) clamp(1.5rem, 5vw, 4.5rem)',
+        overflow: 'hidden',
+        borderTop: '1px solid rgba(255, 255, 255, 0.05)',
+      }}
+    >
+      <div className="w-full max-w-[1360px] mx-auto grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-16 items-center">
+        {/* Left Column: Headlines and 3 feature blocks */}
+        <div className="lg:col-span-6 flex flex-col justify-center">
+          <h2
+            className="heading-serif font-black"
+            style={{
+              color: '#ffffff',
+              fontSize: 'clamp(2.75rem, 5vw, 4.5rem)',
+              lineHeight: 1.05,
+              letterSpacing: '-0.03em',
+              margin: '0 0 1.25rem',
+            }}
+          >
+            Ready to build<br />
+            your <span style={{ fontFamily: 'var(--font-times)', fontStyle: 'italic', fontWeight: 700, color: 'var(--accent-purple)' }}>tribes?</span>
+          </h2>
+          <p
+            style={{
+              color: '#9e9ea6',
+              fontSize: 'clamp(1rem, 1.3vw, 1.15rem)',
+              lineHeight: 1.6,
+              maxWidth: '520px',
+              margin: '0 0 2.5rem',
+              fontWeight: 400,
+            }}
+          >
+            Stop sifting through CVs. Design your own career sprints, discover performance-validated talent, and build a pipeline before roles even open.
+          </p>
+
+          <div className="flex flex-col gap-6">
+            {/* Feature 1 */}
+            <div className="flex items-start gap-4">
+              <div
+                style={{
+                  width: '42px',
+                  height: '42px',
+                  borderRadius: '10px',
+                  background: 'rgba(187, 98, 222, 0.14)',
+                  border: '1px solid rgba(187, 98, 222, 0.25)',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  flexShrink: 0,
+                  color: 'var(--accent-purple)',
+                  fontFamily: 'Poppins, sans-serif',
+                  fontWeight: 800,
+                  fontSize: '0.95rem',
+                  letterSpacing: '-0.02em',
+                }}
+              >
+                01
+              </div>
+              <div>
+                <h4 style={{ color: '#ffffff', fontSize: '1.1rem', fontWeight: 700, margin: '0 0 0.25rem' }}>
+                  Disrupt entry-level hiring
+                </h4>
+                <p style={{ color: '#888890', fontSize: '0.92rem', lineHeight: 1.55, margin: 0 }}>
+                  Replace months of screening with a 2-week sprint that shows you exactly who can do the work.
+                </p>
+              </div>
+            </div>
+
+            {/* Feature 2 */}
+            <div className="flex items-start gap-4">
+              <div
+                style={{
+                  width: '42px',
+                  height: '42px',
+                  borderRadius: '10px',
+                  background: 'rgba(187, 98, 222, 0.14)',
+                  border: '1px solid rgba(187, 98, 222, 0.25)',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  flexShrink: 0,
+                  color: 'var(--accent-purple)',
+                  fontFamily: 'Poppins, sans-serif',
+                  fontWeight: 800,
+                  fontSize: '0.95rem',
+                  letterSpacing: '-0.02em',
+                }}
+              >
+                02
+              </div>
+              <div>
+                <h4 style={{ color: '#ffffff', fontSize: '1.1rem', fontWeight: 700, margin: '0 0 0.25rem' }}>
+                  Build your own tribes
+                </h4>
+                <p style={{ color: '#888890', fontSize: '0.92rem', lineHeight: 1.55, margin: 0 }}>
+                  Create talent communities around your culture, values, and craft, before they’re even on the market.
+                </p>
+              </div>
+            </div>
+
+            {/* Feature 3 */}
+            <div className="flex items-start gap-4">
+              <div
+                style={{
+                  width: '42px',
+                  height: '42px',
+                  borderRadius: '10px',
+                  background: 'rgba(187, 98, 222, 0.14)',
+                  border: '1px solid rgba(187, 98, 222, 0.25)',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  flexShrink: 0,
+                  color: 'var(--accent-purple)',
+                  fontFamily: 'Poppins, sans-serif',
+                  fontWeight: 800,
+                  fontSize: '0.95rem',
+                  letterSpacing: '-0.02em',
+                }}
+              >
+                03
+              </div>
+              <div>
+                <h4 style={{ color: '#ffffff', fontSize: '1.1rem', fontWeight: 700, margin: '0 0 0.25rem' }}>
+                  Access a validated talent pool
+                </h4>
+                <p style={{ color: '#888890', fontSize: '0.92rem', lineHeight: 1.55, margin: 0 }}>
+                  Every candidate comes with an AntBox Readiness Score, sprint history, and verified work output.
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Right Column: Tribe Analytics Engine Card Dashboard */}
+        <div className="lg:col-span-6">
+          <div
+            style={{
+              background: 'linear-gradient(145deg, rgba(22, 22, 28, 0.95) 0%, rgba(12, 12, 16, 0.98) 100%)',
+              border: '1px solid rgba(255, 255, 255, 0.10)',
+              borderRadius: '1.5rem',
+              padding: 'clamp(1.5rem, 3vw, 2.25rem)',
+              boxShadow: '0 25px 60px rgba(0, 0, 0, 0.6), inset 0 1px 0 rgba(255,255,255,0.09)',
+              position: 'relative',
+            }}
+          >
+            {/* Card Header */}
+            <div className="flex items-center justify-between" style={{ marginBottom: '1.25rem' }}>
+              <div className="flex items-center">
+                <span style={{ color: '#ffffff', fontWeight: 700, fontSize: '1.05rem', letterSpacing: '-0.01em' }}>
+                  Tribe Analytics Engine
+                </span>
+              </div>
+              <div className="flex items-center gap-2">
+                <span className="relative flex h-2.5 w-2.5">
+                  <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+                  <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-emerald-500"></span>
+                </span>
+              </div>
+            </div>
+
+            {/* Orbit / Radar Graphic Area with Continuous Planet Revolution */}
+            <div
+              style={{
+                position: 'relative',
+                height: '250px',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                margin: '1rem 0',
+              }}
+            >
+              {/* Outer Orbit Ring with 2 Revolving Nodes */}
+              <motion.div
+                animate={{ rotate: 360 }}
+                transition={{ duration: 24, repeat: Infinity, ease: 'linear' }}
+                style={{
+                  position: 'absolute',
+                  width: '230px',
+                  height: '230px',
+                  borderRadius: '50%',
+                  border: '1px dashed rgba(255, 255, 255, 0.12)',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                }}
+              >
+                {/* Planet 1 on Outer Orbit (Left) */}
+                <div
+                  style={{
+                    position: 'absolute',
+                    left: '-17px',
+                    top: 'calc(50% - 17px)',
+                    width: '34px',
+                    height: '34px',
+                    borderRadius: '50%',
+                    background: 'rgba(26, 26, 32, 0.95)',
+                    border: '1px solid rgba(255, 255, 255, 0.22)',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    color: 'rgba(255,255,255,0.75)',
+                    boxShadow: '0 4px 14px rgba(0,0,0,0.5)',
+                  }}
+                >
+                  <motion.div
+                    animate={{ rotate: -360 }}
+                    transition={{ duration: 24, repeat: Infinity, ease: 'linear' }}
+                    style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}
+                  >
+                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                      <line x1="18" y1="20" x2="18" y2="10"></line>
+                      <line x1="12" y1="20" x2="12" y2="4"></line>
+                      <line x1="6" y1="20" x2="6" y2="14"></line>
+                    </svg>
+                  </motion.div>
+                </div>
+
+                {/* Planet 2 on Outer Orbit (Right) */}
+                <div
+                  style={{
+                    position: 'absolute',
+                    right: '-17px',
+                    top: 'calc(50% - 17px)',
+                    width: '34px',
+                    height: '34px',
+                    borderRadius: '50%',
+                    background: 'rgba(26, 26, 32, 0.95)',
+                    border: '1px solid rgba(255, 255, 255, 0.22)',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    color: 'rgba(255,255,255,0.75)',
+                    boxShadow: '0 4px 14px rgba(0,0,0,0.5)',
+                  }}
+                >
+                  <motion.div
+                    animate={{ rotate: -360 }}
+                    transition={{ duration: 24, repeat: Infinity, ease: 'linear' }}
+                    style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}
+                  >
+                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                      <circle cx="12" cy="12" r="10"></circle>
+                      <line x1="2" y1="12" x2="22" y2="12"></line>
+                      <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path>
+                    </svg>
+                  </motion.div>
+                </div>
+              </motion.div>
+
+              {/* Inner Orbit Ring with 1 Revolving Node */}
+              <motion.div
+                animate={{ rotate: -360 }}
+                transition={{ duration: 16, repeat: Infinity, ease: 'linear' }}
+                style={{
+                  position: 'absolute',
+                  width: '142px',
+                  height: '142px',
+                  borderRadius: '50%',
+                  border: '1px solid rgba(255, 255, 255, 0.09)',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                }}
+              >
+                {/* Planet on Inner Orbit (Top) */}
+                <div
+                  style={{
+                    position: 'absolute',
+                    top: '-17px',
+                    left: 'calc(50% - 17px)',
+                    width: '34px',
+                    height: '34px',
+                    borderRadius: '50%',
+                    background: 'rgba(26, 26, 32, 0.95)',
+                    border: '1px solid rgba(255, 255, 255, 0.22)',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    color: 'rgba(255,255,255,0.75)',
+                    boxShadow: '0 4px 14px rgba(0,0,0,0.5)',
+                  }}
+                >
+                  <motion.div
+                    animate={{ rotate: 360 }}
+                    transition={{ duration: 16, repeat: Infinity, ease: 'linear' }}
+                    style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}
+                  >
+                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                      <rect x="2" y="3" width="20" height="14" rx="2" ry="2"></rect>
+                      <line x1="8" y1="21" x2="16" y2="21"></line>
+                      <line x1="12" y1="17" x2="12" y2="21"></line>
+                    </svg>
+                  </motion.div>
+                </div>
+              </motion.div>
+
+              {/* Center Antbox Core without glow */}
+              <div
+                style={{
+                  width: '78px',
+                  height: '78px',
+                  borderRadius: '50%',
+                  background: 'linear-gradient(135deg, #BB62DE 0%, #8E43AC 100%)',
+                  border: '2px solid rgba(255, 255, 255, 0.25)',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  padding: '16px',
+                  boxShadow: 'none',
+                  zIndex: 2,
+                }}
+              >
+                <img
+                  src="/antbox-favicon.png"
+                  alt="Antbox Core"
+                  style={{
+                    width: '100%',
+                    height: '100%',
+                    objectFit: 'contain',
+                    display: 'block',
+                  }}
+                />
+              </div>
+            </div>
+
+            {/* Bottom 2x2 Metric Cards Grid */}
+            <div className="grid grid-cols-2 gap-3 md:gap-4 mt-4">
+              <div
+                style={{
+                  background: 'rgba(28, 28, 34, 0.8)',
+                  border: '1px solid rgba(255, 255, 255, 0.06)',
+                  borderRadius: '0.85rem',
+                  padding: '1rem 1.15rem',
+                }}
+              >
+                <div style={{ color: '#7a7a85', fontSize: '0.72rem', fontWeight: 700, letterSpacing: '0.06em', textTransform: 'uppercase' }}>
+                  ACTIVE CANDIDATES
+                </div>
+                <div style={{ color: '#ffffff', fontSize: 'clamp(1.5rem, 2.2vw, 1.85rem)', fontWeight: 800, marginTop: '0.35rem', letterSpacing: '-0.02em' }}>
+                  1000+
+                </div>
+              </div>
+
+              <div
+                style={{
+                  background: 'rgba(28, 28, 34, 0.8)',
+                  border: '1px solid rgba(255, 255, 255, 0.06)',
+                  borderRadius: '0.85rem',
+                  padding: '1rem 1.15rem',
+                }}
+              >
+                <div style={{ color: '#7a7a85', fontSize: '0.72rem', fontWeight: 700, letterSpacing: '0.06em', textTransform: 'uppercase' }}>
+                  AVG READINESS
+                </div>
+                <div style={{ color: '#ffffff', fontSize: 'clamp(1.5rem, 2.2vw, 1.85rem)', fontWeight: 800, marginTop: '0.35rem', letterSpacing: '-0.02em' }}>
+                  87%
+                </div>
+              </div>
+
+              <div
+                style={{
+                  background: 'rgba(28, 28, 34, 0.8)',
+                  border: '1px solid rgba(255, 255, 255, 0.06)',
+                  borderRadius: '0.85rem',
+                  padding: '1rem 1.15rem',
+                }}
+              >
+                <div style={{ color: '#7a7a85', fontSize: '0.72rem', fontWeight: 700, letterSpacing: '0.06em', textTransform: 'uppercase' }}>
+                  BOOTCAMPS
+                </div>
+                <div style={{ color: '#ffffff', fontSize: 'clamp(1.5rem, 2.2vw, 1.85rem)', fontWeight: 800, marginTop: '0.35rem', letterSpacing: '-0.02em' }}>
+                  7+
+                </div>
+              </div>
+
+              <div
+                style={{
+                  background: 'rgba(28, 28, 34, 0.8)',
+                  border: '1px solid rgba(255, 255, 255, 0.06)',
+                  borderRadius: '0.85rem',
+                  padding: '1rem 1.15rem',
+                }}
+              >
+                <div style={{ color: '#7a7a85', fontSize: '0.72rem', fontWeight: 700, letterSpacing: '0.06em', textTransform: 'uppercase' }}>
+                  UNIVERSITY PARTNERS
+                </div>
+                <div style={{ color: '#ffffff', fontSize: 'clamp(1.5rem, 2.2vw, 1.85rem)', fontWeight: 800, marginTop: '0.35rem', letterSpacing: '-0.02em' }}>
+                  3
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  );
+}
+
 function CandidateCTA() {
   const sectionRef = useRef(null);
   const { scrollYProgress } = useScroll({
@@ -906,17 +1319,17 @@ function CorporateHeroAndProblems({ scrollProgress }) {
         <div className="flex flex-col items-center justify-center gap-2 md:gap-4 font-black tracking-[-0.03em] uppercase leading-[1.05] text-center w-full relative z-10" style={{ fontFamily: 'Poppins, sans-serif' }}>
           {/* Row 1: WHERE [ROTATING WORD WITH TYPING ANIMATION] */}
           <motion.div
-            style={{ x: leftX, opacity: topOpacity, display: peripheralDisplay }}
-            className="text-[clamp(36px,8vw,120px)] whitespace-nowrap block"
+            style={{ x: leftX, opacity: topOpacity }}
+            className="text-[clamp(36px,8vw,120px)] whitespace-nowrap block pointer-events-none"
           >
             <span style={{ color: 'var(--black)' }}>WHERE </span>
             <span style={{ color: 'var(--black)' }}>{currentText}</span>
           </motion.div>
 
-          {/* Row 2: IS BUILT */}
-          <div className="flex items-center justify-center gap-4 text-[clamp(36px,8vw,120px)] w-full">
+          {/* Row 2: IS BUILT — footprint locked permanently so BUILT never shifts */}
+          <div className="flex items-center justify-center gap-4 text-[clamp(36px,8vw,120px)] w-full pointer-events-none">
             <motion.div
-              style={{ x: isX, opacity: isOpacity, display: peripheralDisplay, pointerEvents: 'none', color: 'var(--black)' }}
+              style={{ x: isX, opacity: isOpacity, pointerEvents: 'none', color: 'var(--black)' }}
               className="uppercase"
             >
               IS
@@ -936,7 +1349,7 @@ function CorporateHeroAndProblems({ scrollProgress }) {
           </div>
 
           {/* Row 3: not found */}
-          <motion.div style={{ x: rightX, opacity: topOpacity, display: peripheralDisplay }}>
+          <motion.div style={{ x: rightX, opacity: topOpacity }} className="pointer-events-none">
             <span
               className="block"
               style={{
@@ -1120,6 +1533,7 @@ function CorporateView({ activeTab, setActiveTab }) {
       >
         <WeBuiltAntboxSection />
         <WhatWeBringSection />
+        <ReadyToBuildTribesSection />
         <CorporateCTA />
       </div>
     </div>
@@ -1128,147 +1542,139 @@ function CorporateView({ activeTab, setActiveTab }) {
 
 function HowItWorksCard({ step, index, totalCards, scrollYProgress }) {
   // Relative position from active focal center (-3 to +3)
-  // When scroll reaches index / (totalCards - 1), relPos is 0 (focal center)
+  // Maps all 4 cards across [0, 0.82] so Step 04 locks in full view before unpinning
   const relPos = useTransform(scrollYProgress, (progress) => {
-    const currentPos = progress * (totalCards - 1);
+    const normalized = Math.min(progress / 0.82, 1.0);
+    const currentPos = normalized * (totalCards - 1);
     return index - currentPos;
   });
 
-  // True circular semi-circle arc math with Radius R = 500px
-  const cardY = useTransform(relPos, (rel) => {
-    const clampedRel = Math.max(-2.8, Math.min(2.8, rel));
-    return `${Math.sin(clampedRel * 0.44) * 500}px`;
+  // Pure parametric semi-circle angle theta in radians
+  const angle = useTransform(relPos, (rel) => {
+    const clamped = Math.max(-2.2, Math.min(2.2, rel));
+    return clamped * 0.48;
   });
 
-  const cardX = useTransform(relPos, (rel) => {
-    const clampedRel = Math.max(-2.8, Math.min(2.8, rel));
-    const offset = 500 * (1 - Math.cos(clampedRel * 0.44));
-    return `${offset}px`;
+  // Circle radius R = 480px
+  const cardY = useTransform(angle, (th) => {
+    const R = 480;
+    return `${Math.sin(th) * R}px`;
   });
 
-  // Tangent rotation along the semi-circle wheel curve around its attachment point
-  const cardRotate = useTransform(relPos, (rel) => {
-    const clampedRel = Math.max(-2.8, Math.min(2.8, rel));
-    return clampedRel * 24;
+  // Circle x offset = R * (1 - cos(theta)) — perfectly arcs outward to right
+  const cardX = useTransform(angle, (th) => {
+    const R = 480;
+    return `${(1 - Math.cos(th)) * R}px`;
   });
 
-  // Scale: 1.02 at focal center, smooth taper outward
+  // Smooth tangent angle along the circle arc
+  const cardRotate = useTransform(angle, (th) => {
+    return ((th * 180) / Math.PI) * 0.6;
+  });
+
   const cardScale = useTransform(relPos, (rel) => {
     const dist = Math.abs(rel);
-    return Math.max(0.76, 1.02 - dist * 0.12);
+    return Math.max(0.82, 1.05 - dist * 0.15);
   });
 
-  // Active card is crystal clear, all other cards remain softly blurred
-  const cardBlur = useTransform(relPos, (rel) => {
-    const dist = Math.abs(rel);
-    if (dist <= 0.35) return 0;
-    return Math.min(8, (dist - 0.35) * 5.5);
-  });
-  const cardFilter = useMotionTemplate`blur(${cardBlur}px)`;
-
-  // Opacity: 1 at focal center, above & below cards remain clearly visible on the semi-circle
+  // Smooth opacity curve: 1 at focal center, fading cleanly to 0 at extremes
   const cardOpacity = useTransform(relPos, (rel) => {
     const dist = Math.abs(rel);
-    if (dist <= 0.4) return 1;
-    if (dist >= 2.4) return 0;
-    return Math.max(0.3, 1 - (dist - 0.4) * 0.35);
+    if (dist <= 0.35) return 1;
+    if (dist >= 1.4) return 0;
+    return Math.max(0, 1 - (dist - 0.35) * 0.95);
   });
 
   const zIndex = useTransform(relPos, (rel) => {
     return Math.round(50 - Math.abs(rel) * 10);
   });
 
-  // Point scale on axis line
   const pointScale = useTransform(relPos, (rel) => {
     const dist = Math.abs(rel);
-    return dist <= 0.35 ? 1.35 : 0.9;
+    return dist <= 0.35 ? 1.35 : 0.85;
   });
 
   return (
     <motion.div
       style={{
         position: 'absolute',
-        width: 'min(450px, 88%)',
-        right: 'clamp(2rem, 4.5vw, 4rem)',
+        width: 'min(520px, 90%)',
+        right: 'clamp(0.5rem, 2.5vw, 3rem)',
         borderRadius: '26px',
-        overflow: 'visible',
         x: cardX,
         y: cardY,
         rotate: cardRotate,
         opacity: cardOpacity,
-        filter: cardFilter,
         scale: cardScale,
         zIndex: zIndex,
         transformOrigin: 'left center',
+        pointerEvents: 'none',
       }}
     >
-      {/* Point attached to card riding directly on the curved axis line */}
+      {/* Point attached to card - clean, zero shadow */}
       <motion.div
         style={{
           position: 'absolute',
-          left: '-10px',
+          left: '-11px',
           top: '50%',
           transform: 'translateY(-50%)',
           width: '18px',
           height: '18px',
           borderRadius: '50%',
           background: 'var(--accent-purple)',
-          border: '3px solid #F7F5EE',
-          boxShadow: '0 0 14px rgba(187, 98, 222, 0.95)',
+          border: '3.5px solid #F7F5EE',
+          boxShadow: 'none',
           scale: pointScale,
           zIndex: 10,
         }}
       />
 
-      {/* Card body */}
+      {/* Dominant Large Card Body - NO SHADOW */}
       <div
         style={{
           borderRadius: '26px',
           overflow: 'hidden',
-          boxShadow: '0 30px 70px rgba(0,0,0,0.5)',
-          border: '1px solid rgba(187, 98, 222, 0.35)',
+          boxShadow: 'none',
+          border: '1.5px solid rgba(187, 98, 222, 0.45)',
           background: '#240a2f',
+          pointerEvents: 'auto',
         }}
       >
-        {/* Big gap statement area — solid brand purple, completely opaque */}
         <div style={{
-          minHeight: '230px',
+          minHeight: '200px',
           background: '#240a2f',
           display: 'flex',
           flexDirection: 'column',
           alignItems: 'flex-start',
           justifyContent: 'center',
-          padding: '2.25rem 2.25rem',
+          padding: '2.1rem 2.4rem',
           position: 'relative',
         }}>
-          {/* Step indicator tag on card */}
-          <div style={{ display: 'flex', alignItems: 'center', gap: '0.65rem', marginBottom: '0.9rem' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', marginBottom: '0.9rem' }}>
             <span style={{
               fontFamily: 'Poppins, sans-serif',
-              fontSize: '1rem',
-              fontWeight: 800,
+              fontSize: '1.1rem',
+              fontWeight: 900,
               color: 'var(--accent-purple)',
-              letterSpacing: '1px',
+              letterSpacing: '1.2px',
             }}>{step.label}</span>
-            <span style={{ width: '22px', height: '1.5px', background: 'rgba(187, 98, 222, 0.5)' }}></span>
+            <span style={{ width: '26px', height: '2px', background: 'rgba(187, 98, 222, 0.6)' }}></span>
           </div>
 
-          {/* The GAP text — big and bold */}
           <p style={{
             fontFamily: 'Poppins, sans-serif',
-            fontWeight: 700,
-            fontSize: 'clamp(1.15rem, 1.9vw, 1.4rem)',
+            fontWeight: 800,
+            fontSize: 'clamp(1.2rem, 1.9vw, 1.5rem)',
             color: '#ffffff',
-            lineHeight: 1.45,
+            lineHeight: 1.42,
             margin: 0,
-            maxWidth: '420px',
+            maxWidth: '440px',
           }}>{step.gap}</p>
         </div>
 
-        {/* Footer bar — THE GAP badge */}
         <div style={{
           background: '#180620',
-          padding: '1rem 2.25rem',
+          padding: '0.9rem 2.4rem',
           borderTop: '2px solid var(--accent-purple)',
           display: 'flex',
           alignItems: 'center',
@@ -1277,11 +1683,11 @@ function HowItWorksCard({ step, index, totalCards, scrollYProgress }) {
             display: 'inline-block',
             background: 'var(--accent-purple)',
             color: '#ffffff',
-            padding: '0.35rem 1.15rem',
+            padding: '0.35rem 1.2rem',
             borderRadius: '50px',
-            fontSize: '0.72rem',
+            fontSize: '0.78rem',
             fontWeight: 900,
-            letterSpacing: '1.5px',
+            letterSpacing: '1.8px',
             textTransform: 'uppercase',
             flexShrink: 0,
           }}>THE GAP</span>
@@ -1304,7 +1710,6 @@ function CandidateHowItWorks() {
       gap: 'Getting rejected by automated resume scanners without getting a chance to show real skills.',
       solution: 'Discover Your Career Pathway Early',
       body: 'Participate in AntBox campus roadshows and hands-on workshops. Identify your core strengths and learn market-relevant tools long before placement season opens.',
-      color: '#2b0c37',
       accent: '#BB62DE'
     },
     {
@@ -1312,7 +1717,6 @@ function CandidateHowItWorks() {
       gap: 'Zero real-world project exposure before your first full-time role.',
       solution: 'Build Proof of Work, Not Just Resumes',
       body: 'Work on real-world micro-internships with actual corporate briefs. Show hiring managers proof of what you can build, rather than just listing skills on paper.',
-      color: '#1a0826',
       accent: '#e093ff'
     },
     {
@@ -1320,7 +1724,6 @@ function CandidateHowItWorks() {
       gap: 'Waiting months during placement season with endless interview rounds and uncertainty.',
       solution: 'Skip the Resume Queue',
       body: 'Top companies evaluate your live performance on micro-projects instead of filtering you out with generic criteria.',
-      color: '#0f0518',
       accent: '#BB62DE'
     },
     {
@@ -1328,20 +1731,21 @@ function CandidateHowItWorks() {
       gap: 'Unsure how to bridge the gap between classroom theory and industry expectations.',
       solution: 'Fast-Track Offers & Zero Retraining',
       body: 'Land job offers faster with complete confidence. Step into your role on Day 1 ready to deliver, without the fear of revoked offers or post-hiring lag.',
-      color: '#200840',
       accent: '#d580ff'
     },
   ];
 
-  // For each card, determine which step it maps to (0-1 range per card)
   const totalCards = steps.length;
-
-  // Active step driven by scroll
   const [activeStep, setActiveStep] = useState(0);
+
   useEffect(() => {
     return scrollYProgress.on('change', (latest) => {
-      const idx = Math.min(Math.round(latest * (totalCards - 1)), totalCards - 1);
-      setActiveStep(idx);
+      const normalized = Math.min(latest / 0.82, 1.0);
+      const focalIdx = Math.min(
+        Math.max(0, Math.round(normalized * (totalCards - 1))),
+        totalCards - 1
+      );
+      setActiveStep(focalIdx);
     });
   }, [scrollYProgress, totalCards]);
 
@@ -1350,36 +1754,40 @@ function CandidateHowItWorks() {
       ref={sectionRef}
       style={{
         position: 'relative',
-        height: '155vh',
+        height: '350vh',
         background: '#F7F5EE',
+        overflow: 'visible',
       }}
     >
-      {/* Sticky wrapper — fills viewport */}
+      {/* Sticky wrapper — stays locked, stationary and pinned for the entire duration of all 4 card animations */}
       <div style={{
         position: 'sticky',
         top: 0,
         height: '100vh',
         display: 'flex',
-        overflow: 'hidden',
+        alignItems: 'center',
+        overflow: 'visible',
+        padding: '5.5rem clamp(2.5rem, 5.5vw, 6.5rem) 2rem',
       }}>
-        {/* LEFT — Title pushed down from navbar, expanded left section */}
+        {/* LEFT — Section Title at Top & Active Solution in Center */}
         <div style={{
-          flex: '0 0 58%',
+          flex: '0 0 48%',
           position: 'relative',
           display: 'flex',
           flexDirection: 'column',
-          justifyContent: 'center',
-          padding: 'clamp(2.5rem, 6vw, 7.5rem)',
+          justifyContent: 'space-between',
+          height: '75vh',
           zIndex: 2,
+          paddingRight: '2rem',
         }}>
-          {/* Top Title: HOW IT WORKS — enlarged and clear of navbar */}
-          <div style={{ position: 'absolute', top: 'clamp(5rem, 10vh, 7.5rem)', left: 'clamp(2.5rem, 6vw, 7.5rem)' }}>
+          {/* Top Section Header — shifted upwards to anchor the section */}
+          <div style={{ paddingTop: '0.5rem' }}>
             <h2 style={{
               fontFamily: 'Poppins, sans-serif',
-              fontSize: 'clamp(3.8rem, 6.8vw, 6.2rem)',
+              fontSize: 'clamp(3.5rem, 5.8vw, 5.2rem)',
               fontWeight: 900,
-              letterSpacing: '-0.05em',
-              lineHeight: 0.9,
+              letterSpacing: '-0.04em',
+              lineHeight: 0.92,
               color: 'var(--black)',
               margin: 0,
               textTransform: 'uppercase',
@@ -1388,8 +1796,8 @@ function CandidateHowItWorks() {
             </h2>
           </div>
 
-          {/* Active Solution Container — enlarged and filling the space */}
-          <div style={{ width: '100%', maxWidth: '750px', marginTop: '6rem' }}>
+          {/* Center Active Solution Container */}
+          <div style={{ width: '100%', maxWidth: '620px', margin: 'auto 0' }}>
             <AnimatePresence mode="wait">
               <motion.div
                 key={activeStep}
@@ -1399,12 +1807,12 @@ function CandidateHowItWorks() {
                 transition={{ duration: 0.35, ease: [0.22, 1, 0.36, 1] }}
                 style={{ width: '100%' }}
               >
-                {/* Heading with side vertical accent bar */}
-                <div style={{ display: 'flex', alignItems: 'center', gap: '1.35rem', marginBottom: '1.5rem' }}>
+                {/* Heading with prominent vertical accent bar */}
+                <div style={{ display: 'flex', alignItems: 'center', gap: '1.35rem', marginBottom: '1.4rem' }}>
                   <div
                     style={{
                       width: '6px',
-                      height: 'clamp(2.6rem, 4vw, 3.6rem)',
+                      height: 'clamp(2.5rem, 4vw, 3.6rem)',
                       borderRadius: '999px',
                       background: steps[activeStep].accent || 'var(--accent-purple)',
                       flexShrink: 0,
@@ -1412,7 +1820,7 @@ function CandidateHowItWorks() {
                   />
                   <h3 style={{
                     fontFamily: 'Poppins, sans-serif',
-                    fontSize: 'clamp(2.1rem, 3.6vw, 3.2rem)',
+                    fontSize: 'clamp(2.2rem, 3.4vw, 3.1rem)',
                     fontWeight: 800,
                     color: 'var(--black)',
                     lineHeight: 1.15,
@@ -1424,7 +1832,7 @@ function CandidateHowItWorks() {
                 {/* Description body underneath */}
                 <p style={{
                   fontFamily: 'Century Gothic, sans-serif',
-                  fontSize: 'clamp(1.2rem, 1.8vw, 1.55rem)',
+                  fontSize: 'clamp(1.2rem, 1.7vw, 1.5rem)',
                   color: '#383838',
                   lineHeight: 1.62,
                   paddingLeft: '1.75rem',
@@ -1436,10 +1844,11 @@ function CandidateHowItWorks() {
           </div>
         </div>
 
-        {/* RIGHT — animated cards matching semi-circle structure */}
+        {/* RIGHT — Animated Cards moving on pure semi-circle arc with NO shadow */}
         <div style={{
-          flex: '0 0 42%',
+          flex: '0 0 52%',
           position: 'relative',
+          height: '100vh',
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'flex-end',
@@ -1466,8 +1875,8 @@ function CandidateStorySection() {
       className="w-full relative z-10"
       style={{
         background: '#F7F5EE',
-        padding: 'clamp(5rem, 8vw, 7.5rem) clamp(1.5rem, 5vw, 6.5rem)',
-        borderTop: '1px solid rgba(0,0,0,0.06)',
+        padding: 'clamp(2rem, 4vw, 4.5rem) clamp(1.5rem, 5vw, 6.5rem)',
+        borderTop: 'none',
       }}
     >
       <div className="max-w-[1600px] w-full mx-auto grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-16 items-center">
@@ -1566,16 +1975,6 @@ function CandidateStorySection() {
                   />
                 </div>
               </div>
-            </div>
-
-            {/* Tags Row */}
-            <div className="flex flex-wrap items-center gap-2.5 pt-1">
-              <span className="px-3.5 py-1.5 rounded-full text-xs font-semibold bg-[#f6effb] text-[var(--accent-purple)]" style={{ fontFamily: 'Poppins, sans-serif' }}>
-                Product Design Sprint
-              </span>
-              <span className="px-3.5 py-1.5 rounded-full text-xs font-medium bg-[#ece7dc] text-neutral-700" style={{ fontFamily: 'Century Gothic, sans-serif' }}>
-                Fintech · 2 weeks
-              </span>
             </div>
 
             {/* Bottom Left Floating Badge */}
@@ -2045,8 +2444,10 @@ function CandidateView() {
         <CompanyMarqueeSection />
 
         <CandidateHowItWorks />
-        <CandidateStorySection />
-        <CandidateCTA />
+        <div style={{ position: 'relative', zIndex: 10, background: '#F7F5EE' }}>
+          <CandidateStorySection />
+          <CandidateCTA />
+        </div>
       </div>
     </div>
   );
@@ -2054,35 +2455,70 @@ function CandidateView() {
 
 export default function Home() {
   const { activeTab } = useTab();
+  const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
-    // Always start at top of the webpage when switching between Corporates and Candidates
-    window.scrollTo({ top: 0, left: 0, behavior: 'instant' });
-  }, [activeTab]);
+    setMounted(true);
+  }, []);
+
+  useEffect(() => {
+    if (mounted) {
+      window.scrollTo({ top: 0, left: 0, behavior: 'instant' });
+    }
+  }, [activeTab, mounted]);
+
+  const currentTab = mounted ? activeTab : 'corporates';
 
   return (
-    <AnimatePresence mode="wait">
-      {activeTab === 'corporates' ? (
-        <motion.div
-          key="corporate"
-          initial={{ opacity: 0, y: 12 }}
-          animate={{ opacity: 1, y: 0 }}
-          exit={{ opacity: 0, y: -12 }}
-          transition={{ duration: 0.28, ease: 'easeInOut' }}
-        >
-          <CorporateView />
-        </motion.div>
-      ) : (
-        <motion.div
-          key="candidate"
-          initial={{ opacity: 0, y: 12 }}
-          animate={{ opacity: 1, y: 0 }}
-          exit={{ opacity: 0, y: -12 }}
-          transition={{ duration: 0.28, ease: 'easeInOut' }}
-        >
-          <CandidateView />
-        </motion.div>
-      )}
-    </AnimatePresence>
+    <div
+      style={{
+        position: 'relative',
+        width: '100%',
+        minHeight: '100vh',
+        overflowX: 'clip',
+        background: currentTab === 'corporates' ? '#F7F5EE' : 'var(--black)',
+        transition: 'background 0.45s ease',
+      }}
+    >
+      <AnimatePresence mode="popLayout" initial={false}>
+        {currentTab === 'corporates' ? (
+          <motion.div
+            key="corporate"
+            initial={false}
+            animate={{ opacity: 1, scale: 1, borderRadius: '0px' }}
+            exit={{ opacity: 0, scale: 0.92, borderRadius: '28px' }}
+            transition={{
+              duration: 0.48,
+              ease: [0.22, 1, 0.36, 1],
+            }}
+            style={{
+              width: '100%',
+              transformOrigin: '50% 25vh',
+              overflow: 'visible',
+            }}
+          >
+            <CorporateView />
+          </motion.div>
+        ) : (
+          <motion.div
+            key="candidate"
+            initial={false}
+            animate={{ opacity: 1, scale: 1, borderRadius: '0px' }}
+            exit={{ opacity: 0, scale: 0.92, borderRadius: '28px' }}
+            transition={{
+              duration: 0.48,
+              ease: [0.22, 1, 0.36, 1],
+            }}
+            style={{
+              width: '100%',
+              transformOrigin: '50% 25vh',
+              overflow: 'visible',
+            }}
+          >
+            <CandidateView />
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </div>
   );
 }

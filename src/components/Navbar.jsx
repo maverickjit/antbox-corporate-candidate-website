@@ -162,7 +162,7 @@ export default function Navbar() {
                   bottom: '3px',
                   background: 'linear-gradient(135deg, #c069e4 0%, #8e43ac 100%)',
                   borderRadius: '9999px',
-                  transition: 'left 0.28s cubic-bezier(0.4, 0, 0.2, 1), width 0.28s cubic-bezier(0.4, 0, 0.2, 1)',
+                  transition: 'left 0.38s cubic-bezier(0.22, 1, 0.36, 1), width 0.38s cubic-bezier(0.22, 1, 0.36, 1)',
                   boxShadow: '0 2px 10px rgba(192, 105, 228, 0.5), inset 0 1px 0 rgba(255,255,255,0.3)',
                 }}
               />
